@@ -51,7 +51,7 @@ function OpSys {
     elseif ($WinVer -Match 'Microsoft Windows 10') {
         
         Write-Host "$WinVer"
-        
+
     }
 
     elseif ($WinVer -Match 'Microsoft Windows 8.1') {
@@ -123,14 +123,14 @@ ______________________________________________________
             EnvTool
             ToolDir           
 
-            Start-Process PowerShell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function RemoveMStoreApps, PerfilTheme).Definition
                 ))
             )
 
-            Start-Process PowerShell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function DownloadMztool, <#DriverBooster,#> NetFx3, Office2007).Definition
@@ -138,7 +138,7 @@ ______________________________________________________
             )
 
 
-            Start-Process PowerShell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WingetModule, WingetInstall).Definition
@@ -153,7 +153,7 @@ ______________________________________________________
 
             WingetUpdate
 
-            Start-Process PowerShell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WinUpdateModule, WinUpdate).Definition
@@ -386,7 +386,7 @@ ______________________________________________________
 
                         Hora
                         
-                        Start-Process PowerShell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+                        Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
                               (Get-Command -Type Function WingetUpdate, WinUpdate).Definition
@@ -696,7 +696,7 @@ function DownloadMztool {
 function EnvTool {
     
     #Adicionar variáveis de ambiente.
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
         [Environment]::SetEnvironmentVariable('MZBETA', 'PowerShell irm https://seulink.net/MZTBETA | iex', 'MACHINE')
@@ -850,7 +850,7 @@ function WingetUpdate {
 
     #WINGET - Atualização de pacotes de softwares instalados.
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -865,7 +865,7 @@ function WinUpdate {
 
     #Instalação de novas atualizações do Windows através do Windows Update.
     
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -884,7 +884,7 @@ function AnyDesk {
 
     #Download do software AnyDek-CM.
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
         
         Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$home\Desktop\AnyDesk.exe"
                    
@@ -973,7 +973,7 @@ function NetFx3 {
 function DriverBooster {
     #Extração e inicialização do software Driver Booster.
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1031,7 +1031,7 @@ function DriverBooster {
 
 function RemoveMStoreApps {
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEMSTOREAPPS'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -2082,7 +2082,7 @@ function DelTemp {
 }
 
 function awin {
-    Start-Process PowerShell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
+    Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
 
 DisplayMenu 
