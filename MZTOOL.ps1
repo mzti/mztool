@@ -898,21 +898,23 @@ function Office365 {
 
     #Cria o arquivo XML de isntalação personalizada no diretório C:\TOOL\OFFICE\365.
     [xml]$XML = @'
-<Configuration ID="646616bb-84c9-4354-9908-8abd74c04f4c">
-  <Add OfficeClientEdition="64" Channel="Current" MigrateArch="TRUE">
+<Configuration ID="2f14748e-0e70-4b84-9728-0404c2f268b3">
+  <Add OfficeClientEdition="64" Channel="Current">
     <Product ID="O365ProPlusEEANoTeamsRetail">
       <Language ID="pt-br" />
-      <Language ID="MatchPreviousMSI" />
+      <ExcludeApp ID="Access" />
       <ExcludeApp ID="Groove" />
       <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="OneNote" />
+      <ExcludeApp ID="Publisher" />
+      <ExcludeApp ID="Bing" />
     </Product>
   </Add>
   <Updates Enabled="TRUE" />
-  <RemoveMSI />
   <AppSettings>
-    <User Key="software\microsoft\office\16.0\excel\options" Name="defaultformat" Value="60" Type="REG_DWORD" App="excel16" Id="L_SaveExcelfilesas" />
-    <User Key="software\microsoft\office\16.0\powerpoint\options" Name="defaultformat" Value="52" Type="REG_DWORD" App="ppt16" Id="L_SavePowerPointfilesas" />
-    <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="ODT" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
+    <User Key="software\microsoft\office\16.0\excel\options" Name="defaultformat" Value="51" Type="REG_DWORD" App="excel16" Id="L_SaveExcelfilesas" />
+    <User Key="software\microsoft\office\16.0\powerpoint\options" Name="defaultformat" Value="27" Type="REG_DWORD" App="ppt16" Id="L_SavePowerPointfilesas" />
+    <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
     <User Key="software\microsoft\office\16.0\word\options" Name="verticalruler" Value="1" Type="REG_DWORD" App="word16" Id="L_VerticalrulerPrintviewonly" />
   </AppSettings>
   <Display Level="Full" AcceptEULA="TRUE" />
