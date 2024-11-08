@@ -830,15 +830,15 @@ function WingetInstall {
 
         WaitOffice2007Winget
         
-        Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements
+        Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
         WaitOffice2007Winget
          
-        Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements 
+        Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
         WaitOffice2007Winget
         
-        Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements
+        Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
         Clear-Host
             
@@ -886,8 +886,19 @@ function AnyDesk {
     #Download do software AnyDek-CM.
 
     Start-Process PowerShell {
+
+        if (Test-Path -Path "$home\OneDrive\Desktop") {
         
-        Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$home\Desktop\AnyDesk.exe"
+            $DESKTOP = "$home\OneDrive\Desktop"
+        }
+    
+        else {
+       
+            $DESKTOP = "$home\Desktop"
+
+        }
+        
+        Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"
                    
     }
 }
@@ -939,7 +950,7 @@ function Office365 {
    
     $365XML = "$TOOL\OFFICE\365\OFFICE365.xml"
 
-    Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements
+    Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
     
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
 
