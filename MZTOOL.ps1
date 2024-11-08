@@ -929,7 +929,7 @@ function Office365 {
     <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
     <User Key="software\microsoft\office\16.0\word\options" Name="verticalruler" Value="1" Type="REG_DWORD" App="word16" Id="L_VerticalrulerPrintviewonly" />
   </AppSettings>
-  <Display Level="None" AcceptEULA="TRUE" />
+  <Display Level="TRUE" AcceptEULA="TRUE" />
 </Configuration> 
 '@
 
@@ -1266,7 +1266,7 @@ function PinIcons {
         }
         $registry.Dispose()
     }
-    
+
     Remove-Item $provisioning -Force -Recurse
 
     #Remover ícone do Microsoft CoPilot da barra de tarefas.
