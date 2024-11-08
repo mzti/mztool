@@ -1223,8 +1223,8 @@ function PinIcons {
         <taskbar:DesktopApp DesktopApplicationID="Microsoft.Windows.Explorer" />
         <taskbar:DesktopApp DesktopApplicationID="Chrome" />
         <taskbar:DesktopApp DesktopApplicationID="{6D809377-6AF0-444B-8957-A3773F02200E}\Adobe\Acrobat DC\Acrobat\Acrobat.exe" />
-        <taskbar:DesktopApp DesktopApplicationID="{6D809377-6AF0-444b-8957-A3773F02200E}\Microsoft Office\root\Office16\WINWORD.EXE" />
-        <taskbar:DesktopApp DesktopApplicationID="{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Microsoft Office\Office12\WINWORD.EXE" />        
+        <taskbar:DesktopApp DesktopApplicationID="C:\Program Files\Microsoft Office\root\Office16\WINWORD.exe" />
+        <taskbar:DesktopApp DesktopApplicationID="{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Microsoft Office\Office12\WINWORD.exe" />        
       </taskbar:TaskbarPinList>
     </defaultlayout:TaskbarLayout>
  </CustomTaskbarLayoutCollection>
