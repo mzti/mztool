@@ -899,7 +899,7 @@ function Office365 {
 
     #Cria o arquivo XML de isntalação personalizada no diretório C:\TOOL\OFFICE\365.
     [xml]$XML = @'
-<Configuration ID="2f14748e-0e70-4b84-9728-0404c2f268b3">
+<Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
   <Add OfficeClientEdition="64" Channel="Current">
     <Product ID="O365ProPlusEEANoTeamsRetail">
       <Language ID="pt-br" />
@@ -918,7 +918,7 @@ function Office365 {
     <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
     <User Key="software\microsoft\office\16.0\word\options" Name="verticalruler" Value="1" Type="REG_DWORD" App="word16" Id="L_VerticalrulerPrintviewonly" />
   </AppSettings>
-  <Display Level="Full" AcceptEULA="TRUE" />
+  <Display Level="None" AcceptEULA="TRUE" />
 </Configuration> 
 '@
 
@@ -946,16 +946,22 @@ function Office365 {
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
 
     if (Test-Path -Path "$home\OneDrive\Desktop") {
+        
         $DESKTOP = "$home\OneDrive\Desktop"
     }
     
     else {
+       
         $DESKTOP = "$home\Desktop"
+        
     }
 
     Copy-Item "$365LNK\Word.lnk" "$DESKTOP"
     Copy-Item "$365LNK\Excel.lnk" "$DESKTOP"
     Copy-Item "$365LNK\PowerPoint.lnk" "$DESKTOP"
+    
+    Remove-Item $365 -Force -Recurse
+
     
     Clear-Host
 }
