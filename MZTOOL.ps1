@@ -934,9 +934,7 @@ function Office365 {
     }
 
     [System.IO.Directory]::CreateDirectory($365) | Out-Null
-    $TOOLFOLDER = Get-Item $TOOL -ErrorAction SilentlyContinue
-    $TOOLFOLDER.Attributes = 'Hidden'
-    
+        
     $XML.save("$TOOL\OFFICE\365\OFFICE365.xml") 
    
     $365XML = "$TOOL\OFFICE\365\OFFICE365.xml"
@@ -953,7 +951,7 @@ function Office365 {
     else {
        
         $DESKTOP = "$home\Desktop"
-        
+
     }
 
     Copy-Item "$365LNK\Word.lnk" "$DESKTOP"
