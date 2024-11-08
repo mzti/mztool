@@ -133,7 +133,7 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function DownloadMztool, <#DriverBooster,#> NetFx3, Office2007).Definition
+                    (Get-Command -Type Function DownloadMztool, <#DriverBooster, NetFx3, Office2007,#>Office365 ).Definition
                 ))
             )
 
@@ -940,6 +940,20 @@ function Office365 {
 
     Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements
     
+    $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+
+    if (Test-Path -Path "$home\OneDrive\Desktop") {
+        $DESKTOP = "$home\OneDrive\Desktop"
+    }
+    
+    else {
+        $DESKTOP = "$home\Desktop"
+    }
+
+    Copy-Item "$365LNK\Word.lnk" "$DESKTOP"
+    Copy-Item "$365LNK\Excel.lnk" "$DESKTOP"
+    Copy-Item "$365LNK\PowerPoint.lnk" "$DESKTOP"
+    
     Clear-Host
 }
     
@@ -1191,7 +1205,8 @@ function PinIcons {
         <taskbar:DesktopApp DesktopApplicationID="Microsoft.Windows.Explorer" />
         <taskbar:DesktopApp DesktopApplicationID="Chrome" />
         <taskbar:DesktopApp DesktopApplicationID="{6D809377-6AF0-444B-8957-A3773F02200E}\Adobe\Acrobat DC\Acrobat\Acrobat.exe" />
-        <taskbar:DesktopApp DesktopApplicationID="{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Microsoft Office\Office12\WINWORD.EXE" />
+        <taskbar:DesktopApp DesktopApplicationID="{6D809377-6AF0-444b-8957-A3773F02200E}\Microsoft Office\root\Office16\WINWORD.EXE" />
+        <taskbar:DesktopApp DesktopApplicationID="{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Microsoft Office\Office12\WINWORD.EXE" />        
       </taskbar:TaskbarPinList>
     </defaultlayout:TaskbarLayout>
  </CustomTaskbarLayoutCollection>
