@@ -1267,6 +1267,8 @@ function PinIcons {
         $registry.Dispose()
     }
     
+    Remove-Item $provisioning -Force -Recurse
+
     #Remover ícone do Microsoft CoPilot da barra de tarefas.
     $settings = [PSCustomObject]@{
         Path  = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
