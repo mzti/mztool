@@ -126,14 +126,14 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function RemoveMStoreApps, PerfilTheme).Definition
+                    (Get-Command -Type Function RemoveMStoreApps, PerfilTheme, Office365).Definition
                 ))
             )
 
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function DownloadMztool, <#DriverBooster, NetFx3, Office2007,#>Office365 ).Definition
+                    (Get-Command -Type Function DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
                 ))
             )
 
@@ -875,7 +875,7 @@ function WinUpdate {
 
         Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
         
-        Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
+        #Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
 
         Clear-Host
     }  
