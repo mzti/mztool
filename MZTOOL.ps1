@@ -622,12 +622,13 @@ ______________________________________________________
 function Hora {
     
     Start-Process PowerShell -WindowStyle Hidden {
-    
+        w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
         net start w32time 
         w32tm /resync /force
    
     }
 }
+
 
 function ToolDir {
 
@@ -2119,6 +2120,8 @@ function DelTemp {
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
+
+Hora
 
 DisplayMenu 
 
