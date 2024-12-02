@@ -605,6 +605,10 @@ ______________________________________________________
         h {
             Hora #Testar Hora/Data
         }
+
+        sfc {
+            ImgHealth
+        }
         
         default {
             #ENTRADA INVÁLIDA.
@@ -2115,6 +2119,15 @@ function DelTemp {
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
     Start-Sleep 1     
+}
+
+function ImgHealth {
+
+    SFC /SCANNOW
+    DISM /Cleanup-Image
+    DISM /Online /Cleanup-Image /CheckHealth
+    DISM /Online /Cleanup-Image /RestoreHealth
+
 }
 
 function awin {
