@@ -607,7 +607,7 @@ ______________________________________________________
         }
 
         sfc {
-            ImgHealth
+            ImgHealth #SFC /SCANNOW + DISM /Cleanup-Image
         }
         
         default {
