@@ -2130,6 +2130,14 @@ function ImgHealth {
 
 }
 
+function Pro {
+
+    slmgr /upk
+    slmgr /ipk VK7JG-NPHTM-C97JM-9MPGT-3V66T
+    slmgr /ato
+    slmgr /xpr
+}
+
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
