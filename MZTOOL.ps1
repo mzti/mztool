@@ -606,6 +606,11 @@ ______________________________________________________
             Hora #Testar Hora/Data
         }
 
+        pro {
+
+            Pro #Converter Windows para versão PRO.
+        }
+
         sfc {
             ImgHealth #SFC /SCANNOW + DISM /Cleanup-Image
         }
@@ -2136,7 +2141,7 @@ function Pro {
     slmgr /ipk VK7JG-NPHTM-C97JM-9MPGT-3V66T
     slmgr /ato
     slmgr /xpr
-    
+
 }
 
 function awin {
