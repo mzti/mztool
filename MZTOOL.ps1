@@ -606,8 +606,7 @@ ______________________________________________________
             Hora #Testar Hora/Data
         }
 
-        pro {
-
+        p {
             Pro #Converter Windows para versão PRO.
         }
 
