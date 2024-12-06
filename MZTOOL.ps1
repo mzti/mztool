@@ -2136,6 +2136,7 @@ function ImgHealth {
 
 function Pro {
 
+    changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
     SLMGR.VBS /CPKY
     SLMGR.VBS /CKMS
     Net stop Sppsvc
