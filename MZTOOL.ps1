@@ -2136,10 +2136,12 @@ function ImgHealth {
 
 function Pro {
 
-    slmgr /upk
-    slmgr /ipk VK7JG-NPHTM-C97JM-9MPGT-3V66T
-    slmgr /ato
-    slmgr /xpr
+    SLMGR.VBS /CPKY
+    SLMGR.VBS /CKMS
+    Net stop Sppsvc
+    CD C:\Windows\System32\SPP\Store\2.0
+    Ren Tokens.dat Tokens.old
+    SLMGR.VBS /RILC
 
 }
 
