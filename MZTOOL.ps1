@@ -126,7 +126,7 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function RemoveMStoreApps, PerfilTheme, Office365).Definition
+                    (Get-Command -Type Function RemoveMStoreApps, PerfilTheme<#, Office365#>).Definition
                 ))
             )
 
