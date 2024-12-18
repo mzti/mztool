@@ -838,16 +838,16 @@ function WingetInstall {
     for ($i = 0; $i -le 2; $i++) {
 
         WaitOffice2007Winget
-        
-        Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-
-        WaitOffice2007Winget
          
         Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
         WaitOffice2007Winget
         
         Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+
+        WaitOffice2007Winget
+        
+        Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
         Clear-Host
             
@@ -908,8 +908,7 @@ function AnyDesk {
 
     }
         
-    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"
-                   
+    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"  
     
 }
 
