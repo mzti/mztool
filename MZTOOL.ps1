@@ -875,19 +875,19 @@ function WinUpdate {
 
     #Instalação de novas atualizações do Windows através do Windows Update.
     
-    Start-Process PowerShell {
+    #Start-Process PowerShell {
 
-        $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
-        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-        Import-Module PSWindowsUpdate -Force 
+    Import-Module PSWindowsUpdate -Force 
 
-        Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
+    Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
         
-        #Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
+    #Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
 
-        Clear-Host
-    }  
+    Clear-Host
+    #}  
 }
 
 function AnyDesk {
