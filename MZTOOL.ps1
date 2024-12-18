@@ -860,15 +860,15 @@ function WingetUpdate {
 
     #WINGET - Atualização de pacotes de softwares instalados.
 
-    Start-Process PowerShell {
+    #Start-Process PowerShell {
 
-        $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
-        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
+    Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
-        Clear-Host
-    }
+    Clear-Host
+    #}
 }
 
 function WinUpdate { 
