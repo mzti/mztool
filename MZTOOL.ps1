@@ -894,22 +894,23 @@ function AnyDesk {
 
     #Download do software AnyDek-CM.
 
-    Start-Process PowerShell {
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-        if (Test-Path -Path "$home\OneDrive\Desktop") {
+    if (Test-Path -Path "$home\OneDrive\Desktop") {
         
-            $DESKTOP = "$home\OneDrive\Desktop"
-        }
-    
-        else {
-       
-            $DESKTOP = "$home\Desktop"
-
-        }
-        
-        Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"
-                   
+        $DESKTOP = "$home\OneDrive\Desktop"
     }
+    
+    else {
+       
+        $DESKTOP = "$home\Desktop"
+
+    }
+        
+    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"
+                   
+    
 }
 
 function Office365 {
