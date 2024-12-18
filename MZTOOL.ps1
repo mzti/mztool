@@ -119,7 +119,6 @@ ______________________________________________________
 |____________________________________________________|
 '            
             Hora
-            AnyDesk
             EnvTool
             ToolDir           
 
@@ -133,7 +132,7 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
+                    (Get-Command -Type Function AnyDesk, DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
                 ))
             )
 
@@ -894,9 +893,6 @@ function AnyDesk {
 
     #Download do software AnyDek-CM.
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-
     if (Test-Path -Path "$home\OneDrive\Desktop") {
         
         $DESKTOP = "$home\OneDrive\Desktop"
@@ -909,6 +905,7 @@ function AnyDesk {
     }
         
     Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"  
+
     
 }
 
