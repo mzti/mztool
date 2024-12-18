@@ -126,7 +126,7 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function RemoveMStoreApps, PerfilTheme  <#, Office365#>).Definition
+                    (Get-Command -Type Function RemoveMStoreApps, PerfilTheme).Definition
                 ))
             )
 
@@ -141,7 +141,7 @@ ______________________________________________________
             Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule, WingetInstall).Definition
+                    (Get-Command -Type Function WingetModule, WingetInstall, Office365).Definition
                 ))
             )
          
@@ -177,7 +177,7 @@ ______________________________________________________
 |____________________________________________________|
 '
             DelTemp
-            Start-Sleep -Seconds 5
+            Start-Sleep -Seconds 50
             Exit
         }
 
