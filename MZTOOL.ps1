@@ -476,7 +476,7 @@ ______________________________________________________
             
                             if (Test-Path -Path $2007Folder) {
 
-                                continue
+                                2007Install
 
                             }
 
@@ -485,23 +485,28 @@ ______________________________________________________
                                 ToolDir
                    
                                 DownloadMztool
+
+                                2007Install
                             }
     
                         }
+                        
+                        function 2007Install {
 
-                        2007Folder
+                            2007Folder
 
-                        Office2007
+                            Office2007                        
 
-                        Start-Sleep -1
+                            Start-Sleep -1
 
-                        DelTemp
+                            DelTemp
 
-                        EnvTool
+                            EnvTool
 
-                        Clear-Host
+                            Clear-Host
              
-                        DisplayMenu
+                            DisplayMenu
+                        }
                     }
 
                     2 {
