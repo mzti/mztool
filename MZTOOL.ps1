@@ -488,12 +488,11 @@ ______________________________________________________
 
                                 2007Install
                             }
-    
+                            
                         }
-                        
-                        function 2007Install {
 
-                            2007Folder
+                        2007Folder
+                        function 2007Install {
 
                             Office2007                        
 
