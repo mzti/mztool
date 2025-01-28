@@ -13,6 +13,8 @@ PowerShell irm https://bit.ly/MZT00L | iex
 
 Após a primeira execução da ferramenta, é instalada a variável de ambiente global e é possível executá-la com a variável:
 
-```%MZTOOL%```
+```PowerShell
+%MZTOOL%
+```
 
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/ENVTOOL.png?raw=true)
