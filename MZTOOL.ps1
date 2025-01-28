@@ -51,7 +51,7 @@ function OpSys {
     elseif ($WinVer -Match 'Microsoft Windows 10') {
         
         Write-Host "$WinVer"
-        
+
     }
 
     elseif ($WinVer -Match 'Microsoft Windows 8.1') {
@@ -119,29 +119,28 @@ ______________________________________________________
 |____________________________________________________|
 '            
             Hora
-            AnyDesk
             EnvTool
             ToolDir           
 
-            Start-Process PowerShell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function RemoveMStoreApps, PerfilTheme).Definition
                 ))
             )
 
-            Start-Process PowerShell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function DownloadMztool, <#DriverBooster,#> NetFx3, Office2007).Definition
+                    (Get-Command -Type Function AnyDesk, DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
                 ))
             )
 
 
-            Start-Process PowerShell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule, WingetInstall).Definition
+                    (Get-Command -Type Function WingetModule, WingetInstall, Office365).Definition
                 ))
             )
          
@@ -153,7 +152,7 @@ ______________________________________________________
 
             WingetUpdate
 
-            Start-Process PowerShell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WinUpdateModule, WinUpdate).Definition
@@ -177,7 +176,7 @@ ______________________________________________________
 |____________________________________________________|
 '
             DelTemp
-            Start-Sleep -Seconds 5
+            Start-Sleep -Seconds 50
             Exit
         }
 
@@ -386,7 +385,7 @@ ______________________________________________________
 
                         Hora
                         
-                        Start-Process PowerShell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+                        Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
                               (Get-Command -Type Function WingetUpdate, WinUpdate).Definition
@@ -476,7 +475,7 @@ ______________________________________________________
             
                             if (Test-Path -Path $2007Folder) {
 
-                                2007Install
+                                continue
 
                             }
 
@@ -485,27 +484,23 @@ ______________________________________________________
                                 ToolDir
                    
                                 DownloadMztool
-
-                                2007Install
                             }
-                            
+    
                         }
 
                         2007Folder
-                        function 2007Install {
 
-                            Office2007                        
+                        Office2007
 
-                            Start-Sleep -1
+                        Start-Sleep -1
 
-                            DelTemp
+                        DelTemp
 
-                            EnvTool
+                        EnvTool
 
-                            Clear-Host
+                        Clear-Host
              
-                            DisplayMenu
-                        }
+                        DisplayMenu
                     }
 
                     2 {
@@ -609,6 +604,14 @@ ______________________________________________________
         h {
             Hora #Testar Hora/Data
         }
+
+        p {
+            Pro #Converter Windows para versão PRO.
+        }
+
+        sfc {
+            ImgHealth #SFC /SCANNOW + DISM /Cleanup-Image
+        }
         
         default {
             #ENTRADA INVÁLIDA.
@@ -626,12 +629,13 @@ ______________________________________________________
 function Hora {
     
     Start-Process PowerShell -WindowStyle Hidden {
-    
+        w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
         net start w32time 
         w32tm /resync /force
    
     }
 }
+
 
 function ToolDir {
 
@@ -700,7 +704,7 @@ function DownloadMztool {
 function EnvTool {
     
     #Adicionar variáveis de ambiente.
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
         [Environment]::SetEnvironmentVariable('MZBETA', 'PowerShell irm https://bit.ly/MZBETA | iex', 'MACHINE')
@@ -766,16 +770,17 @@ function WingetModule {
    
     #Módulo WINGET.
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
+    $ErrorActionPreference = 'SilentlyContinue'
             
     if ( $WinVer -Match 'Windows 11') {
         Write-Host "$WinVer"
                 
         #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
-        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix"
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue
         Add-AppPackage -Path "$env:TEMP\source.msix"
         Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements
         Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements
-        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue
         Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
         Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements
         
@@ -793,15 +798,15 @@ function WingetModule {
         Winget Source Remove --Name winget
         Winget Source Remove --Name msstore
         Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue 
-        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix"
-        Add-AppPackage -Path "$env:TEMP\source.msix"
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue
+        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue
         Start-Sleep 1
         Winget Source Reset --Force     
         Winget Source Update
         Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements
         Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements
-        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"  
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue 
         Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements
     
     }
@@ -832,16 +837,16 @@ function WingetInstall {
     for ($i = 0; $i -le 2; $i++) {
 
         WaitOffice2007Winget
-        
-        Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements
-
-        WaitOffice2007Winget
          
-        Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements 
+        Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
         WaitOffice2007Winget
         
-        Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements
+        Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+
+        WaitOffice2007Winget
+        
+        Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
         Clear-Host
             
@@ -854,45 +859,54 @@ function WingetUpdate {
 
     #WINGET - Atualização de pacotes de softwares instalados.
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    #Start-Process PowerShell {
 
-        $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
-        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
+    Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
-        Clear-Host
-    }
+    Clear-Host
+    #}
 }
 
 function WinUpdate { 
 
     #Instalação de novas atualizações do Windows através do Windows Update.
     
-    Start-Process PowerShell -WindowStyle Hidden {
+    #Start-Process PowerShell {
 
-        $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
-        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-        Import-Module PSWindowsUpdate -Force 
+    Import-Module PSWindowsUpdate -Force 
 
-        Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
+    Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
         
-        Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
+    #Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
 
-        Clear-Host
-    }  
+    Clear-Host
+    #}  
 }
 
 function AnyDesk {
 
     #Download do software AnyDek-CM.
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    if (Test-Path -Path "$home\OneDrive\Desktop") {
         
-        Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$home\Desktop\AnyDesk.exe"
-                   
+        $DESKTOP = "$home\OneDrive\Desktop"
     }
+    
+    else {
+       
+        $DESKTOP = "$home\Desktop"
+
+    }
+        
+    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"  
+
+    
 }
 
 function Office365 {
@@ -902,24 +916,26 @@ function Office365 {
 
     #Cria o arquivo XML de isntalação personalizada no diretório C:\TOOL\OFFICE\365.
     [xml]$XML = @'
-<Configuration ID="646616bb-84c9-4354-9908-8abd74c04f4c">
-  <Add OfficeClientEdition="64" Channel="Current" MigrateArch="TRUE">
+<Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
+  <Add OfficeClientEdition="64" Channel="Current">
     <Product ID="O365ProPlusEEANoTeamsRetail">
       <Language ID="pt-br" />
-      <Language ID="MatchPreviousMSI" />
+      <ExcludeApp ID="Access" />
       <ExcludeApp ID="Groove" />
       <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="OneNote" />
+      <ExcludeApp ID="Publisher" />
+      <ExcludeApp ID="Bing" />
     </Product>
   </Add>
   <Updates Enabled="TRUE" />
-  <RemoveMSI />
   <AppSettings>
-    <User Key="software\microsoft\office\16.0\excel\options" Name="defaultformat" Value="60" Type="REG_DWORD" App="excel16" Id="L_SaveExcelfilesas" />
-    <User Key="software\microsoft\office\16.0\powerpoint\options" Name="defaultformat" Value="52" Type="REG_DWORD" App="ppt16" Id="L_SavePowerPointfilesas" />
-    <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="ODT" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
+    <User Key="software\microsoft\office\16.0\excel\options" Name="defaultformat" Value="51" Type="REG_DWORD" App="excel16" Id="L_SaveExcelfilesas" />
+    <User Key="software\microsoft\office\16.0\powerpoint\options" Name="defaultformat" Value="27" Type="REG_DWORD" App="ppt16" Id="L_SavePowerPointfilesas" />
+    <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
     <User Key="software\microsoft\office\16.0\word\options" Name="verticalruler" Value="1" Type="REG_DWORD" App="word16" Id="L_VerticalrulerPrintviewonly" />
   </AppSettings>
-  <Display Level="Full" AcceptEULA="TRUE" />
+  <Display Level="TRUE" AcceptEULA="TRUE" />
 </Configuration> 
 '@
 
@@ -935,14 +951,32 @@ function Office365 {
     }
 
     [System.IO.Directory]::CreateDirectory($365) | Out-Null
-    $TOOLFOLDER = Get-Item $TOOL -ErrorAction SilentlyContinue
-    $TOOLFOLDER.Attributes = 'Hidden'
-    
+        
     $XML.save("$TOOL\OFFICE\365\OFFICE365.xml") 
    
     $365XML = "$TOOL\OFFICE\365\OFFICE365.xml"
 
-    Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements
+    Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+    
+    $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+
+    if (Test-Path -Path "$home\OneDrive\Desktop") {
+        
+        $DESKTOP = "$home\OneDrive\Desktop"
+    }
+    
+    else {
+       
+        $DESKTOP = "$home\Desktop"
+
+    }
+
+    Copy-Item "$365LNK\Word.lnk" "$DESKTOP"
+    Copy-Item "$365LNK\Excel.lnk" "$DESKTOP"
+    Copy-Item "$365LNK\PowerPoint.lnk" "$DESKTOP"
+    
+    Remove-Item $365 -Force -Recurse
+
     
     Clear-Host
 }
@@ -977,7 +1011,7 @@ function NetFx3 {
 function DriverBooster {
     #Extração e inicialização do software Driver Booster.
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1035,7 +1069,7 @@ function DriverBooster {
 
 function RemoveMStoreApps {
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEMSTOREAPPS'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1195,7 +1229,8 @@ function PinIcons {
         <taskbar:DesktopApp DesktopApplicationID="Microsoft.Windows.Explorer" />
         <taskbar:DesktopApp DesktopApplicationID="Chrome" />
         <taskbar:DesktopApp DesktopApplicationID="{6D809377-6AF0-444B-8957-A3773F02200E}\Adobe\Acrobat DC\Acrobat\Acrobat.exe" />
-        <taskbar:DesktopApp DesktopApplicationID="{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Microsoft Office\Office12\WINWORD.EXE" />
+        <taskbar:DesktopApp DesktopApplicationID="C:\ProgramData\Microsoft\Windows\Start Menu\Programs\WINWORD.lnk" />
+        <taskbar:DesktopApp DesktopApplicationID="{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Microsoft Office\Office12\WINWORD.exe" />        
       </taskbar:TaskbarPinList>
     </defaultlayout:TaskbarLayout>
  </CustomTaskbarLayoutCollection>
@@ -1237,7 +1272,9 @@ function PinIcons {
         }
         $registry.Dispose()
     }
-    
+
+    Remove-Item $provisioning -Force -Recurse
+
     #Remover ícone do Microsoft CoPilot da barra de tarefas.
     $settings = [PSCustomObject]@{
         Path  = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
@@ -2085,9 +2122,33 @@ function DelTemp {
     Start-Sleep 1     
 }
 
-function awin {
-    Start-Process PowerShell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
+function ImgHealth {
+
+    SFC /SCANNOW
+    DISM /Cleanup-Image
+    DISM /Online /Cleanup-Image /CheckHealth
+    DISM /Online /Cleanup-Image /RestoreHealth
+
 }
+
+function Pro {
+
+    changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
+    SLMGR.VBS /CPKY
+    SLMGR.VBS /CKMS
+    Net stop Sppsvc
+    Set-Location C:\Windows\System32\SPP\Store\2.0
+    Rename-Item Tokens.dat Tokens.old
+    SLMGR.VBS /RILC
+    changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
+
+}
+
+function awin {
+    Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
+}
+
+Hora
 
 DisplayMenu 
 
