@@ -707,7 +707,6 @@ function EnvTool {
     Start-Process PowerShell {
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
-        [Environment]::SetEnvironmentVariable('MZBETA', 'PowerShell irm https://bit.ly/MZBETA | iex', 'MACHINE')
     }
 }
 
