@@ -11,7 +11,7 @@ PowerShell irm https://bit.ly/MZT00L | iex
 
 ## Variáveis de Ambiente
 
-Após a primeira execução da ferramenta, é instalada a variável de ambiente global e é possível executá-la com a variável a partir de então:
+Após a primeira execução da ferramenta, é instalada uma variável de ambiente global que armazena o código acima e logo é possível executar a ferramenta com a variável a partir de então:
 
 ```PowerShell
 %MZTOOL%
