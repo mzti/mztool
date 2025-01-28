@@ -2149,6 +2149,8 @@ function awin {
 
 Hora
 
+EnvTool
+
 DisplayMenu 
 
 EXIT
