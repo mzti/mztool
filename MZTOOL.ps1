@@ -838,7 +838,7 @@ function WingetInstall {
         
         #Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
          
-        Winget Install --Id Google.Chrome.EXE --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+        Winget Install --Id Google.Chrome.BETA --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
         #WaitOffice2007Winget
         
@@ -1369,7 +1369,7 @@ function DefaultSoftwares {
 }
 
 function StartSoftwares {
-    
+
     Start-Process CHROME
     Start-Process ACROBAT
     Start-Sleep 5
