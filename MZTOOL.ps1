@@ -2055,8 +2055,7 @@ function ChromeAcrobatDefault {
     Set-FTA ChromeHTML .htm
     Set-FTA ChromeHTML .html
 }
-
-FUNCTION STARTSOFTWARES {
+function STARTSOFTWARES {
     Start-Process CHROME
     Start-Process ACROBAT
     Start-Sleep 5
@@ -2110,14 +2109,13 @@ FUNCTION STARTSOFTWARES {
         $registry.Dispose()
     }    
 
-    ChromeAcrobatDefault
+    #ChromeAcrobatDefault
 
     Start-Sleep 5
     Start-Process CHROME https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/, https://raw.githubusercontent.com/DanielMozartt/MZTOOL/BETA/BETA.ps1
     Start-Process ACROBAT
 
 }
-
 function DelTemp {
 
     #Remover arquivos temporários.
@@ -2132,7 +2130,6 @@ function DelTemp {
 
     Start-Sleep 1     
 }
-
 function ImgHealth {
 
     SFC /SCANNOW
