@@ -836,7 +836,7 @@ function WingetInstall {
 
         #WaitOffice2007Winget
         
-        #Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+        #Winget Install --Id Google.Chrome.BETA --Accept-Source-Agreements --Accept-Package-Agreements --Silent
          
         Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
