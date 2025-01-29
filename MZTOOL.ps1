@@ -1184,8 +1184,10 @@ function PerfilTheme {
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'AlwaysHibernateThumbnails' -Type DWord -Value 0
     #Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'ShellState' -Value ([byte[]] (24, 00, 00, 00, 3E, 28, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 00, 00, 13, 00, 00, 00, 00, 00, 00, 00, 72, 00, 00, 00))
    
-
-
+    #Remove Widgets.
+    
+    Get-AppxPackage *WebExperience* | Remove-AppxPackage
+    
     #Reinicia o Explorer.exe
 
     Stop-Process -Name 'explorer'
