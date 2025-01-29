@@ -838,7 +838,7 @@ function WingetInstall {
         
         #Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
          
-        Winget Install --Id Google.Chrome.BETA --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+        Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
         #WaitOffice2007Winget
         
@@ -1424,8 +1424,10 @@ function StartSoftwares {
     }    
 
     Start-Sleep 5
-    Start-Process CHROME https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/, https://raw.githubusercontent.com/DanielMozartt/MZTOOL/BETA/BETA.ps1
+
     Start-Process ACROBAT
+    Start-Process CHROME https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/, https://github.com/DanielMozartt/MZTOOL
+    
 
 }
 
