@@ -143,14 +143,24 @@ ______________________________________________________
                     (Get-Command -Type Function WingetModule, WingetInstall, Office365).Definition
                 ))
             )
+
+            PAUSE
          
             PinIcons
 
+            PAUSE
+
             DefaultSoftwares
+
+            PAUSE
 
             STARTSOFTWARES
 
+            PAUSE
+
             WingetUpdate
+
+            PAUSE
 
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -823,27 +833,29 @@ function WingetInstall {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    function WaitOffice2007Winget {
+    <#function WaitOffice2007Winget {
             
         if (Get-Process -Name setup -ErrorAction SilentlyContinue) {
             Wait-Process -Name setup
         }
 
-    }
+    }#>
         
-    WaitOffice2007Winget
+    #WaitOffice2007Winget
             
     for ($i = 0; $i -le 2; $i++) {
 
-        WaitOffice2007Winget
+        #WaitOffice2007Winget
+        
+        #Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
          
-        Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+        Winget Install --Id Google.Chrome.EXE --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
-        WaitOffice2007Winget
+        #WaitOffice2007Winget
         
         Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
-        WaitOffice2007Winget
+        #WaitOffice2007Winget
         
         Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
