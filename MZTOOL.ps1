@@ -148,7 +148,7 @@ ______________________________________________________
 
             DefaultSoftwares
 
-            STARTSOFTWARES
+            StartSoftwares
 
             WingetUpdate
 
@@ -1368,7 +1368,8 @@ function DefaultSoftwares {
     }
 }
 
-function STARTSOFTWARES {
+function StartSoftwares {
+    
     Start-Process CHROME
     Start-Process ACROBAT
     Start-Sleep 5
