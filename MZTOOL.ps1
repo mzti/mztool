@@ -1349,7 +1349,7 @@ function DefaultSoftwares {
     
     #Definir Google Chrome e Acrobat Reader como navegador padrão, e Acrobat Reader como leitor de PDF padrão.
     
-    ChromeAcrobatDefault    
+    # ChromeAcrobatDefault    
     
     #Desabilitar primeira inicialização do Microsoft Edge.
     
