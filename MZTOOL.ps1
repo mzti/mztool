@@ -143,24 +143,14 @@ ______________________________________________________
                     (Get-Command -Type Function WingetModule, WingetInstall, Office365).Definition
                 ))
             )
-
-            PAUSE
          
             PinIcons
 
-            PAUSE
-
             DefaultSoftwares
-
-            PAUSE
 
             STARTSOFTWARES
 
-            PAUSE
-
             WingetUpdate
-
-            PAUSE
 
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
