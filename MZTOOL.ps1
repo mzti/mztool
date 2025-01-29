@@ -905,7 +905,6 @@ function AnyDesk {
     }
         
     Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"  
-
     
 }
 
@@ -1004,7 +1003,6 @@ function NetFx3 {
         Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum            
         
     }
-
     
 }
 
@@ -1215,6 +1213,23 @@ function PinIcons {
     #Fixar ícones de softwares Google Chrome, Acrobat Reader, Microsoft Word na barra de tarefas.
 
     $TOOL = 'C:\TOOL'
+
+    
+    $appPath = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    
+    $shortcutPath = "C:\Users\Public\Desktop\Chrome.lnk"
+    
+    $WScriptShell = New-Object -ComObject WScript.Shell
+   
+    $shortcut = $WScriptShell.CreateShortcut($shortcutPath)
+    $shortcut.TargetPath = $appPath
+    $shortcut.Save()
+
+    $shell = New-Object -ComObject Shell.Application
+    $folder = $shell.Namespace((Get-Item $shortcutPath).DirectoryName)
+    $item = $folder.ParseName((Get-Item $shortcutPath).Name)
+    $item.InvokeVerb("taskbarpin")
+
 
     $taskbar_layout =
     @'
