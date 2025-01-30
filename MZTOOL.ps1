@@ -1214,22 +1214,6 @@ function PinIcons {
 
     $TOOL = 'C:\TOOL'
 
-    <#
-    $appPath = "C:\Program Files\Google\Chrome\Application\chrome.exe"
-    
-    $shortcutPath = "C:\Users\Public\Desktop\Chrome.lnk"
-    
-    $WScriptShell = New-Object -ComObject WScript.Shell
-   
-    $shortcut = $WScriptShell.CreateShortcut($shortcutPath)
-    $shortcut.TargetPath = $appPath
-    $shortcut.Save()
-
-    $shell = New-Object -ComObject Shell.Application
-    $folder = $shell.Namespace((Get-Item $shortcutPath).DirectoryName)
-    $item = $folder.ParseName((Get-Item $shortcutPath).Name)
-    $item.InvokeVerb("taskbarpin")
-#>
     $taskbar_layout =
     @"
 <?xml version="1.0" encoding="utf-8"?>
@@ -1288,9 +1272,7 @@ function PinIcons {
             }
         }
         $registry.Dispose()
-    }
-
-    Remove-Item $provisioning -Force -Recurse
+    } 
 
     #Remover ícone do Microsoft CoPilot da barra de tarefas.
     $settings = [PSCustomObject]@{
@@ -1343,7 +1325,7 @@ function PinIcons {
     #Ativa plano de energia para Alto Desempenho.
     
     POWERCFG /SETACTIVE SCHEME_MIN
-       
+          
 }
 
 function DefaultSoftwares {
