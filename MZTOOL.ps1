@@ -752,8 +752,9 @@ function WinUpdateModule {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'   
     
     #Pacote NuGet.
-    Install-PackageProvider -Name NuGet -Force
-        
+    Install-PackageProvider -Name NuGet -Force    
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+    
     #Módulo WINDOWS UPDATE.
     Install-Module PSWindowsUpdate -AllowClobber -Force
     Import-Module PSWindowsUpdate -Force       
