@@ -960,16 +960,7 @@ function Office365 {
     
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
 
-    if (Test-Path -Path "$home\OneDrive\Desktop") {
-        
-        $DESKTOP = "$home\OneDrive\Desktop"
-    }
-    
-    else {
-       
-        $DESKTOP = "$home\Desktop"
-
-    }
+    $DESKTOP = "C:\Users\Public\DESKTOP"
 
     Copy-Item "$365LNK\Word.lnk" "$DESKTOP"
     Copy-Item "$365LNK\Excel.lnk" "$DESKTOP"
