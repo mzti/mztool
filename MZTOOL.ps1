@@ -636,6 +636,7 @@ function Hora {
     }
 }
 
+
 function ToolDir {
 
     #Criação do diretório C:\TOOL.
@@ -703,7 +704,7 @@ function DownloadMztool {
 function EnvTool {
     
     #Adicionar variáveis de ambiente.
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell {
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
     }
