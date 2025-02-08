@@ -641,6 +641,8 @@ function ToolDir {
 
     #Criação do diretório C:\TOOL.
 
+    $ErrorActionPreference = 'silentlycontinue'
+
     $TOOL = 'C:\TOOL'
     
     #Se o diretório C:\TOOL já existir, é deletado.
