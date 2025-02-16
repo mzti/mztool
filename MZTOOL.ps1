@@ -177,7 +177,7 @@ ______________________________________________________
 '
             DelTemp
             Start-Sleep -Seconds 50
-            Pause
+            
         }
 
         2 {
@@ -1366,6 +1366,7 @@ function StartSoftwares {
 
     Start-Process CHROME
     Start-Process ACROBAT
+    Start-Process WINWORD
     Start-Sleep 5
     
     Stop-Process -Name CHROME -Force
