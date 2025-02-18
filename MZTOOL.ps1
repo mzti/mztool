@@ -155,7 +155,7 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, WinUpdate).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate).Definition
                 ))
             )
             
@@ -388,7 +388,7 @@ ______________________________________________________
                         Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
-                              (Get-Command -Type Function WingetUpdate, WinUpdate).Definition
+                              (Get-Command -Type Function WingetUpdate, RemoveGhostDrivers, WinUpdate).Definition
                             ))
                         )
                         
@@ -891,6 +891,20 @@ function WinUpdate {
 
     Clear-Host
     #}  
+}
+
+function RemoveGhostDrivers {
+
+    #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
+   
+    #Obtem a lista de drivers de Dispositivos Ocultos.
+    $DISPOSITIVOSOCULTOS = Get-PnpDevice | Where-Object { $_.Status -eq 'Unknown' } 
+
+    #Remove os drivers de Dispositivos Ocultos da lista obtida.
+    ForEach ($DRIVER in $DISPOSITIVOSOCULTOS) {
+        pnputil /remove-device $DRIVER.InstanceId
+    }
+    
 }
 
 function AnyDesk {
