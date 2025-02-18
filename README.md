@@ -28,6 +28,17 @@ PowerShell irm https://bit.ly/MZT00L | iex
 
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/EXECUTAR.png?raw=true)
 
+
+## DEMONSTRAÇÃO
+
+
+
+https://github.com/user-attachments/assets/52d5eace-c531-45a0-92ac-c1b0ca7a35ec
+
+
+
+VÍDEO SEM EDIÇOES - https://www.youtube.com/watch?v=w7V6YisqsB4
+
 ## VARIÁVEIS DE AMBIENTE
 
 Após a primeira execução da ferramenta, é instalada uma variável de ambiente global que armazena o código acima e logo é possível executar a ferramenta com a variável a partir de então:
@@ -38,7 +49,7 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/ENVTOOL.png?raw=true)
 
-### COMPATIBILIDADE> 
+### COMPATIBILIDADE 
 
 Windows 10 X64 & X86, Windows 11.
 
