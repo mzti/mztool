@@ -1,7 +1,7 @@
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/MENU.png?raw=true)
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/WINGET%20%25%20WINUPDATE.png?raw=true)
 
-## FUNCIONALIDADES>
+## FUNCIONALIDADES
 
 - 1 - Implementação automatizada:
 
@@ -20,7 +20,7 @@
 - 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
 
 
-## COMO USAR A FERRAMENTA> 
+## COMO USAR A FERRAMENTA 
 ### EM UM AMBIENTE WINDOWS, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO NA CAIXA EXECUTAR.
 ```PowerShell
 PowerShell irm https://bit.ly/MZT00L | iex
@@ -28,7 +28,7 @@ PowerShell irm https://bit.ly/MZT00L | iex
 
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/EXECUTAR.png?raw=true)
 
-## Variáveis de Ambiente
+## VARIÁVEIS DE AMBIENTE
 
 Após a primeira execução da ferramenta, é instalada uma variável de ambiente global que armazena o código acima e logo é possível executar a ferramenta com a variável a partir de então:
 
@@ -41,4 +41,5 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 ### COMPATIBILIDADE> 
 
 Windows 10 X64 & X86, Windows 11.
+
 *Versões anteriores ao Windows 10 e outros sistemas operacionais não são compatíves com Winget.
