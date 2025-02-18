@@ -993,6 +993,7 @@ function Office365 {
     
     Remove-Item $365 -Force -Recurse
 
+    Stop-Process -Name OfficeC2RClient -Force
     
     Clear-Host
 }    
@@ -1460,8 +1461,7 @@ function ImgHealth {
     #Verifica e repara arquivos corrompidos do sistema operacional.
 
     SFC /SCANNOW
-    DISM /Cleanup-Image
-    DISM /Online /Cleanup-Image /CheckHealth
+    DISM /Online /Cleanup-Image /CheckHealth 
     DISM /Online /Cleanup-Image /RestoreHealth
 
 }
