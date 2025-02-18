@@ -49,7 +49,7 @@ function OpSys {
 
     }#>
 
-    if ($WinVer -notmatch 'Microsoft Windows 10' -and $WinVer -notmatch 'Microsoft Windows 11') {
+    if ($WinVer -notmatch 'Microsoft Windows 10' -or $WinVer -notmatch 'Microsoft Windows 11') {
 
         Write-Host 'SISTEMA OPERACIONAL NÃO SUPORTADO.'
 
