@@ -155,7 +155,7 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth).Definition
                 ))
             )
             
@@ -754,12 +754,12 @@ function WinUpdateModule {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'   
     
     #Pacote NuGet.
-    Install-PackageProvider -Name NuGet -Force    
-    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+    Install-PackageProvider -Name NuGet -Force |  Clear-Host   
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted  |  Clear-Host
     
     #Módulo WINDOWS UPDATE.
-    Install-Module PSWindowsUpdate -AllowClobber -Force
-    Import-Module PSWindowsUpdate -Force       
+    Install-Module PSWindowsUpdate -AllowClobber -Force |  Clear-Host
+    Import-Module PSWindowsUpdate -Force |  Clear-Host        
     
     Clear-Host
              
@@ -775,16 +775,16 @@ function WingetModule {
     $ErrorActionPreference = 'SilentlyContinue'
             
     if ( $WinVer -Match 'Windows 11') {
-        Write-Host "$WinVer"
+        Write-Host "$WinVer" |  Clear-Host
                 
         #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
-        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue
-        Add-AppPackage -Path "$env:TEMP\source.msix"
-        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements
-        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements
-        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue
-        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\source.msix" |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" |  Clear-Host
+        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
         
     }
 
@@ -792,24 +792,24 @@ function WingetModule {
         Write-Host "$WinVer"
                 
         #Pacote NuGet.
-        Install-PackageProvider -Name NuGet -Force
+        Install-PackageProvider -Name NuGet -Force |  Clear-Host
         
         #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
-        Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery 
-        Repair-WinGetPackageManager
-        Winget Source Remove --Name winget
-        Winget Source Remove --Name msstore
-        Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue 
-        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue
-        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue
+        Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery |  Clear-Host
+        Repair-WinGetPackageManager |  Clear-Host
+        Winget Source Remove --Name winget |  Clear-Host
+        Winget Source Remove --Name msstore |  Clear-Host
+        Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue |  Clear-Host
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
         Start-Sleep 1
-        Winget Source Reset --Force     
-        Winget Source Update
-        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements
-        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements
-        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue
-        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue 
-        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements
+        Winget Source Reset --Force |  Clear-Host     
+        Winget Source Update |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue  |  Clear-Host
+        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
     
     }
 
@@ -895,6 +895,10 @@ function WinUpdate {
 
 function RemoveGhostDrivers {
 
+    
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEGHOSTDEVICES'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
     #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
    
     #Obtem a lista de drivers de Dispositivos Ocultos.
@@ -902,7 +906,9 @@ function RemoveGhostDrivers {
 
     #Remove os drivers de Dispositivos Ocultos da lista obtida.
     ForEach ($DRIVER in $DISPOSITIVOSOCULTOS) {
+        
         pnputil /remove-device $DRIVER.InstanceId
+    
     }
     
 }
@@ -960,7 +966,7 @@ function Office365 {
     
     $365 = "$TOOL\OFFICE\365"
     
-    #Se o diretório $Env:TOOL\OFFICE\365 já existir, é deletado.
+    #Se o diretório $TOOL\OFFICE\365 já existir, é deletado.
 
     if ($365) {
 
@@ -1016,6 +1022,7 @@ function NetFx3 {
 }
 
 function DriverBooster {
+    
     #Extração e inicialização do software Driver Booster.
 
     Start-Process PowerShell {
@@ -1129,7 +1136,7 @@ function RemoveMStoreApps {
 
         Get-AppxPackage -AllUsers | Where-Object { $_.name -in $app_packages } | Remove-AppxPackage -AllUsers
 
-        #Resta o proceso Explorer.exe
+        #Reinicia o proceso Explorer.exe.
         Stop-Process -Name 'explorer'
 
     }
@@ -1143,7 +1150,6 @@ function PerfilTheme {
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
 
     #Adiciona o Tema Escuro ao Windows.
-
     if ( $WinVer -Match 'Windows 11') {
         Write-Host "$WinVer"
         Start-Process -FilePath 'C:\Windows\Resources\Themes\dark.theme'
@@ -1159,7 +1165,6 @@ function PerfilTheme {
     }    
     
     #Adiciona ícones de sistema a Área de Trabalho.
-
     $DESKINCONSREG = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
 
     New-ItemProperty -Path "$DESKINCONSREG" -Name '{018D5C66-4533-4307-9B53-224DE2ED1FE6}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
@@ -1168,8 +1173,7 @@ function PerfilTheme {
     New-ItemProperty -Path "$DESKINCONSREG" -Name '{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
     New-ItemProperty -Path "$DESKINCONSREG" -Name '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
 
-    #Mostra e atualiza a Área de Trabalho.
-    
+    #Mostra e atualiza a Área de Trabalho.    
     for ($i = 0; $i -le 1; $i++) {
         (New-Object -ComObject shell.application).toggleDesktop()
         Start-Sleep 2
@@ -1180,7 +1184,6 @@ function PerfilTheme {
     }
 
     #Define as opções de Efeitos Visuais do Windows para personalizado.
-
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 3
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewShadow' -Type DWord -Value 1
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewAlphaSelect' -Type DWord -Value 0
@@ -1191,16 +1194,13 @@ function PerfilTheme {
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'AlwaysHibernateThumbnails' -Type DWord -Value 0
     #Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'ShellState' -Value ([byte[]] (24, 00, 00, 00, 3E, 28, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 00, 00, 13, 00, 00, 00, 00, 00, 00, 00, 72, 00, 00, 00))
    
-    #Remove Widgets.
-    
+    #Remove Widgets.    
     Get-AppxPackage *WebExperience* | Remove-AppxPackage
     
     #Reinicia o Explorer.exe
-
     Stop-Process -Name 'explorer'
 
     #Finaliza janela de personalização do Windows.
-
     if (Get-Process -Name 'systemsettings') {
                         
         Stop-Process -Name 'systemsettings' -Force
@@ -1219,7 +1219,7 @@ function PinIcons {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > PINICONS'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Fixar ícones de softwares Google Chrome, Acrobat Reader, Microsoft Word na barra de tarefas.
+    #Fixa os ícones dos softwares Google Chrome, Acrobat Reader, Microsoft Word e do Windows Explorer na barra de tarefas e remove os demais ícones.
 
     $TOOL = 'C:\TOOL'
 
@@ -1247,7 +1247,6 @@ function PinIcons {
 </LayoutModificationTemplate>
 "@
 
-    # prepare provisioning folder
     [System.IO.FileInfo]$provisioning = "$($env:ProgramData)\provisioning\tasbar_layout.xml"
     if (!$provisioning.Directory.Exists) {
         $provisioning.Directory.Create()
@@ -1283,7 +1282,7 @@ function PinIcons {
         $registry.Dispose()
     } 
 
-    #Remover ícone do Microsoft CoPilot da barra de tarefas.
+    #Remove o ícone do Microsoft CoPilot da barra de tarefas.
     $settings = [PSCustomObject]@{
         Path  = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
         Value = 0
@@ -1312,8 +1311,7 @@ function PinIcons {
     
     Stop-Process -Name 'explorer'
 
-    #Mostra e atualiza a Área de Trabalho.
-    
+    #Mostra e atualiza a Área de Trabalho.    
     for ($i = 0; $i -le 2; $i++) {
         (New-Object -ComObject shell.application).toggleDesktop()
         Start-Sleep 2
@@ -1323,16 +1321,14 @@ function PinIcons {
         Start-Sleep 2
     }   
 
-    #Desabilitar notificações da central de ações.
-    
+    #Desabilita as notificações da central de ações.    
     If (!(Test-Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer')) {
         New-Item -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer'
     }
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -Name 'DisableNotificationCenter' -Type DWord -Value 1
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'ToastEnabled' -Type DWord -Value 0
 
-    #Ativa plano de energia para Alto Desempenho.
-    
+    #Ativa plano de energia para Alto Desempenho.    
     POWERCFG /SETACTIVE SCHEME_MIN
           
 }
@@ -1342,9 +1338,22 @@ function DefaultSoftwares {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > DEFAULTSOFTWARES'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     
-    #Definir Google Chrome e Acrobat Reader como navegador padrão, e Acrobat Reader como leitor de PDF padrão.
-          
-    #Desabilitar primeira inicialização do Microsoft Edge.
+    #Define o Google Chrome como navegador padrão, e Acrobat Reader como leitor de PDF padrão.
+    #Antigo script não funciona em builds novas do Windows.      
+}
+
+function StartSoftwares {
+
+    Start-Process CHROME
+    Start-Process ACROBAT
+    Start-Process WINWORD
+    Start-Sleep 5
+    
+    Stop-Process -Name CHROME -Force
+    Stop-Process -Name ACROBAT -Force
+    Stop-Process -Name Eula -Force
+
+    #Desabilita a primeira inicialização do Microsoft Edge.
     
     $settings = 
     [PSCustomObject]@{
@@ -1364,41 +1373,17 @@ function DefaultSoftwares {
         $registry.Dispose()
     }
 
-    #Mostra e atualiza a Área de Trabalho.
-    
-    for ($i = 0; $i -le 2; $i++) {
-        (New-Object -ComObject shell.application).toggleDesktop()
-        Start-Sleep 2
-        (New-Object -ComObject Wscript.Shell).sendkeys('{F5}')
-        Start-Sleep 1
-        (New-Object -ComObject shell.application).undominimizeall()
-        Start-Sleep 2
-    }
-}
-
-function StartSoftwares {
-
-    Start-Process CHROME
-    Start-Process ACROBAT
-    Start-Process WINWORD
-    Start-Sleep 5
-    
-    Stop-Process -Name CHROME -Force
-    Stop-Process -Name ACROBAT -Force
-    Stop-Process -Name Eula -Force
-
-    #Aceitar EULA Acrobat Reader.
+    #Aceita EULA Acrobat Reader.
     $ACROBATREG = 'HKCU:\SOFTWARE\Adobe\Adobe Acrobat\DC\AdobeViewer'
     New-Item -Path "$ACROBATREG"
     New-ItemProperty -Path "$ACROBATREG" -Name 'EULA' -PropertyType dword -Value 00000001
    
-    #Desabilitar notificações do Google Chrome e desabilitar tela inicial.
-
+    #Desabilita notificações do Google Chrome e desabilita a tela inicial.
     $settings = 
     [PSCustomObject]@{
         Path  = 'SOFTWARE\Policies\Google\Chrome'
         Value = 0
-        Name  = 'PrivacySandboxPromptEnabled' # notification
+        Name  = 'PrivacySandboxPromptEnabled' #Notificação.
     },
     [PSCustomObject]@{ 
         Path  = 'SOFTWARE\Policies\Google\Chrome'
@@ -1434,15 +1419,25 @@ function StartSoftwares {
 
     Start-Sleep 5
 
+    #Mostra e atualiza a Área de Trabalho.
+    for ($i = 0; $i -le 2; $i++) {
+        (New-Object -ComObject shell.application).toggleDesktop()
+        Start-Sleep 2
+        (New-Object -ComObject Wscript.Shell).sendkeys('{F5}')
+        Start-Sleep 1
+        (New-Object -ComObject shell.application).undominimizeall()
+        Start-Sleep 2
+    }
+
     Start-Process ACROBAT
-    Start-Process CHROME https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/, https://github.com/DanielMozartt/MZTOOL
+    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/
     
 
 }
 
 function DelTemp {
 
-    #Remover arquivos temporários.
+    #Remove arquivos temporários do sistema.
 
     Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue 
 
@@ -1457,6 +1452,11 @@ function DelTemp {
 
 function ImgHealth {
 
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> IMGHEALTH'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
+    #Verifica e repara arquivos corrompidos do sistema operacional.
+
     SFC /SCANNOW
     DISM /Cleanup-Image
     DISM /Online /Cleanup-Image /CheckHealth
@@ -1465,6 +1465,12 @@ function ImgHealth {
 }
 
 function Pro {
+
+    
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINDOWSPRO'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
+    #Converte a versão do Windows para PRO.
 
     changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
     SLMGR.VBS /CPKY
