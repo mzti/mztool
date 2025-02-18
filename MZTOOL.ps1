@@ -45,8 +45,8 @@ function OpSys {
 
     if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
         
-        Continue
-        
+        continue
+
     }
 
     else {
