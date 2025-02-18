@@ -148,8 +148,6 @@ ______________________________________________________
 
             #DefaultSoftwares
 
-            StartSoftwares
-
             WingetUpdate
 
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
