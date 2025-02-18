@@ -19,4 +19,7 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/ENVTOOL.png?raw=true)
 
-### COMPATIBILIDADE: Windows 10 X64,X86 e Windows 11. *Versões anteriores do Windows não são compatíves com Winget.
+### COMPATIBILIDADE: 
+
+Windows 10 X64 & X86, Windows 11.
+*Versões anteriores do Windows e outros sistemas operacionais não são compatíves com Winget.
