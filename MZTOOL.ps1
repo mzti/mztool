@@ -43,13 +43,13 @@ function OpSys {
     #Verifica se o sistema operacional é suportado.
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
 
-    if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
+    <# if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
         
-        continue
+        #Script Continua.
 
-    }
+    }#>
 
-    else {
+    if ($WinVer -notmatch 'Microsoft Windows 10' -and $WinVer -notmatch 'Microsoft Windows 11') {
 
         Write-Host 'SISTEMA OPERACIONAL NÃO SUPORTADO.'
 
