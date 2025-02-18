@@ -146,7 +146,7 @@ ______________________________________________________
          
             PinIcons
 
-            DefaultSoftwares
+            #DefaultSoftwares
 
             StartSoftwares
 
@@ -155,7 +155,7 @@ ______________________________________________________
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, StartSoftwares).Definition
                 ))
             )
             
