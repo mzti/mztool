@@ -22,4 +22,4 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 ### COMPATIBILIDADE: 
 
 Windows 10 X64 & X86, Windows 11.
-*Versões anteriores do Windows e outros sistemas operacionais não são compatíves com Winget.
+*Versões anteriores ao Windows 10 e outros sistemas operacionais não são compatíves com Winget.
