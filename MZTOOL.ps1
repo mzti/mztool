@@ -39,25 +39,14 @@ else {
 }
  
 function OpSys {
+
     #Verifica se o sistema operacional é suportado.
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
 
-    if ( $WinVer -Match 'Microsoft Windows 11') {
+    if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
         
-        Write-Host "$WinVer"
-
-    }
-
-    elseif ($WinVer -Match 'Microsoft Windows 10') {
+        Continue
         
-        Write-Host "$WinVer"
-
-    }
-
-    elseif ($WinVer -Match 'Microsoft Windows 8.1') {
-        
-        Write-Host "$WinVer"
-
     }
 
     else {
@@ -909,28 +898,22 @@ function RemoveGhostDrivers {
     #Remove os drivers de Dispositivos Ocultos da lista obtida.
     ForEach ($DRIVER in $DISPOSITIVOSOCULTOS) {
         
-        pnputil /remove-device $DRIVER.InstanceId
+        pnputil /remove-device $DRIVER.InstanceId | Clear-Host
     
     }
-    
+
+       
 }
 
 function AnyDesk {
 
-    #Download do software AnyDek-CM.
+    #Download do software AnyDesk-CM.
 
-    if (Test-Path -Path "$home\OneDrive\Desktop") {
-        
-        $DESKTOP = "$home\OneDrive\Desktop"
-    }
-    
-    else {
-       
-        $DESKTOP = "$home\Desktop"
-
-    }
+    $DESKTOP = "C:\Users\Public\DESKTOP"
         
     Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"  
+
+    Clear-Host
     
 }
 
@@ -1464,6 +1447,8 @@ function ImgHealth {
     DISM /Online /Cleanup-Image /CheckHealth 
     DISM /Online /Cleanup-Image /RestoreHealth
 
+    Clear-Host
+
 }
 
 function Pro {
@@ -1482,6 +1467,8 @@ function Pro {
     Rename-Item Tokens.dat Tokens.old
     SLMGR.VBS /RILC
     changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
+
+    Clear-Host
 
 }
 
