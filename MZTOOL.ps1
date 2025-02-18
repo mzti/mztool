@@ -705,7 +705,7 @@ function DownloadMztool {
 
 function EnvTool {
     
-    #Adicionar variáveis de ambiente.
+    #Adiciona variáveis de ambiente.
     Start-Process PowerShell -WindowStyle Hidden {
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
@@ -713,7 +713,9 @@ function EnvTool {
 }
 
 function Diagnostics64 {
-   
+    
+    #Inicializa Softwares de diagnósticos de hardware x64.
+
     $MZTOOLFOLDER = 'C:\TOOL\MZTOOL'
 
     Start-Process $MZTOOLFOLDER\AIDA_64\aida64.exe
@@ -730,6 +732,8 @@ function Diagnostics64 {
 }
 
 function Diagnostics32 {
+    
+    #Inicializa Softwares de diagnósticos de hardware x32.
 
     $MZTOOLFOLDER = 'C:\TOOL\MZTOOL'
               
