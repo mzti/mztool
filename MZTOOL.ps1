@@ -133,14 +133,14 @@ ______________________________________________________
          
             PinIcons
 
-            #DefaultSoftwares
+            DefaultSoftwares
 
             WingetUpdate
 
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, StartSoftwares).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DefaultSoftwares, StartSoftwares, DefaultSoftwares).Definition
                 ))
             )
             
