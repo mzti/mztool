@@ -106,7 +106,9 @@ ______________________________________________________
 |____________________________________________________|
 '            
             Hora
+            
             EnvTool
+            
             ToolDir           
 
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
@@ -460,7 +462,7 @@ ______________________________________________________
             
                             if (Test-Path -Path $2007Folder) {
 
-                                continue
+                                #Script continues.
 
                             }
 
