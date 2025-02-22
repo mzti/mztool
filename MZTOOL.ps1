@@ -105,10 +105,6 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            Hora
-            
-            EnvTool
-            
             ToolDir           
 
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
@@ -192,11 +188,7 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA                 |
 |                   DANIEL MOZART                    |
 |____________________________________________________|
-'
-                Hora
-                        
-                AnyDesk
-                                
+'                               
                 ToolDir 
 
                 Start-Sleep -Seconds 1
@@ -228,7 +220,7 @@ ______________________________________________________
 
                 DelTemp
 
-                EnvTool
+         
 
                 Clear-Host
         
@@ -254,11 +246,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                
-                Hora
-                        
-                AnyDesk
-                                
+                                          
                 ToolDir 
 
                 Start-Sleep -Seconds 1
@@ -289,8 +277,6 @@ ______________________________________________________
                 Start-Sleep -Seconds 1
 
                 DelTemp
-
-                EnvTool
 
                 Clear-Host
         
@@ -344,8 +330,6 @@ ______________________________________________________
 
                         DelTemp
 
-                        EnvTool
-
                         Clear-Host
 
                         DisplayMenu
@@ -369,9 +353,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-
-                        Hora
-                        
+      
                         Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
@@ -380,8 +362,6 @@ ______________________________________________________
                         )
                         
                         DelTemp
-
-                        EnvTool
 
                         Clear-Host
                                     
@@ -481,9 +461,7 @@ ______________________________________________________
 
                         Start-Sleep -1
 
-                        DelTemp
-
-                        EnvTool
+                        DelTemp                       
 
                         Clear-Host
              
@@ -515,8 +493,6 @@ ______________________________________________________
                         Start-Sleep -1
 
                         DelTemp
-
-                        EnvTool
 
                         Clear-Host
              
@@ -570,34 +546,36 @@ ______________________________________________________
             Exit-PSSession
         }
 
-        . {
-            awin exit
+        # COMANDOS DE TESTE OCULTOS DO MENU.
+
+        any {
+            AnyDesk #Testa a função AnyDesk.
         }
 
         e {
-            EnvTool #TESTAR ENVTOOL
+            EnvTool #Testa a função  EnvTool.
         }
 
         w {
             WingetModule
-            WingetInstall #TESTAR WINGET
+            WingetInstall #Testa a função WingetInstall.
         }
 
         u {
             WinUpdateModule
-            WinUpdate #TESTAR WINUPDATE
+            WinUpdate #Testa a função WinUpdate.
         }
         
         h {
-            Hora #Testar Hora/Data
+            Hora #Testa a função Hora/Data.
         }
 
         p {
-            Pro #Converter Windows para versão PRO.
+            Pro #Testa a função Pro.
         }
 
         sfc {
-            ImgHealth #SFC /SCANNOW + DISM /Cleanup-Image
+            ImgHealth #Testa a função ImgHealth.
         }
         
         default {
@@ -1490,7 +1468,7 @@ function Pro {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINDOWSPRO'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Converte a versão do Windows para PRO.
+    #Converte a versão do Windows para PRO. (Não ativa o sistema, para a ativação é necessário haver uma Licença Digital HWID).
 
     changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
     SLMGR.VBS /CPKY
@@ -1503,10 +1481,6 @@ function Pro {
 
     Clear-Host
 
-}
-
-function awin {
-    Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
 
 Hora
