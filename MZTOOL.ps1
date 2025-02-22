@@ -1325,8 +1325,10 @@ function DefaultSoftwares {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     
     #Define o Google Chrome como navegador padrão, e Acrobat Reader como leitor de PDF padrão.
+    
     #Script não funciona em builds novas do Windows. 
     
+    <#
     # Define o Google Chrome como navegador padrão.
     $chromeProgId = "ChromeHTML"
     $registryPath = "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations"
@@ -1353,6 +1355,7 @@ function DefaultSoftwares {
     # Define o Acrobat Reader como leitor de PDF padrão.
     $pdfRegistryPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pdf\UserChoice"
     Set-ItemProperty -Path $pdfRegistryPath -Name "ProgId" -Value "Acrobat.Document.DC"
+    #>
     
     Clear-Host
 
