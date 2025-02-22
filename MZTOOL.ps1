@@ -107,14 +107,14 @@ ______________________________________________________
 '            
             ToolDir           
 
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function <#RemoveMStoreApps,#> PerfilTheme).Definition
                 ))
             )
 
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function AnyDesk, DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
@@ -122,7 +122,7 @@ ______________________________________________________
             )
 
 
-            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WingetModule, WingetInstall, Office365).Definition
@@ -135,7 +135,7 @@ ______________________________________________________
 
             WingetUpdate
 
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DefaultSoftwares, StartSoftwares, DefaultSoftwares).Definition
@@ -219,9 +219,7 @@ ______________________________________________________
                 Start-Sleep -Seconds 1
 
                 DelTemp
-
-         
-
+        
                 Clear-Host
         
                 DisplayMenu
@@ -354,7 +352,7 @@ ______________________________________________________
 |____________________________________________________|
 '
       
-                        Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
+                        Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
                               (Get-Command -Type Function WingetUpdate, RemoveGhostDrivers, WinUpdate).Definition
@@ -577,7 +575,11 @@ ______________________________________________________
         sfc {
             ImgHealth #Testa a função ImgHealth.
         }
-        
+
+        db {
+            DriverBooster #Testa a função DriverBooster.
+        }
+
         default {
             #ENTRADA INVÁLIDA.
 
@@ -666,6 +668,7 @@ function DownloadMztool {
 
     Remove-Item $MZTOOLZIP
 
+    Clear-Host
 }
 
 function EnvTool {
@@ -808,9 +811,7 @@ function WingetInstall {
     for ($i = 0; $i -le 2; $i++) {
 
         #WaitOffice2007Winget
-        
-        #Winget Install --Id Google.Chrome.BETA --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-         
+                 
         Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
         #WaitOffice2007Winget
@@ -832,22 +833,18 @@ function WingetUpdate {
 
     #WINGET - Atualização de pacotes de softwares instalados.
 
-    #Start-Process PowerShell {
-
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
     Clear-Host
-    #}
+   
 }
 
 function WinUpdate { 
 
     #Instalação de novas atualizações do Windows através do Windows Update.
-    
-    #Start-Process PowerShell {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -855,11 +852,9 @@ function WinUpdate {
     Import-Module PSWindowsUpdate -Force 
 
     Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
-        
-    #Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
-
+      
     Clear-Host
-    #}  
+    
 }
 
 function RemoveGhostDrivers {
@@ -989,7 +984,7 @@ function DriverBooster {
     
     #Extração e inicialização do software Driver Booster.
 
-    Start-Process PowerShell {
+    Start-Process PowerShell -WindowStyle Hidden {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1047,7 +1042,7 @@ function DriverBooster {
 
 function RemoveMStoreApps {
 
-    Start-Process PowerShell {
+    Start-Process PowerShell -WindowStyle Hidden {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEMSTOREAPPS'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
