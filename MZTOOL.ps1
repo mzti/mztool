@@ -706,9 +706,7 @@ function ToolDir {
     #Criação do diretório C:\TOOL.
 
     $ErrorActionPreference = 'silentlycontinue'
-
-    #$TOOL = 'C:\TOOL'
-    
+     
     #Se o diretório C:\TOOL já existir, é deletado.
 
     if (Test-Path -Path $env:TOOL) {
@@ -728,10 +726,8 @@ function DownloadMztool {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-
-    #$TOOL = 'C:\TOOL'
-   
-    $MZTOOLZIP = 'C:\TOOL\MZTOOL.zip'
+     
+    $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
     $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
        
@@ -757,7 +753,7 @@ function DownloadMztool {
     
     Clear-Host
             
-    #Extração do arquivo MZTOOL.zip para a pasta $TOOL.
+    #Extração do arquivo MZTOOL.zip para a pasta $Env:TOOL.
     
     Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL
 
@@ -1029,9 +1025,7 @@ function Microsoft365 {
 function Office2007 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE2007'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-       
-    #$TOOL = 'C:\TOOL'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'     
 
     Start-Process "$env:TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
     Wait-Job -Name NetFx3  
@@ -1060,12 +1054,10 @@ function DriverBooster {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        
+        Expand-Archive -LiteralPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER"
 
-        $TOOL = 'C:\TOOL'
-
-        Expand-Archive -LiteralPath "$TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$TOOL\MZTOOL\DRIVER_BOOSTER"
-
-        Start-Process "$TOOL\MZTOOL\DRIVER_BOOSTER\DriverBoosterPortable.exe" -Wait
+        Start-Process "$Env:TOOL\MZTOOL\DRIVER_BOOSTER\DriverBoosterPortable.exe" -Wait
         
         Start-Sleep -Seconds 1
         #Finaliza os serviços do software Driver Booster e deleta a pasta temporária do mesmo.
@@ -1082,7 +1074,7 @@ function DriverBooster {
                 
                 Start-Sleep -Seconds 5
 
-                Remove-Item -Path "$TOOL\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path "$Env:TOOL\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
             }
 
             elseif (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
@@ -1096,7 +1088,7 @@ function DriverBooster {
                 
                 Start-Sleep -Seconds 5
 
-                Remove-Item -Path "$TOOL\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path "$Env:TOOL:\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
             }
 
             else {
