@@ -632,7 +632,7 @@ ______________________________________________________
             Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
             Start-Sleep -Seconds 1
             DisplayMenu
-            
+
         }
     }
     
@@ -848,7 +848,7 @@ function WingetInstall {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Testa se exista uma instalação do Microsoft Office 2007 em andamento e aguarda a finalização para evitar conflito do Windows Install.
+    #Testa se existe uma instalação do Microsoft Office 2007 em andamento e aguarda a finalização para evitar conflitos do Windows Install.
     function WaitOffice2007Winget {
             
         if (Get-Process -Name setup -ErrorAction SilentlyContinue) {
@@ -909,7 +909,6 @@ function WinUpdate {
 }
 
 function RemoveGhostDrivers {
-
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEGHOSTDEVICES'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -925,7 +924,6 @@ function RemoveGhostDrivers {
         pnputil /remove-device $DRIVER.InstanceId | Clear-Host
     
     }
-
        
 }
 
@@ -949,7 +947,7 @@ function Microsoft365 {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> MICROSOFT365'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Cria o arquivo XML de isntalação personalizada no diretório C:\TOOL\OFFICE\365.
+    #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
     [xml]$XML = @'
 <Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
   <Add OfficeClientEdition="64" Channel="Current">
@@ -979,13 +977,11 @@ function Microsoft365 {
 
     Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
     
+    #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-
     $DESKTOP = "C:\Users\Public\DESKTOP"
-
-    Copy-Item "$365LNK\Word.lnk" "$DESKTOP"
-    Copy-Item "$365LNK\Excel.lnk" "$DESKTOP"
-    Copy-Item "$365LNK\PowerPoint.lnk" "$DESKTOP"
+    $APPS = @("Word.lnk", "Excel.lnk", "PowerPoint.lnk")
+    $APPS | ForEach-Object { Copy-Item "$365LNK\$_" "$DESKTOP" }
     
     Stop-Process -Name OfficeC2RClient -Force
     
