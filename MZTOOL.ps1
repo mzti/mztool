@@ -33,7 +33,9 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
     
 #>
 
-#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+#MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
+
 
 #Define a política de execução para permitir scripts assinados.
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
