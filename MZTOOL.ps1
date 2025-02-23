@@ -44,9 +44,11 @@ $adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
   
 #Verifica se o script está sendo executado como administrador.
 if ($myWindowsPrincipal.IsInRole($adminRole)) {
+
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
     
     #Executando como administrador. Formatação e estilo aplicadas.
-
+        
     $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
@@ -63,19 +65,22 @@ else {
     
     #Não está executando como administrador.
     
+    #Define a política de execução para permitir scripts assinados.
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue
+    
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
          
-        # Verifica e cria o perfil do PowerShell se não existir.
+        #Verifica e cria o perfil do PowerShell se não existir.
         if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
            
             New-Item -Path $PROFILE -Type File -Force
         }
 
-        # Adiciona as variáveis de ambiente ao perfil do PowerShell.
+        #Adiciona as variáveis de ambiente ao perfil do PowerShell.
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"        
 
-        # Define as variável de ambiente para o ambiente de usuário.
+        #Define as variável de ambiente para o ambiente de usuário.
             
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
 
