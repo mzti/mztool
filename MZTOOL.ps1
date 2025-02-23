@@ -1222,16 +1222,34 @@ function PerfilTheme {
     }
 
     #Define as opções de Efeitos Visuais do Windows para personalizado.
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewShadow' -Type DWord -Value 1
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewAlphaSelect' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'AlwaysHibernateThumbnails' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarAnimations' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'IconsOnly' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'EnableAeroPeek' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'AlwaysHibernateThumbnails' -Type DWord -Value 0
-    #Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'ShellState' -Value ([byte[]] (24, 00, 00, 00, 3E, 28, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 00, 00, 13, 00, 00, 00, 00, 00, 00, 00, 72, 00, 00, 00))
+    $settings = @{
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' = @{
+            'VisualFXSetting'           = 3
+            'AlwaysHibernateThumbnails' = 0
+            'IconsOnly'                 = 0
+        }
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'      = @{
+            'ListviewShadow'      = 1
+            'ListviewAlphaSelect' = 0
+            'TaskbarAnimations'   = 0
+        }
+        'HKCU:\Software\Microsoft\Windows\DWM'                                   = @{
+            'EnableAeroPeek'            = 0
+            'AlwaysHibernateThumbnails' = 0
+        }
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'               = @{
+            'ShellState' = [byte[]](24, 0, 0, 0, 62, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 114, 0, 0, 0)
+        }
+    }
    
+    foreach ($path in $settings.Keys) {
+        foreach ($name in $settings[$path].Keys) {
+            Set-ItemProperty -Path $path -Name $name -Value $settings[$path][$name] -Type DWord -ErrorAction SilentlyContinue
+        }
+    }
+
+    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
+        
     #Remove Widgets.    
     Get-AppxPackage *WebExperience* | Remove-AppxPackage
     
@@ -1559,8 +1577,8 @@ function StartSoftwares {
     }
 
     Start-Process ACROBAT
-    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/
-    
+    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/    
+    Start-Process -FilePath "C:\Windows\System32\SystemPropertiesPerformance.exe"    
 
 }
 
