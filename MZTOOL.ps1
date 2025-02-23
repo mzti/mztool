@@ -1171,6 +1171,15 @@ function PerfilTheme {
         continue
     }      
     
+    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    function RefreshUser {
+
+        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+        Stop-Process -Name explorer        
+    }
+
+    RefreshUser
+    
     Clear-Host
 
 }
