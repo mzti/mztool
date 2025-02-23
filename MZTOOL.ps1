@@ -73,10 +73,9 @@ else {
         }
 
         # Adiciona as variáveis de ambiente ao perfil do PowerShell.
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"        
 
-        # Define as variávelde ambiente para o ambiente de usuário.
+        # Define as variável de ambiente para o ambiente de usuário.
             
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
         Pause
@@ -85,8 +84,8 @@ else {
 
     PwshEnvTool
 
-    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force -ErrorAction SilentlyContinue
 
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
@@ -690,6 +689,9 @@ function MachineEnvTool {
         # Define as variáveis de ambiente para o ambiente de máquina.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
+        
+        #Define a variável na biblioteca Powershell do ambiente Machine.
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
 
     }
 }
