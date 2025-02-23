@@ -67,32 +67,26 @@ else {
     #Não está executando como administrador.
     
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
-    function EnvTool {
-    
-        #Adiciona variáveis de ambiente.
-        Start-Process PowerShell {
-        
-            # Verifica e cria o perfil do PowerShell se não existir
-            if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-                # Cria o perfil do PowerShell se não existir
-                New-Item -Path $PROFILE -Type File -Force
-            }
-
-            # Adiciona as variáveis de ambiente ao perfil do PowerShell.
-            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"
-            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
-
-            # Define as variáveis de ambiente para o ambiente de usuário e máquina.
-            [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
-            [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
-            [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
-
-            Pause
-
+    function PwshEnvTool { 
+         
+        # Verifica e cria o perfil do PowerShell se não existir
+        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
+            # Cria o perfil do PowerShell se não existir
+            New-Item -Path $PROFILE -Type File -Force
         }
+
+        # Adiciona as variáveis de ambiente ao perfil do PowerShell.
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
+
+        # Define as variávelde ambiente para o ambiente de usuário.
+            
+        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
+        Pause
+
     }
 
-    EnvTool   
+    PwshEnvTool
 
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
