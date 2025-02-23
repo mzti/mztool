@@ -47,11 +47,9 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     
     #Executando como administrador. Formatação e estilo aplicadas.
 
-    #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
-    EnvTool
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
-    pause
-    
     $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
@@ -72,7 +70,7 @@ else {
     function EnvTool {
     
         #Adiciona variáveis de ambiente.
-        Start-Process PowerShell -WindowStyle Hidden {
+        Start-Process PowerShell {
         
             # Verifica e cria o perfil do PowerShell se não existir
             if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
@@ -88,12 +86,13 @@ else {
             [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
             [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
             [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
+
+            Pause
+
         }
     }
-    
-    EnvTool
 
-    pause
+    EnvTool   
 
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
@@ -110,11 +109,6 @@ function OpSys {
 
     if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
         
-        #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
-        EnvTool
-
-        pause
-
         #Script Continua.
 
     }
