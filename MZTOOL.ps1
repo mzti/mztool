@@ -47,7 +47,8 @@ $adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
   
 #Verifica se o script está sendo executado como administrador.
 if ($myWindowsPrincipal.IsInRole($adminRole)) {
-
+    
+    #Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
     
     #Executando como administrador. Formatação e estilo aplicadas.
@@ -72,7 +73,7 @@ else {
     function PwshEnvTool { 
          
         Start-Process Powershell -WindowStyle Hidden {
-            
+
             #Verifica e cria o perfil do PowerShell se não existir.
             if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
            
