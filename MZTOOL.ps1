@@ -8,6 +8,7 @@
 .NOTES
     Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
     Compatibilidade: Windows 11 e 10.
+    Versão: BETA.
      
 .EXAMPLE
 
@@ -103,7 +104,7 @@ function DisplayMenu {
 ______________________________________________________
 |                                                    |
 |                       MZTOOL                       |
-| _________________________________________________  | 
+| _______________________BETA______________________  | 
 |                                                    | 
 |                                                    |
 | |1| INSTALAÇÃO COMPLETA                            |
