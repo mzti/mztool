@@ -34,6 +34,8 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #>
 
 #Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+#Define a política de execução para permitir scripts assinados.
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 #Obtém o ID e o Objeto de Segurança do usuário atual.
@@ -64,10 +66,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
 
 else {
     
-    #Não está executando como administrador.
-    
-    #Define a política de execução para permitir scripts assinados.
-    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 2>$null
+    #Não está executando como administrador.        
     
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
