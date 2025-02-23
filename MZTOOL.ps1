@@ -78,7 +78,6 @@ else {
         # Define as variável de ambiente para o ambiente de usuário.
             
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
-        Pause
 
     }
 
@@ -91,6 +90,9 @@ else {
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
     [System.Diagnostics.Process]::Start($newProcess) | Out-Null     
+    
+    Pause
+    
     exit 
 }
  
