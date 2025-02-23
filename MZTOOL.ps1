@@ -1,3 +1,37 @@
+<#
+.SYNOPSIS
+    Instalação e personalização automatizada de softwares e o perfil de usuário no ambiente Windows.
+
+.DESCRIPTION
+    Instale softwares e personaliza o perfil de usuário no Windows automaticamente a partir da nuvem e de pacotes e módulos da Microsoft. 
+    
+.NOTES
+    Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
+    Compatibilidade: Windows 11 e 10.
+     
+.EXAMPLE
+
+    1 - Implementação automatizada:
+
+Módulos e Gerenciador de pacotes (MSIX, NuGet): Implementação, atualização e auto-reparo do Winget e PSWindowsUpdate.
+
+Softwares (Winget): Adobe Acrobat Reader, Google Chrome, Microsoft 365, Powershell, AnyDesk.
+
+Atualizações (PSWindowsUpdate): Remoção de drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos) e Implementação e Atualização de novos e atuais Drivers de Dispositivo e Atualizações do Windows Update.
+
+Personalização do Perfil de Usuário (Regedit, XML, Appx): Tema, Ícones da Área de Trabalho e Barra de Tarefas, Remoção de Widgets, Remoção de Bloatwares, Remoção do Microsoft Copilot, Remoção de Ícones Visão de Tarefas e Notícias, Remoção de notificações da Central de Ações, Define o Google Chrome como navegador padrão e o Acrobat Reader como leitor de PDF padrão.
+2 - Download e execução standalone automatizada em nuvem de softwares para monitoramento e diagnóstico de hardwares.
+
+HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, GPUZ.
+3 - Atualização automátizada de softwares e drivers através do Winget e Módulo Windows Update.
+
+4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
+
+.LINK
+    https://github.com/DanielMozartt/MZTOOL
+    
+#>
+
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
 #Obtém o ID e o Objeto de Segurança do usuário atual.
@@ -107,14 +141,14 @@ ______________________________________________________
 '            
             ToolDir           
 
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function <#RemoveMStoreApps,#> PerfilTheme).Definition
                 ))
             )
 
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function AnyDesk, DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
@@ -122,10 +156,10 @@ ______________________________________________________
             )
 
 
-            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule, WingetInstall, Office365).Definition
+                    (Get-Command -Type Function WingetModule, WingetInstall, Microsoft365).Definition
                 ))
             )
          
@@ -135,7 +169,7 @@ ______________________________________________________
 
             WingetUpdate
 
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DefaultSoftwares, StartSoftwares, DefaultSoftwares).Definition
@@ -219,9 +253,7 @@ ______________________________________________________
                 Start-Sleep -Seconds 1
 
                 DelTemp
-
-         
-
+        
                 Clear-Host
         
                 DisplayMenu
@@ -354,7 +386,7 @@ ______________________________________________________
 |____________________________________________________|
 '
       
-                        Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
+                        Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
                               (Get-Command -Type Function WingetUpdate, RemoveGhostDrivers, WinUpdate).Definition
@@ -454,8 +486,10 @@ ______________________________________________________
                             }
     
                         }
-
+                                         
                         2007Folder
+
+                        NetFx3
 
                         Office2007
 
@@ -488,7 +522,7 @@ ______________________________________________________
                         
                         WingetModule
 
-                        Office365 
+                        Microsoft365 
 
                         Start-Sleep -1
 
@@ -547,47 +581,62 @@ ______________________________________________________
         }
 
         # COMANDOS DE TESTE OCULTOS DO MENU.
-
+        
+        #Testa a função AnyDesk.
         any {
-            AnyDesk #Testa a função AnyDesk.
+            AnyDesk 
         }
 
+        #Testa a função  EnvTool.
         e {
-            EnvTool #Testa a função  EnvTool.
+            EnvTool 
         }
+
+        #Testa a função WingetInstall.
 
         w {
             WingetModule
             WingetInstall #Testa a função WingetInstall.
         }
 
+        #Testa a função WinUpdate.
         u {
             WinUpdateModule
-            WinUpdate #Testa a função WinUpdate.
+            WinUpdate 
         }
         
+        #Testa a função ClockDate.
         h {
-            Hora #Testa a função Hora/Data.
+            ClockDate 
         }
 
+        #Testa a função Pro.
         p {
-            Pro #Testa a função Pro.
+            Pro 
         }
 
+        #Testa a função ImgHealth.
         sfc {
-            ImgHealth #Testa a função ImgHealth.
+            ImgHealth 
         }
-        
+
+        #Testa a função DriverBooster.
+        db {
+            DriverBooster 
+        }
+
         . {
             awin exit
         }
 
         default {
+
             #ENTRADA INVÁLIDA.
 
             Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
             Start-Sleep -Seconds 1
             DisplayMenu
+
         }
     }
     
@@ -595,9 +644,12 @@ ______________________________________________________
 
 #FUNÇÕES---------------------------------------------------------------
 
-function Hora {
+function ClockDate {
+
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.
     
     Start-Process PowerShell -WindowStyle Hidden {
+
         w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
         net start w32time 
         w32tm /resync /force
@@ -670,6 +722,7 @@ function DownloadMztool {
 
     Remove-Item $MZTOOLZIP
 
+    Clear-Host
 }
 
 function EnvTool {
@@ -799,29 +852,28 @@ function WingetInstall {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    <#function WaitOffice2007Winget {
+    #Testa se existe uma instalação do Microsoft Office 2007 em andamento e aguarda a finalização para evitar conflitos do Windows Install.
+    function WaitOffice2007Winget {
             
         if (Get-Process -Name setup -ErrorAction SilentlyContinue) {
             Wait-Process -Name setup
         }
 
-    }#>
+    }
         
-    #WaitOffice2007Winget
+    WaitOffice2007Winget
             
     for ($i = 0; $i -le 2; $i++) {
 
-        #WaitOffice2007Winget
-        
-        #Winget Install --Id Google.Chrome.BETA --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-         
+        WaitOffice2007Winget
+                 
         Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
-        #WaitOffice2007Winget
+        WaitOffice2007Winget
         
         Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
-        #WaitOffice2007Winget
+        WaitOffice2007Winget
         
         Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
@@ -836,22 +888,18 @@ function WingetUpdate {
 
     #WINGET - Atualização de pacotes de softwares instalados.
 
-    #Start-Process PowerShell {
-
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
     Clear-Host
-    #}
+   
 }
 
 function WinUpdate { 
 
     #Instalação de novas atualizações do Windows através do Windows Update.
-    
-    #Start-Process PowerShell {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -859,15 +907,12 @@ function WinUpdate {
     Import-Module PSWindowsUpdate -Force 
 
     Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
-        
-    #Get-WindowsUpdate -Download -Install -AcceptAll -ForceInstall -IgnoreReboot
-
+      
     Clear-Host
-    #}  
+    
 }
 
 function RemoveGhostDrivers {
-
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEGHOSTDEVICES'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -883,11 +928,13 @@ function RemoveGhostDrivers {
         pnputil /remove-device $DRIVER.InstanceId | Clear-Host
     
     }
-
        
 }
 
 function AnyDesk {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Download do software AnyDesk-CM.
 
@@ -899,12 +946,12 @@ function AnyDesk {
     
 }
 
-function Office365 {
+function Microsoft365 {
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE365'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> MICROSOFT365'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Cria o arquivo XML de isntalação personalizada no diretório C:\TOOL\OFFICE\365.
+    #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
     [xml]$XML = @'
 <Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
   <Add OfficeClientEdition="64" Channel="Current">
@@ -927,37 +974,19 @@ function Office365 {
   </AppSettings>
   <Display Level="TRUE" AcceptEULA="TRUE" />
 </Configuration> 
-'@
-
-    $TOOL = 'C:\TOOL'
-    
-    $365 = "$TOOL\OFFICE\365"
-    
-    #Se o diretório $TOOL\OFFICE\365 já existir, é deletado.
-
-    if ($365) {
-
-        Remove-Item -Path "$365"-Recurse -Force -ErrorAction SilentlyContinue
-    }
-
-    [System.IO.Directory]::CreateDirectory($365) | Out-Null
-        
-    $XML.save("$TOOL\OFFICE\365\OFFICE365.xml") 
+'@           
+    $XML.save("$env:Temp\MICROSOFT365.xml") 
    
-    $365XML = "$TOOL\OFFICE\365\OFFICE365.xml"
+    $365XML = "$env:Temp\MICROSOFT365.xml"
 
     Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
     
+    #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-
     $DESKTOP = "C:\Users\Public\DESKTOP"
-
-    Copy-Item "$365LNK\Word.lnk" "$DESKTOP"
-    Copy-Item "$365LNK\Excel.lnk" "$DESKTOP"
-    Copy-Item "$365LNK\PowerPoint.lnk" "$DESKTOP"
+    $APPS = @("Word.lnk", "Excel.lnk", "PowerPoint.lnk")
+    $APPS | ForEach-Object { Copy-Item "$365LNK\$_" "$DESKTOP" }
     
-    Remove-Item $365 -Force -Recurse
-
     Stop-Process -Name OfficeC2RClient -Force
     
     Clear-Host
@@ -968,9 +997,9 @@ function Office2007 {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE2007'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
        
-    $TOOL = 'C:\TOOL'
+    #$TOOL = 'C:\TOOL'
 
-    Start-Process "$TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
+    Start-Process "$env:TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
     Wait-Job -Name NetFx3  
     Start-Process 'winword.exe'
    
@@ -993,7 +1022,7 @@ function DriverBooster {
     
     #Extração e inicialização do software Driver Booster.
 
-    Start-Process PowerShell {
+    Start-Process PowerShell -WindowStyle Hidden {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1051,7 +1080,7 @@ function DriverBooster {
 
 function RemoveMStoreApps {
 
-    Start-Process PowerShell {
+    Start-Process PowerShell -WindowStyle Hidden {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEMSTOREAPPS'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1152,7 +1181,7 @@ function PerfilTheme {
     }
 
     #Define as opções de Efeitos Visuais do Windows para personalizado.
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 3
+    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewShadow' -Type DWord -Value 1
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewAlphaSelect' -Type DWord -Value 0
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'AlwaysHibernateThumbnails' -Type DWord -Value 0
@@ -1175,8 +1204,17 @@ function PerfilTheme {
     }
 
     else {
-        continue
+        #Script continua.
     }      
+    
+    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    function RefreshUser {
+
+        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+        Stop-Process -Name explorer        
+    }
+
+    RefreshUser
     
     Clear-Host
 
@@ -1188,8 +1226,6 @@ function PinIcons {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Fixa os ícones dos softwares Google Chrome, Acrobat Reader, Microsoft Word e do Windows Explorer na barra de tarefas e remove os demais ícones.
-
-    $TOOL = 'C:\TOOL'
 
     $taskbar_layout =
     @"
@@ -1272,11 +1308,57 @@ function PinIcons {
         }
         $registry.Dispose()
     }
-    
-    $TRAYICONS = "$TOOL\MZTOOL\REG\TRAYICONS.REG"
 
-    Start-Process Reg.exe -ArgumentList "Import $TRAYICONS" -Wait
+    function TrayIcons {
+
+        #Define e personaliza as configurações dos ícones da barra de tarefas.
+
+        $property = @{
+            "Start_SearchFiles"           = 2
+            "ServerAdminUI"               = 0
+            "Hidden"                      = 1
+            "ShowCompColor"               = 1
+            "HideFileExt"                 = 1
+            "DontPrettyPath"              = 0
+            "ShowInfoTip"                 = 1
+            "HideIcons"                   = 0
+            "MapNetDrvBtn"                = 0
+            "WebView"                     = 1
+            "Filter"                      = 0
+            "ShowSuperHidden"             = 0
+            "SeparateProcess"             = 0
+            "AutoCheckSelect"             = 0
+            "IconsOnly"                   = 0
+            "ShowTypeOverlay"             = 1
+            "ShowStatusBar"               = 1
+            "ListviewAlphaSelect"         = 1
+            "ListviewShadow"              = 1
+            "TaskbarAnimations"           = 1
+            "TaskbarSizeMove"             = 0
+            "DisablePreviewDesktop"       = 1
+            "TaskbarSmallIcons"           = 0
+            "TaskbarAutoHideInTabletMode" = 0
+            "ShellMigrationLevel"         = 3
+            "StartShownOnUpgrade"         = 1
+            "ReindexedProfile"            = 1
+            "StartMenuInit"               = 13
+            "OTPTBAttempted"              = 1
+            "WinXMigrationLevel"          = 1
+            "OTPTBImprSuccess"            = 1
+            "ShowCopilotButton"           = 0
+            "ShowTaskViewButton"          = 0
+        }
+
+        foreach ($name in $property.Keys) {
+            Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name $name -Value $property[$name] -Type DWord
+        }
+
+        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarStateLastRun" -Value 0x5eae966600000000 -Type QWord
+
+    }
     
+    TrayIcons
+
     Stop-Process -Name 'explorer'
 
     #Mostra e atualiza a Área de Trabalho.    
@@ -1345,6 +1427,9 @@ function DefaultSoftwares {
 
 function StartSoftwares {
 
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> STARTSOFTWARES'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
     Start-Process CHROME
     Start-Process ACROBAT
     Start-Process WINWORD
@@ -1355,7 +1440,6 @@ function StartSoftwares {
     Stop-Process -Name Eula -Force
 
     #Desabilita a primeira inicialização do Microsoft Edge.
-    
     $settings = 
     [PSCustomObject]@{
         Path  = 'SOFTWARE\Policies\Microsoft\Edge'
@@ -1438,6 +1522,9 @@ function StartSoftwares {
 
 function DelTemp {
 
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLEANTEMP'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
     #Remove arquivos temporários do sistema.
 
     Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue 
@@ -1491,7 +1578,7 @@ function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
 
-Hora
+ClockDate
 
 EnvTool
 
