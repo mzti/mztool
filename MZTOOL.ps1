@@ -581,47 +581,58 @@ ______________________________________________________
         }
 
         # COMANDOS DE TESTE OCULTOS DO MENU.
-
+        
+        #Testa a função AnyDesk.
         any {
-            AnyDesk #Testa a função AnyDesk.
+            AnyDesk 
         }
 
+        #Testa a função  EnvTool.
         e {
-            EnvTool #Testa a função  EnvTool.
+            EnvTool 
         }
+
+        #Testa a função WingetInstall.
 
         w {
             WingetModule
             WingetInstall #Testa a função WingetInstall.
         }
 
+        #Testa a função WinUpdate.
         u {
             WinUpdateModule
-            WinUpdate #Testa a função WinUpdate.
+            WinUpdate 
         }
         
+        #Testa a função ClockDate.
         h {
-            Hora #Testa a função Hora/Data.
+            ClockDate 
         }
 
+        #Testa a função Pro.
         p {
-            Pro #Testa a função Pro.
+            Pro 
         }
 
+        #Testa a função ImgHealth.
         sfc {
-            ImgHealth #Testa a função ImgHealth.
+            ImgHealth 
         }
 
+        #Testa a função DriverBooster.
         db {
-            DriverBooster #Testa a função DriverBooster.
+            DriverBooster 
         }
 
         default {
+
             #ENTRADA INVÁLIDA.
 
             Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
             Start-Sleep -Seconds 1
             DisplayMenu
+            
         }
     }
     
@@ -629,9 +640,12 @@ ______________________________________________________
 
 #FUNÇÕES---------------------------------------------------------------
 
-function Hora {
+function ClockDate {
+
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.
     
     Start-Process PowerShell -WindowStyle Hidden {
+
         w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
         net start w32time 
         w32tm /resync /force
@@ -834,6 +848,7 @@ function WingetInstall {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
+    #Testa se exista uma instalação do Microsoft Office 2007 em andamento e aguarda a finalização para evitar conflito do Windows Install.
     function WaitOffice2007Winget {
             
         if (Get-Process -Name setup -ErrorAction SilentlyContinue) {
@@ -915,6 +930,9 @@ function RemoveGhostDrivers {
 }
 
 function AnyDesk {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Download do software AnyDesk-CM.
 
@@ -1556,7 +1574,7 @@ function Pro {
 
 }
 
-Hora
+ClockDate
 
 EnvTool
 
