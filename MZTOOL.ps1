@@ -78,7 +78,7 @@ else {
         }
 
         #Adiciona as variáveis de ambiente ao perfil do PowerShell.
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"        
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue     
 
         #Define as variável de ambiente para o ambiente de usuário.
             
