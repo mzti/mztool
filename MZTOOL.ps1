@@ -96,10 +96,7 @@ else {
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($newProcess) | Out-Null     
-    
-    Pause
-    
+    [System.Diagnostics.Process]::Start($newProcess) | Out-Null              
     exit 
 }
  
