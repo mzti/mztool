@@ -47,9 +47,6 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     
     #Executando como administrador. Formatação e estilo aplicadas.
 
-    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-
     $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
@@ -88,6 +85,9 @@ else {
 
     PwshEnvTool
 
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
@@ -104,7 +104,6 @@ function OpSys {
     if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
         
         #Script Continua.
-
     }
 
     else {
@@ -691,7 +690,7 @@ function MachineEnvTool {
         # Define as variáveis de ambiente para o ambiente de máquina.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
-        
+
     }
 }
 
