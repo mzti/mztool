@@ -670,17 +670,19 @@ function EnvTool {
     Start-Process PowerShell -WindowStyle Hidden {
         
         # Verifica e cria o perfil do PowerShell se não existir
-        if (-not (Test-Path -Path $PROFILE)) {
-           
+        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
+            # Cria o perfil do PowerShell se não existir
             New-Item -Path $PROFILE -Type File -Force
         }
 
-        # Abre o perfil do PowerShell e adiciona a variável de ambiente
+        # Adiciona as variáveis de ambiente ao perfil do PowerShell.
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"
-               
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
+
+        # Define as variáveis de ambiente para o ambiente de usuário e máquina.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
-        [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
+        [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
     }
 }
 
