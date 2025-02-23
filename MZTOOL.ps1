@@ -84,8 +84,7 @@ else {
 
     PwshEnvTool
 
-    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force -ErrorAction SilentlyContinue
+    Pause
 
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
