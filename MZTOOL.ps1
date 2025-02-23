@@ -1169,6 +1169,13 @@ function PerfilTheme {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+   
+    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    function RefreshUser {
+
+        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+        Stop-Process -Name explorer        
+    }
 
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
 
@@ -1190,11 +1197,19 @@ function PerfilTheme {
     #Adiciona ícones de sistema a Área de Trabalho.
     $DESKINCONSREG = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
 
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{018D5C66-4533-4307-9B53-224DE2ED1FE6}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{20D04FE0-3AEA-1069-A2D8-08002B30309D}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
+    # Lista de ícones de sistema.
+    $ICONS = @(
+        '{018D5C66-4533-4307-9B53-224DE2ED1FE6}', #OneDrive
+        '{20D04FE0-3AEA-1069-A2D8-08002B30309D}', #Este Computador
+        '{59031a47-3f72-44a7-89c5-5595fe6b30ee}', #Rede
+        '{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}', #Grupo Doméstico
+        '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}'  #Painel de Controle
+    )
+
+    # Adiciona ou modifica propriedades no registro para exibir ícones.
+    foreach ($ICON in $ICONS) {
+        New-ItemProperty -Path "$DESKINCONSREG" -Name $ICON -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
+    }    
 
     #Mostra e atualiza a Área de Trabalho.    
     for ($i = 0; $i -le 1; $i++) {
@@ -1220,8 +1235,8 @@ function PerfilTheme {
     #Remove Widgets.    
     Get-AppxPackage *WebExperience* | Remove-AppxPackage
     
-    #Reinicia o Explorer.exe
-    Stop-Process -Name 'explorer'
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    RefreshUser
 
     #Finaliza janela de personalização do Windows.
     if (Get-Process -Name 'systemsettings') {
@@ -1231,15 +1246,9 @@ function PerfilTheme {
 
     else {
         #Script continua.
-    }      
-    
-    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    function RefreshUser {
-
-        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
-        Stop-Process -Name explorer        
-    }
-
+    }    
+       
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     RefreshUser
     
     Clear-Host
@@ -1250,9 +1259,15 @@ function PinIcons {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > PINICONS'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+   
+    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    function RefreshUser {
+
+        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+        Stop-Process -Name explorer        
+    }
 
     #Fixa os ícones dos softwares Google Chrome, Acrobat Reader, Microsoft Word e do Windows Explorer na barra de tarefas e remove os demais ícones.
-
     $taskbar_layout =
     @"
 <?xml version="1.0" encoding="utf-8"?>
@@ -1277,7 +1292,7 @@ function PinIcons {
 </LayoutModificationTemplate>
 "@
 
-    [System.IO.FileInfo]$provisioning = "$($env:ProgramData)\provisioning\tasbar_layout.xml"
+    [System.IO.FileInfo]$provisioning = "$($env:ProgramData)\provisioning\taskbar_layout.xml"
     if (!$provisioning.Directory.Exists) {
         $provisioning.Directory.Create()
     }
@@ -1338,7 +1353,6 @@ function PinIcons {
     function TrayIcons {
 
         #Define e personaliza as configurações dos ícones da barra de tarefas.
-
         $property = @{
             "Start_SearchFiles"           = 2
             "ServerAdminUI"               = 0
@@ -1385,7 +1399,8 @@ function PinIcons {
     
     TrayIcons
 
-    Stop-Process -Name 'explorer'
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    RefreshUser
 
     #Mostra e atualiza a Área de Trabalho.    
     for ($i = 0; $i -le 2; $i++) {
@@ -1406,6 +1421,9 @@ function PinIcons {
 
     #Ativa plano de energia para Alto Desempenho.    
     POWERCFG /SETACTIVE SCHEME_MIN
+
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    RefreshUser
           
 }
 
