@@ -159,7 +159,7 @@ ______________________________________________________
             Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule, WingetInstall, Office365).Definition
+                    (Get-Command -Type Function WingetModule, WingetInstall, Microsoft365).Definition
                 ))
             )
          
@@ -522,7 +522,7 @@ ______________________________________________________
                         
                         WingetModule
 
-                        Office365 
+                        Microsoft365 
 
                         Start-Sleep -1
 
@@ -834,27 +834,27 @@ function WingetInstall {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    <#function WaitOffice2007Winget {
+    function WaitOffice2007Winget {
             
         if (Get-Process -Name setup -ErrorAction SilentlyContinue) {
             Wait-Process -Name setup
         }
 
-    }#>
+    }
         
-    #WaitOffice2007Winget
+    WaitOffice2007Winget
             
     for ($i = 0; $i -le 2; $i++) {
 
-        #WaitOffice2007Winget
+        WaitOffice2007Winget
                  
         Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
-        #WaitOffice2007Winget
+        WaitOffice2007Winget
         
         Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
 
-        #WaitOffice2007Winget
+        WaitOffice2007Winget
         
         Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
@@ -926,9 +926,9 @@ function AnyDesk {
     
 }
 
-function Office365 {
+function Microsoft365 {
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE365'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> MICROSOFT365'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Cria o arquivo XML de isntalação personalizada no diretório C:\TOOL\OFFICE\365.
@@ -954,24 +954,10 @@ function Office365 {
   </AppSettings>
   <Display Level="TRUE" AcceptEULA="TRUE" />
 </Configuration> 
-'@
-
-    $TOOL = 'C:\TOOL'
-    
-    $365 = "$TOOL\OFFICE\365"
-    
-    #Se o diretório $TOOL\OFFICE\365 já existir, é deletado.
-
-    if ($365) {
-
-        Remove-Item -Path "$365"-Recurse -Force -ErrorAction SilentlyContinue
-    }
-
-    [System.IO.Directory]::CreateDirectory($365) | Out-Null
-        
-    $XML.save("$TOOL\OFFICE\365\OFFICE365.xml") 
+'@           
+    $XML.save("$env:Temp\MICROSOFT365.xml") 
    
-    $365XML = "$TOOL\OFFICE\365\OFFICE365.xml"
+    $365XML = "$env:Temp\MICROSOFT365.xml"
 
     Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
     
@@ -983,8 +969,6 @@ function Office365 {
     Copy-Item "$365LNK\Excel.lnk" "$DESKTOP"
     Copy-Item "$365LNK\PowerPoint.lnk" "$DESKTOP"
     
-    Remove-Item $365 -Force -Recurse
-
     Stop-Process -Name OfficeC2RClient -Force
     
     Clear-Host
@@ -1202,7 +1186,7 @@ function PerfilTheme {
     }
 
     else {
-        continue
+        #Script continua.
     }      
     
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
@@ -1309,54 +1293,53 @@ function PinIcons {
 
     function TrayIcons {
 
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Start_SearchFiles" -Value 2 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ServerAdminUI" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowCompColor" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "DontPrettyPath" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowInfoTip" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideIcons" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "MapNetDrvBtn" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "WebView" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Filter" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowSuperHidden" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "SeparateProcess" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "AutoCheckSelect" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "IconsOnly" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowTypeOverlay" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowStatusBar" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ListviewAlphaSelect" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ListviewShadow" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarAnimations" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarSizeMove" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "DisablePreviewDesktop" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarSmallIcons" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarAutoHideInTabletMode" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShellMigrationLevel" -Value 3 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "StartShownOnUpgrade" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ReindexedProfile" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "StartMenuInit" -Value 13 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "OTPTBAttempted" -Value 1 -Type DWord
+        #Define e personaliza as configurações dos ícones da barra de tarefas.
+
+        $property = @{
+            "Start_SearchFiles"           = 2
+            "ServerAdminUI"               = 0
+            "Hidden"                      = 1
+            "ShowCompColor"               = 1
+            "HideFileExt"                 = 1
+            "DontPrettyPath"              = 0
+            "ShowInfoTip"                 = 1
+            "HideIcons"                   = 0
+            "MapNetDrvBtn"                = 0
+            "WebView"                     = 1
+            "Filter"                      = 0
+            "ShowSuperHidden"             = 0
+            "SeparateProcess"             = 0
+            "AutoCheckSelect"             = 0
+            "IconsOnly"                   = 0
+            "ShowTypeOverlay"             = 1
+            "ShowStatusBar"               = 1
+            "ListviewAlphaSelect"         = 1
+            "ListviewShadow"              = 1
+            "TaskbarAnimations"           = 1
+            "TaskbarSizeMove"             = 0
+            "DisablePreviewDesktop"       = 1
+            "TaskbarSmallIcons"           = 0
+            "TaskbarAutoHideInTabletMode" = 0
+            "ShellMigrationLevel"         = 3
+            "StartShownOnUpgrade"         = 1
+            "ReindexedProfile"            = 1
+            "StartMenuInit"               = 13
+            "OTPTBAttempted"              = 1
+            "WinXMigrationLevel"          = 1
+            "OTPTBImprSuccess"            = 1
+            "ShowCopilotButton"           = 0
+            "ShowTaskViewButton"          = 0
+        }
+
+        foreach ($name in $property.Keys) {
+            Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name $name -Value $property[$name] -Type DWord
+        }
+
         Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarStateLastRun" -Value 0x5eae966600000000 -Type QWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "WinXMigrationLevel" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "OTPTBImprSuccess" -Value 1 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowCopilotButton" -Value 0 -Type DWord
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowTaskViewButton" -Value 0 -Type DWord 
 
     }
     
     TrayIcons
-
-    <# 
-    
-    $TOOL = 'C:\TOOL'
-    
-    $TRAYICONS = "$TOOL\MZTOOL\REG\TRAYICONS.REG"
-
-    Start-Process Reg.exe -ArgumentList "Import $TRAYICONS" -Wait
-    
-    #>
 
     Stop-Process -Name 'explorer'
 
@@ -1426,6 +1409,9 @@ function DefaultSoftwares {
 
 function StartSoftwares {
 
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> STARTSOFTWARES'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
     Start-Process CHROME
     Start-Process ACROBAT
     Start-Process WINWORD
@@ -1436,7 +1422,6 @@ function StartSoftwares {
     Stop-Process -Name Eula -Force
 
     #Desabilita a primeira inicialização do Microsoft Edge.
-    
     $settings = 
     [PSCustomObject]@{
         Path  = 'SOFTWARE\Policies\Microsoft\Edge'
@@ -1518,6 +1503,9 @@ function StartSoftwares {
 }
 
 function DelTemp {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLEANTEMP'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Remove arquivos temporários do sistema.
 
