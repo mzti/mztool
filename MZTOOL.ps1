@@ -63,6 +63,9 @@ else {
     
     #Não está executando como administrador.
     
+    #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
+    EnvTool
+
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
@@ -78,6 +81,9 @@ function OpSys {
 
     if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
         
+        #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
+        EnvTool
+
         #Script Continua.
 
     }
