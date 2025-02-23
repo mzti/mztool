@@ -66,7 +66,7 @@ else {
     #Não está executando como administrador.
     
     #Define a política de execução para permitir scripts assinados.
-    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue -WarningAction SilentlyContinu
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue -WarningAction SilentlyContinue #2>$null
     
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
