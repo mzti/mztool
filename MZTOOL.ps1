@@ -1599,7 +1599,7 @@ function awin {
 
 ClockDate
 
-EnvTool
+#EnvTool
 
 DisplayMenu 
 
