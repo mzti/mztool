@@ -47,6 +47,11 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     
     #Executando como administrador. Formatação e estilo aplicadas.
 
+    #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
+    EnvTool
+
+    pause
+    
     $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
@@ -66,6 +71,8 @@ else {
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     EnvTool
 
+    pause
+
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
@@ -83,6 +90,8 @@ function OpSys {
         
         #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
         EnvTool
+
+        pause
 
         #Script Continua.
 
