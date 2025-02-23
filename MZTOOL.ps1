@@ -658,6 +658,25 @@ function ClockDate {
     }
 }
 
+function EnvTool {
+    
+    #Adiciona variáveis de ambiente.
+    Start-Process PowerShell -WindowStyle Hidden {
+        
+        # Verifica e cria o perfil do PowerShell se não existir
+        if (-not (Test-Path -Path $PROFILE)) {
+           
+            New-Item -Path $PROFILE -Type File -Force
+        }
+
+        # Abre o perfil do PowerShell e adiciona a variável de ambiente
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')"
+               
+        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
+        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
+        [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
+    }
+}
 
 function ToolDir {
 
@@ -665,17 +684,17 @@ function ToolDir {
 
     $ErrorActionPreference = 'silentlycontinue'
 
-    $TOOL = 'C:\TOOL'
+    #$TOOL = 'C:\TOOL'
     
     #Se o diretório C:\TOOL já existir, é deletado.
 
-    if (Test-Path -Path $TOOL) {
+    if (Test-Path -Path $env:TOOL) {
 
-        Remove-Item -Path $TOOL -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    [System.IO.Directory]::CreateDirectory($TOOL) | Out-Null
-    $TOOLFOLDER = Get-Item $TOOL -ErrorAction SilentlyContinue
+    [System.IO.Directory]::CreateDirectory($env:TOOL) | Out-Null
+    $TOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
     $TOOLFOLDER.Attributes = 'Hidden' 
 
 }
@@ -687,7 +706,7 @@ function DownloadMztool {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    $TOOL = 'C:\TOOL'
+    #$TOOL = 'C:\TOOL'
    
     $MZTOOLZIP = 'C:\TOOL\MZTOOL.zip'
 
@@ -717,22 +736,13 @@ function DownloadMztool {
             
     #Extração do arquivo MZTOOL.zip para a pasta $TOOL.
     
-    Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $TOOL
+    Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL
 
     #Deletar o arquivo MZTOOL.zip.
 
     Remove-Item $MZTOOLZIP
 
     Clear-Host
-}
-
-function EnvTool {
-    
-    #Adiciona variáveis de ambiente.
-    Start-Process PowerShell -WindowStyle Hidden {
-        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
-        [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
-    }
 }
 
 function Diagnostics64 {
