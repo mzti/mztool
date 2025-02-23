@@ -74,7 +74,7 @@ else {
         #Verifica e cria o perfil do PowerShell se não existir.
         if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
            
-            New-Item -Path $PROFILE -Type File -Force
+            New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         }
 
         #Adiciona as variáveis de ambiente ao perfil do PowerShell.
