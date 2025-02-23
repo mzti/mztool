@@ -69,9 +69,9 @@ else {
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
          
-        # Verifica e cria o perfil do PowerShell se não existir
+        # Verifica e cria o perfil do PowerShell se não existir.
         if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-            # Cria o perfil do PowerShell se não existir
+           
             New-Item -Path $PROFILE -Type File -Force
         }
 
