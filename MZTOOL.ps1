@@ -33,7 +33,8 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
     
 #>
 
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 #Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -66,24 +67,25 @@ else {
     #Não está executando como administrador.
     
     #Define a política de execução para permitir scripts assinados.
-    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue -WarningAction SilentlyContinue #2>$null
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 2>$null
     
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
          
-        #Verifica e cria o perfil do PowerShell se não existir.
-        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
+        Start-Process Powershell -WindowStyle Hidden {
+            #Verifica e cria o perfil do PowerShell se não existir.
+            if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
            
-            New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        }
+                New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+            }
 
-        #Adiciona as variáveis de ambiente ao perfil do PowerShell.
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue     
+            #Adiciona as variáveis de ambiente ao perfil do PowerShell.
+            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue     
 
-        #Define as variável de ambiente para o ambiente de usuário.
+            #Define as variável de ambiente para o ambiente de usuário.
             
-        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
-
+            [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
+        }
     }
 
     PwshEnvTool
