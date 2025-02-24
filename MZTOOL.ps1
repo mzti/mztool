@@ -506,7 +506,7 @@ ______________________________________________________
             
                             if (Test-Path -Path $2007Folder) {
 
-                                #Script continues.
+                                #Script continua.
 
                             }
 
@@ -1104,7 +1104,7 @@ function DriverBooster {
 
             else {
                 
-                continue
+                #Script continua.
             }
     
         }
