@@ -617,44 +617,52 @@ ______________________________________________________
         #Testa a função AnyDesk.
         any {
             AnyDesk 
+            DisplayMenu
         }
 
         #Testa a função  EnvTool.
         e {
             EnvTool 
+            DisplayMenu
         }
 
         #Testa a função WingetInstall.
 
         w {
             WingetModule
-            WingetInstall #Testa a função WingetInstall.
+            WingetInstall 
+            DisplayMenu
         }
 
         #Testa a função WinUpdate.
         u {
             WinUpdateModule
             WinUpdate 
+            DisplayMenu
         }
         
         #Testa a função ClockDate.
         h {
             ClockDate 
+            DisplayMenu
         }
 
         #Testa a função Pro.
         p {
             Pro 
+            DisplayMenu
         }
 
         #Testa a função ImgHealth.
         sfc {
             ImgHealth 
+            DisplayMenu
         }
 
         #Testa a função DriverBooster.
         db {
             DriverBooster 
+            DisplayMenu
         }
 
         . {
