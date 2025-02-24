@@ -126,13 +126,16 @@ OpSys
 #MENU MZTOOL -----------------------------------------------------
 
 function DisplayMenu {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'      
     
     Clear-Host
     Write-Host '
 ______________________________________________________
 |                                                    |
 |                       MZTOOL                       |
-| _______________________BETA______________________  | 
+| _______________________BETA_______________________ | 
 |                                                    | 
 |                                                    |
 | |1| INSTALAÇÃO COMPLETA                            |
