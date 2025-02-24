@@ -83,10 +83,12 @@ else {
             }
 
             #Adiciona as variáveis de ambiente ao perfil do PowerShell.
-            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue     
+            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 
+            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue             
 
             #Define as variável de ambiente para o ambiente de usuário.            
             [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
+            [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User') 
         }
     }
 
@@ -1009,11 +1011,8 @@ function AnyDesk {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Download do software Standalone AnyDesk-CM para a área de trabalho pública.
-
-    $DESKTOP = "C:\Users\Public\DESKTOP"
-        
-    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"  
+    #Download do software Standalone AnyDesk-CM para a área de trabalho pública.           
+    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$env:DESKTOP\AnyDesk.exe"  
 
     Clear-Host
     
@@ -1056,9 +1055,8 @@ function Microsoft365 {
     
     #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-    $DESKTOP = "C:\Users\Public\DESKTOP"
     $APPS = @("Word.lnk", "Excel.lnk", "PowerPoint.lnk")
-    $APPS | ForEach-Object { Copy-Item "$365LNK\$_" "$DESKTOP" }
+    $APPS | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" }
     
     Stop-Process -Name OfficeC2RClient -Force
     
