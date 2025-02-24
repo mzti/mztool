@@ -203,10 +203,12 @@ ______________________________________________________
 
             WingetUpdate
 
+            StartSoftwares
+
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, <#DefaultSoftwares,#> StartSoftwares).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth <#DefaultSoftwares,#>).Definition
                 ))
             )
             
@@ -419,11 +421,12 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
+                        WingetUpdate
       
                         Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
-                              (Get-Command -Type Function WingetUpdate, RemoveGhostDrivers, WinUpdate).Definition
+                              (Get-Command -Type Function RemoveGhostDrivers, WinUpdate).Definition
                             ))
                         )
                         
@@ -810,17 +813,23 @@ function Diagnostics64 {
 
     $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
 
-    Start-Process $MZTOOLFOLDER\AIDA_64\aida64.exe
-    Start-Process $MZTOOLFOLDER\BLUE_SCREEN_VIEW\BlueScreenView.exe
-    Start-Process $MZTOOLFOLDER\CORE_TEMP\Core_Temp_64.exe
-    Start-Process $MZTOOLFOLDER\CPU_Z\cpuz_x64.exe
-    Start-Process $MZTOOLFOLDER\CRYSTAL_DISK\DiskInfo64.exe
-    Start-Process $MZTOOLFOLDER\HDSENTINEL\HDSentinel.exe
-    Start-Process $MZTOOLFOLDER\HWINFO\HWiNFO64.exe
-    Start-Process $MZTOOLFOLDER\GPU_Z.exe
+    $APPS = @(
+        "AIDA_64\aida64.exe",
+        "BLUE_SCREEN_VIEW\BlueScreenView.exe",
+        "CORE_TEMP\Core_Temp_64.exe",
+        "CPU_Z\cpuz_x64.exe",
+        "CRYSTAL_DISK\DiskInfo64.exe",
+        "HDSENTINEL\HDSentinel.exe",
+        "HWINFO\HWiNFO64.exe",
+        "GPU_Z.exe"
+    )
+
+    foreach ($APP in $APPS) {
+
+        Start-Process "$MZTOOLFOLDER\$APP"        
+    }
 
     Clear-Host
-        
 }
 
 function Diagnostics32 {
@@ -828,15 +837,22 @@ function Diagnostics32 {
     #Inicializa Softwares de diagnósticos de hardware x32.
 
     $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
-              
-    Start-Process $MZTOOLFOLDER\AIDA_64\aida64.exe
-    Start-Process $MZTOOLFOLDER\BLUE_SCREEN_VIEW\BlueScreenView.exe
-    Start-Process $MZTOOLFOLDER\CORE_TEMP\Core_Temp_32.exe
-    Start-Process $MZTOOLFOLDER\CPU_Z\cpuz_x32.exe
-    Start-Process $MZTOOLFOLDER\CRYSTAL_DISK\DiskInfo32.exe
-    Start-Process $MZTOOLFOLDER\HDSENTINEL\HDSentinel.exe
-    Start-Process $MZTOOLFOLDER\HWINFO\HWiNFO32.exe
-    Start-Process $MZTOOLFOLDER\GPU_Z.exe
+
+    $APPS = @(
+        "AIDA_64\aida64.exe",
+        "BLUE_SCREEN_VIEW\BlueScreenView.exe",
+        "CORE_TEMP\Core_Temp_32.exe",
+        "CPU_Z\cpuz_x32.exe",
+        "CRYSTAL_DISK\DiskInfo32.exe",
+        "HDSENTINEL\HDSentinel.exe",
+        "HWINFO\HWiNFO32.exe",
+        "GPU_Z.exe"
+    )
+
+    foreach ($APP in $APPS) {
+
+        Start-Process "$MZTOOLFOLDER\$APP"
+    }    
 
     Clear-Host
         
@@ -962,14 +978,16 @@ function WingetInstall {
 function WingetUpdate { 
 
     #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
+    Start-Process PowerShell -WindowStyle Hidden {
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
+        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
+        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
-    Clear-Host
-   
+        Clear-Host
+
+    }
 }
 
 function WinUpdate { 
@@ -1066,8 +1084,9 @@ function Microsoft365 {
 function Office2007 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE2007'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'     
-
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'  
+    
+    #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
     Start-Process "$env:TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
     Wait-Job -Name NetFx3  
     Start-Process 'winword.exe'
@@ -1075,6 +1094,8 @@ function Office2007 {
 }
 
 function NetFx3 {
+
+    #Implementa o recurso .NetFramework 3.5 no sistema.
 
     Start-Job -Name NetFx3 -ScriptBlock { 
 
@@ -1089,7 +1110,7 @@ function NetFx3 {
 
 function DriverBooster {
     
-    #Extração e inicialização do software Driver Booster.   
+    #Extrai e inicializa o software Driver Booster.   
 
     Start-Process PowerShell -WindowStyle Hidden {
     
