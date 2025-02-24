@@ -204,7 +204,7 @@ ______________________________________________________
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DefaultSoftwares, StartSoftwares, DefaultSoftwares).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, <#DefaultSoftwares,#> StartSoftwares).Definition
                 ))
             )
             
