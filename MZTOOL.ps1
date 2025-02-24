@@ -171,7 +171,7 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            ToolDir           
+            #ToolDir           
 
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -1074,7 +1074,7 @@ function DriverBooster {
     #Extração e inicialização do software Driver Booster.
 
     ToolDir
-    
+
     DownloadMztool
 
     Start-Process PowerShell -WindowStyle Hidden {
