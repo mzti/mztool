@@ -664,6 +664,8 @@ ______________________________________________________
 
         #Testa a função DriverBooster.
         db {
+            ToolDir
+            DownloadMztool
             DriverBooster 
             DisplayMenu
         }
@@ -1071,11 +1073,7 @@ function NetFx3 {
 
 function DriverBooster {
     
-    #Extração e inicialização do software Driver Booster.
-
-    ToolDir
-
-    DownloadMztool
+    #Extração e inicialização do software Driver Booster.   
 
     Start-Process PowerShell -WindowStyle Hidden {
     
