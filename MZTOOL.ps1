@@ -673,7 +673,7 @@ ______________________________________________________
 
             ImgHealth 
             DisplayMenu
-            
+
         }
 
         #Testa a função DriverBooster.
@@ -710,8 +710,7 @@ function ClockDate {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLOCK|DATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Define um novo servidor e sincroniza o relógio e a data do sistema.
-    
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.    
     Start-Process PowerShell -WindowStyle Hidden {
 
         w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
@@ -749,7 +748,6 @@ function ToolDir {
     $ErrorActionPreference = 'silentlycontinue'
      
     #Se o diretório C:\TOOL já existir, é deletado.
-
     if (Test-Path -Path $env:TOOL) {
 
         Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
@@ -768,6 +766,7 @@ function DownloadMztool {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
      
+    #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
     $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
@@ -794,12 +793,10 @@ function DownloadMztool {
     
     Clear-Host
             
-    #Extração do arquivo MZTOOL.zip para a pasta $Env:TOOL.
-    
+    #Extrai o conteúdo arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.    
     Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL
 
-    #Deletar o arquivo MZTOOL.zip.
-
+    #Deleta o arquivo MZTOOL.zip.
     Remove-Item $MZTOOLZIP
 
     Clear-Host
@@ -809,7 +806,7 @@ function Diagnostics64 {
     
     #Inicializa Softwares de diagnósticos de hardware x64.
 
-    $MZTOOLFOLDER = 'C:\TOOL\MZTOOL'
+    $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
 
     Start-Process $MZTOOLFOLDER\AIDA_64\aida64.exe
     Start-Process $MZTOOLFOLDER\BLUE_SCREEN_VIEW\BlueScreenView.exe
@@ -828,7 +825,7 @@ function Diagnostics32 {
     
     #Inicializa Softwares de diagnósticos de hardware x32.
 
-    $MZTOOLFOLDER = 'C:\TOOL\MZTOOL'
+    $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
               
     Start-Process $MZTOOLFOLDER\AIDA_64\aida64.exe
     Start-Process $MZTOOLFOLDER\BLUE_SCREEN_VIEW\BlueScreenView.exe
@@ -868,9 +865,12 @@ function WingetModule {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'  
    
     #Módulo WINGET.
+
+    #Obtém a versão do Windows.
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
     $ErrorActionPreference = 'SilentlyContinue'
-            
+     
+    #Verifica se a versão do Windows é a 11.
     if ( $WinVer -Match 'Windows 11') {
         Write-Host "$WinVer" |  Clear-Host
                 
@@ -885,13 +885,14 @@ function WingetModule {
         
     }
 
+    #Verifica se a versão do Windows é a 10.
     elseif ($WinVer -Match 'Windows 10') {
         Write-Host "$WinVer"
                 
-        #Pacote NuGet.
+        #Instala o pacote NuGet.
         Install-PackageProvider -Name NuGet -Force |  Clear-Host
         
-        #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
+        #Reinstala, redefine as fontes e atualiza o WINGET.
         Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery |  Clear-Host
         Repair-WinGetPackageManager |  Clear-Host
         Winget Source Remove --Name winget |  Clear-Host
@@ -933,7 +934,8 @@ function WingetInstall {
     }
         
     WaitOffice2007Winget
-            
+    
+    #Instala os softwares Google Chrome, Microsoft Powershell e Acrobat Reader 64Bit através do Winget.
     for ($i = 0; $i -le 2; $i++) {
 
         WaitOffice2007Winget
@@ -957,7 +959,7 @@ function WingetInstall {
 
 function WingetUpdate { 
 
-    #WINGET - Atualização de pacotes de softwares instalados.
+    #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -970,7 +972,7 @@ function WingetUpdate {
 
 function WinUpdate { 
 
-    #Instalação de novas atualizações do Windows através do Windows Update.
+    #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1007,7 +1009,7 @@ function AnyDesk {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Download do software AnyDesk-CM.
+    #Download do software Standalone AnyDesk-CM para a área de trabalho pública.
 
     $DESKTOP = "C:\Users\Public\DESKTOP"
         
