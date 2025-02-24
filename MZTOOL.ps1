@@ -183,7 +183,7 @@ ______________________________________________________
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function AnyDesk, DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
+                    (Get-Command -Type Function AnyDesk <#, DownloadMztool DriverBooster, NetFx3, Office2007#> ).Definition
                 ))
             )
 
@@ -588,6 +588,9 @@ ______________________________________________________
         0 {
             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
+            $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
+            $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
             Clear-Host
             Write-Host '
 ______________________________________________________
@@ -686,6 +689,9 @@ ______________________________________________________
 
 function ClockDate {
 
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLOCK|DATE'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
     #Define um novo servidor e sincroniza o relógio e a data do sistema.
     
     Start-Process PowerShell -WindowStyle Hidden {
@@ -698,6 +704,9 @@ function ClockDate {
 }
 
 function MachineEnvTool {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> MACHINE ENVTOOL'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     
     #Adiciona variáveis de ambiente.
     Start-Process PowerShell -WindowStyle Hidden {        
@@ -713,6 +722,9 @@ function MachineEnvTool {
 }
 
 function ToolDir {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Criação do diretório C:\TOOL.
 
@@ -1060,6 +1072,10 @@ function NetFx3 {
 function DriverBooster {
     
     #Extração e inicialização do software Driver Booster.
+
+    ToolDir
+    
+    DownloadMztool
 
     Start-Process PowerShell -WindowStyle Hidden {
     
