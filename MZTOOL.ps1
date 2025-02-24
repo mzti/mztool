@@ -691,6 +691,11 @@ ______________________________________________________
 
         }
 
+        dvr {
+
+            Install-DeviceDrivers
+        }
+
         . {
             awin exit
         }
@@ -1696,6 +1701,42 @@ function Pro {
 
     Clear-Host
 
+}
+
+function Install-DeviceDrivers {
+    # Adicionar Serviço de Atualização do Windows
+    $UpdateSvc = New-Object -ComObject Microsoft.Update.ServiceManager
+    $UpdateSvc.AddService2("7971f918-a847-4430-9279-4a52d1efe18d", 7, "")
+
+    # Buscar Atualizações de Drivers
+    $Session = New-Object -ComObject Microsoft.Update.Session
+    $Searcher = $Session.CreateUpdateSearcher()
+    $Searcher.ServiceID = '7971f918-a847-4430-9279-4a52d1efe18d'
+    $Searcher.SearchScope = 1 # Somente na máquina
+    $Searcher.ServerSelection = 3 # Terceiros
+    $Criteria = "IsInstalled=0 and Type='Driver'"
+    $SearchResult = $Searcher.Search($Criteria)
+    $Updates = $SearchResult.Updates
+
+    # Exibir Atualizações de Drivers Disponíveis
+    $Updates | Select-Object Title, DriverModel, DriverVerDate, DriverClass, DriverManufacturer | Format-List
+
+    # Baixar e Instalar as Atualizações
+    $UpdatesToDownload = New-Object -Com Microsoft.Update.UpdateColl
+    $Updates | ForEach-Object { $UpdatesToDownload.Add($_) | Out-Null }
+    $Downloader = $Session.CreateUpdateDownloader()
+    $Downloader.Updates = $UpdatesToDownload
+    $Downloader.Download()
+    $UpdatesToInstall = New-Object -Com Microsoft.Update.UpdateColl
+    $Updates | ForEach-Object { if ($_.IsDownloaded) { $UpdatesToInstall.Add($_) | Out-Null } }
+    $Installer = $Session.CreateUpdateInstaller()
+    $Installer.Updates = $UpdatesToInstall
+    $InstallationResult = $Installer.Install()
+
+    # Reiniciar se Necessário
+    if ($InstallationResult.RebootRequired) {
+        Write-Host "Reinicialização necessária. Por favor, reinicie o computador."
+    }
 }
 
 function awin {
