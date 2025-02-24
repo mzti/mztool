@@ -673,6 +673,7 @@ ______________________________________________________
 
             ImgHealth 
             DisplayMenu
+            
         }
 
         #Testa a função DriverBooster.
@@ -682,7 +683,7 @@ ______________________________________________________
             DownloadMztool
             DriverBooster 
             DisplayMenu
-            
+
         }
 
         . {
