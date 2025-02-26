@@ -823,7 +823,7 @@ function Diagnostics64 {
         "BLUE_SCREEN_VIEW\BlueScreenView.exe",
         "CORE_TEMP\Core_Temp_64.exe",
         "CPU_Z\cpuz_x64.exe",
-        "CRYSTAL_DISK\DiskInfo64.exe",
+        #"CRYSTAL_DISK\DiskInfo64.exe",
         "HDSENTINEL\HDSentinel.exe",
         "HWINFO\HWiNFO64.exe",
         "GPU_Z.exe"
@@ -848,7 +848,7 @@ function Diagnostics32 {
         "BLUE_SCREEN_VIEW\BlueScreenView.exe",
         "CORE_TEMP\Core_Temp_32.exe",
         "CPU_Z\cpuz_x32.exe",
-        "CRYSTAL_DISK\DiskInfo32.exe",
+        #"CRYSTAL_DISK\DiskInfo32.exe",
         "HDSENTINEL\HDSentinel.exe",
         "HWINFO\HWiNFO32.exe",
         "GPU_Z.exe"
