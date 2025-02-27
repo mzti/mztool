@@ -189,7 +189,6 @@ ______________________________________________________
                 ))
             )
 
-
             Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -619,7 +618,7 @@ ______________________________________________________
 
                 Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
             }
-            
+
             Start-Sleep -Seconds 3
             Exit
             Exit-PSHostProcess
@@ -700,6 +699,7 @@ ______________________________________________________
         dvr {
 
             Install-DeviceDrivers
+            
         }
 
         . {
