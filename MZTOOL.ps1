@@ -614,6 +614,12 @@ ______________________________________________________
 '
             
             DelTemp
+
+            if (Test-Path -Path $env:TOOL) {
+
+                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+            }
+            
             Start-Sleep -Seconds 3
             Exit
             Exit-PSHostProcess
