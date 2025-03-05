@@ -1041,7 +1041,11 @@ function AnyDesk {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Download do software Standalone AnyDesk-CM para a área de trabalho pública.           
-    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$env:DESKTOP\AnyDesk.exe"  
+
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile('https://download.anydesk.com/AnyDesk-CM.exe', "$env:DESKTOP\AnyDesk.exe")
+
+    #Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$env:DESKTOP\AnyDesk.exe"  
 
     Clear-Host
     
