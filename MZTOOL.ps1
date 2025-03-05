@@ -74,7 +74,7 @@ else {
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
          
-        Start-Process Powershell <#-WindowStyle Hidden#> {
+        Start-Process Powershell -WindowStyle Hidden {
 
             #Verifica e cria o perfil do PowerShell se não existir.
             if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
@@ -727,7 +727,7 @@ function ClockDate {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Define um novo servidor e sincroniza o relógio e a data do sistema.    
-    Start-Process PowerShell <#-WindowStyle Hidden#> {
+    Start-Process PowerShell -WindowStyle Hidden {
 
         w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
         net start w32time 
@@ -742,7 +742,7 @@ function MachineEnvTool {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     
     #Adiciona variáveis de ambiente.
-    Start-Process PowerShell <#-WindowStyle Hidden#> {        
+    Start-Process PowerShell -WindowStyle Hidden {        
 
         # Define as variáveis de ambiente para o ambiente de máquina.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
