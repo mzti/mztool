@@ -8,6 +8,7 @@
 .NOTES
     Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
     Compatibilidade: Windows 11 e 10.
+    Versão: BETA.
      
 .EXAMPLE
 
@@ -32,7 +33,12 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
     
 #>
 
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+#MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
+
+
+#Define a política de execução para permitir scripts assinados.
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 #Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -44,8 +50,11 @@ $adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
 #Verifica se o script está sendo executado como administrador.
 if ($myWindowsPrincipal.IsInRole($adminRole)) {
     
+    #Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+    
     #Executando como administrador. Formatação e estilo aplicadas.
-
+        
     $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
@@ -60,13 +69,36 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
 
 else {
     
-    #Não está executando como administrador.
+    #Não está executando como administrador.        
     
+    #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
+    function PwshEnvTool { 
+         
+        Start-Process Powershell -WindowStyle Hidden {
+
+            #Verifica e cria o perfil do PowerShell se não existir.
+            if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
+           
+                New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+            }
+
+            #Adiciona as variáveis de ambiente ao perfil do PowerShell.
+            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 
+            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue             
+
+            #Define as variável de ambiente para o ambiente de usuário.            
+            [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
+            [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User') 
+        }
+    }
+
+    PwshEnvTool
+
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($newProcess) | Out-Null     
+    [System.Diagnostics.Process]::Start($newProcess) | Out-Null              
     exit 
 }
  
@@ -78,7 +110,6 @@ function OpSys {
     if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
         
         #Script Continua.
-
     }
 
     else {
@@ -97,13 +128,16 @@ OpSys
 #MENU MZTOOL -----------------------------------------------------
 
 function DisplayMenu {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'      
     
     Clear-Host
     Write-Host '
 ______________________________________________________
 |                                                    |
 |                       MZTOOL                       |
-| _________________________________________________  | 
+| _______________________BETA_______________________ | 
 |                                                    | 
 |                                                    |
 | |1| INSTALAÇÃO COMPLETA                            |
@@ -139,7 +173,7 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            ToolDir           
+            #ToolDir           
 
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -151,10 +185,9 @@ ______________________________________________________
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function AnyDesk, DownloadMztool <#DriverBooster, NetFx3, Office2007,#>).Definition
+                    (Get-Command -Type Function AnyDesk <#, DownloadMztool DriverBooster, NetFx3, Office2007#> ).Definition
                 ))
             )
-
 
             Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -169,10 +202,12 @@ ______________________________________________________
 
             WingetUpdate
 
+            StartSoftwares
+
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DefaultSoftwares, StartSoftwares, DefaultSoftwares).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth <#DefaultSoftwares,#>).Definition
                 ))
             )
             
@@ -385,11 +420,12 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
+                        WingetUpdate
       
                         Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
-                              (Get-Command -Type Function WingetUpdate, RemoveGhostDrivers, WinUpdate).Definition
+                              (Get-Command -Type Function RemoveGhostDrivers, WinUpdate).Definition
                             ))
                         )
                         
@@ -474,7 +510,7 @@ ______________________________________________________
             
                             if (Test-Path -Path $2007Folder) {
 
-                                #Script continues.
+                                #Script continua.
 
                             }
 
@@ -493,7 +529,7 @@ ______________________________________________________
 
                         Office2007
 
-                        Start-Sleep -1
+                        Start-Sleep 1
 
                         DelTemp                       
 
@@ -556,6 +592,9 @@ ______________________________________________________
         0 {
             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
+            $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
+            $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
             Clear-Host
             Write-Host '
 ______________________________________________________
@@ -574,6 +613,12 @@ ______________________________________________________
 '
             
             DelTemp
+
+            if (Test-Path -Path $env:TOOL) {
+
+                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+            }
+
             Start-Sleep -Seconds 3
             Exit
             Exit-PSHostProcess
@@ -584,47 +629,79 @@ ______________________________________________________
         
         #Testa a função AnyDesk.
         any {
+
             AnyDesk 
+            DisplayMenu
+
         }
 
         #Testa a função  EnvTool.
         e {
+
             EnvTool 
+            DisplayMenu
+
         }
 
         #Testa a função WingetInstall.
 
         w {
+
             WingetModule
-            WingetInstall #Testa a função WingetInstall.
+            WingetInstall 
+            DisplayMenu
+
         }
 
         #Testa a função WinUpdate.
         u {
+
             WinUpdateModule
             WinUpdate 
+            DisplayMenu
+
         }
         
         #Testa a função ClockDate.
         h {
+
             ClockDate 
+            DisplayMenu
+
         }
 
         #Testa a função Pro.
         p {
+
             Pro 
+            DisplayMenu
+
         }
 
         #Testa a função ImgHealth.
         sfc {
+
             ImgHealth 
+            DisplayMenu
+
         }
 
         #Testa a função DriverBooster.
         db {
+
+            ToolDir
+            DownloadMztool
             DriverBooster 
+            DisplayMenu
+
         }
 
+        dvr {
+
+            Install-DeviceDrivers
+            
+        }
+   
         default {
 
             #ENTRADA INVÁLIDA.
@@ -642,8 +719,10 @@ ______________________________________________________
 
 function ClockDate {
 
-    #Define um novo servidor e sincroniza o relógio e a data do sistema.
-    
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLOCK|DATE'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.    
     Start-Process PowerShell -WindowStyle Hidden {
 
         w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
@@ -653,24 +732,41 @@ function ClockDate {
     }
 }
 
+function MachineEnvTool {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> MACHINE ENVTOOL'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    
+    #Adiciona variáveis de ambiente.
+    Start-Process PowerShell -WindowStyle Hidden {        
+
+        # Define as variáveis de ambiente para o ambiente de máquina.
+        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
+        [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
+        
+        #Define a variável na biblioteca Powershell do ambiente Machine.
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
+
+    }
+}
 
 function ToolDir {
+
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Criação do diretório C:\TOOL.
 
     $ErrorActionPreference = 'silentlycontinue'
-
-    $TOOL = 'C:\TOOL'
-    
+     
     #Se o diretório C:\TOOL já existir, é deletado.
+    if (Test-Path -Path $env:TOOL) {
 
-    if (Test-Path -Path $TOOL) {
-
-        Remove-Item -Path $TOOL -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    [System.IO.Directory]::CreateDirectory($TOOL) | Out-Null
-    $TOOLFOLDER = Get-Item $TOOL -ErrorAction SilentlyContinue
+    [System.IO.Directory]::CreateDirectory($env:TOOL) | Out-Null
+    $TOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
     $TOOLFOLDER.Attributes = 'Hidden' 
 
 }
@@ -681,10 +777,9 @@ function DownloadMztool {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-
-    $TOOL = 'C:\TOOL'
-   
-    $MZTOOLZIP = 'C:\TOOL\MZTOOL.zip'
+     
+    #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
+    $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
     $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
        
@@ -710,59 +805,61 @@ function DownloadMztool {
     
     Clear-Host
             
-    #Extração do arquivo MZTOOL.zip para a pasta $TOOL.
-    
-    Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $TOOL
+    #Extrai o conteúdo arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.    
+    Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL
 
-    #Deletar o arquivo MZTOOL.zip.
-
+    #Deleta o arquivo MZTOOL.zip.
     Remove-Item $MZTOOLZIP
 
     Clear-Host
-}
-
-function EnvTool {
-    
-    #Adiciona variáveis de ambiente.
-    Start-Process PowerShell -WindowStyle Hidden {
-        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine') 
-        [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'MACHINE')
-    }
 }
 
 function Diagnostics64 {
     
     #Inicializa Softwares de diagnósticos de hardware x64.
 
-    $MZTOOLFOLDER = 'C:\TOOL\MZTOOL'
+    $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
 
-    Start-Process $MZTOOLFOLDER\AIDA_64\aida64.exe
-    Start-Process $MZTOOLFOLDER\BLUE_SCREEN_VIEW\BlueScreenView.exe
-    Start-Process $MZTOOLFOLDER\CORE_TEMP\Core_Temp_64.exe
-    Start-Process $MZTOOLFOLDER\CPU_Z\cpuz_x64.exe
-    Start-Process $MZTOOLFOLDER\CRYSTAL_DISK\DiskInfo64.exe
-    Start-Process $MZTOOLFOLDER\HDSENTINEL\HDSentinel.exe
-    Start-Process $MZTOOLFOLDER\HWINFO\HWiNFO64.exe
-    Start-Process $MZTOOLFOLDER\GPU_Z.exe
+    $APPS = @(
+        "AIDA_64\aida64.exe",
+        "BLUE_SCREEN_VIEW\BlueScreenView.exe",
+        "CORE_TEMP\Core_Temp_64.exe",
+        "CPU_Z\cpuz_x64.exe",
+        #"CRYSTAL_DISK\DiskInfo64.exe",
+        "HDSENTINEL\HDSentinel.exe",
+        "HWINFO\HWiNFO64.exe",
+        "GPU_Z.exe"
+    )
+
+    foreach ($APP in $APPS) {
+
+        Start-Process "$MZTOOLFOLDER\$APP"        
+    }
 
     Clear-Host
-        
 }
 
 function Diagnostics32 {
     
     #Inicializa Softwares de diagnósticos de hardware x32.
 
-    $MZTOOLFOLDER = 'C:\TOOL\MZTOOL'
-              
-    Start-Process $MZTOOLFOLDER\AIDA_64\aida64.exe
-    Start-Process $MZTOOLFOLDER\BLUE_SCREEN_VIEW\BlueScreenView.exe
-    Start-Process $MZTOOLFOLDER\CORE_TEMP\Core_Temp_32.exe
-    Start-Process $MZTOOLFOLDER\CPU_Z\cpuz_x32.exe
-    Start-Process $MZTOOLFOLDER\CRYSTAL_DISK\DiskInfo32.exe
-    Start-Process $MZTOOLFOLDER\HDSENTINEL\HDSentinel.exe
-    Start-Process $MZTOOLFOLDER\HWINFO\HWiNFO32.exe
-    Start-Process $MZTOOLFOLDER\GPU_Z.exe
+    $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
+
+    $APPS = @(
+        "AIDA_64\aida64.exe",
+        "BLUE_SCREEN_VIEW\BlueScreenView.exe",
+        "CORE_TEMP\Core_Temp_32.exe",
+        "CPU_Z\cpuz_x32.exe",
+        #"CRYSTAL_DISK\DiskInfo32.exe",
+        "HDSENTINEL\HDSentinel.exe",
+        "HWINFO\HWiNFO32.exe",
+        "GPU_Z.exe"
+    )
+
+    foreach ($APP in $APPS) {
+
+        Start-Process "$MZTOOLFOLDER\$APP"
+    }    
 
     Clear-Host
         
@@ -793,9 +890,12 @@ function WingetModule {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'  
    
     #Módulo WINGET.
+
+    #Obtém a versão do Windows.
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
     $ErrorActionPreference = 'SilentlyContinue'
-            
+     
+    #Verifica se a versão do Windows é a 11.
     if ( $WinVer -Match 'Windows 11') {
         Write-Host "$WinVer" |  Clear-Host
                 
@@ -810,13 +910,14 @@ function WingetModule {
         
     }
 
+    #Verifica se a versão do Windows é a 10.
     elseif ($WinVer -Match 'Windows 10') {
         Write-Host "$WinVer"
                 
-        #Pacote NuGet.
+        #Instala o pacote NuGet.
         Install-PackageProvider -Name NuGet -Force |  Clear-Host
         
-        #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
+        #Reinstala, redefine as fontes e atualiza o WINGET.
         Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery |  Clear-Host
         Repair-WinGetPackageManager |  Clear-Host
         Winget Source Remove --Name winget |  Clear-Host
@@ -858,7 +959,8 @@ function WingetInstall {
     }
         
     WaitOffice2007Winget
-            
+    
+    #Instala os softwares Google Chrome, Microsoft Powershell e Acrobat Reader 64Bit através do Winget.
     for ($i = 0; $i -le 2; $i++) {
 
         WaitOffice2007Winget
@@ -882,20 +984,22 @@ function WingetInstall {
 
 function WingetUpdate { 
 
-    #WINGET - Atualização de pacotes de softwares instalados.
+    #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
+    Start-Process PowerShell -WindowStyle Hidden {
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
+        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
+        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
-    Clear-Host
-   
+        Clear-Host
+
+    }
 }
 
 function WinUpdate { 
 
-    #Instalação de novas atualizações do Windows através do Windows Update.
+    #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -932,11 +1036,8 @@ function AnyDesk {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Download do software AnyDesk-CM.
-
-    $DESKTOP = "C:\Users\Public\DESKTOP"
-        
-    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$DESKTOP\AnyDesk.exe"  
+    #Download do software Standalone AnyDesk-CM para a área de trabalho pública.           
+    Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$env:DESKTOP\AnyDesk.exe"  
 
     Clear-Host
     
@@ -979,9 +1080,8 @@ function Microsoft365 {
     
     #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-    $DESKTOP = "C:\Users\Public\DESKTOP"
     $APPS = @("Word.lnk", "Excel.lnk", "PowerPoint.lnk")
-    $APPS | ForEach-Object { Copy-Item "$365LNK\$_" "$DESKTOP" }
+    $APPS | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" }
     
     Stop-Process -Name OfficeC2RClient -Force
     
@@ -991,17 +1091,18 @@ function Microsoft365 {
 function Office2007 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE2007'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-       
-    $TOOL = 'C:\TOOL'
-
-    Start-Process "$TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'  
+    
+    #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
+    Start-Process "$env:TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
     Wait-Job -Name NetFx3  
     Start-Process 'winword.exe'
    
 }
 
 function NetFx3 {
+
+    #Implementa o recurso .NetFramework 3.5 no sistema.
 
     Start-Job -Name NetFx3 -ScriptBlock { 
 
@@ -1016,18 +1117,16 @@ function NetFx3 {
 
 function DriverBooster {
     
-    #Extração e inicialização do software Driver Booster.
+    #Extrai e inicializa o software Driver Booster.   
 
     Start-Process PowerShell -WindowStyle Hidden {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        
+        Expand-Archive -LiteralPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER"
 
-        $TOOL = 'C:\TOOL'
-
-        Expand-Archive -LiteralPath "$TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$TOOL\MZTOOL\DRIVER_BOOSTER"
-
-        Start-Process "$TOOL\MZTOOL\DRIVER_BOOSTER\DriverBoosterPortable.exe" -Wait
+        Start-Process "$Env:TOOL\MZTOOL\DRIVER_BOOSTER\DriverBoosterPortable.exe" -Wait
         
         Start-Sleep -Seconds 1
         #Finaliza os serviços do software Driver Booster e deleta a pasta temporária do mesmo.
@@ -1044,7 +1143,7 @@ function DriverBooster {
                 
                 Start-Sleep -Seconds 5
 
-                Remove-Item -Path "$TOOL\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path "$Env:TOOL\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
             }
 
             elseif (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
@@ -1058,12 +1157,12 @@ function DriverBooster {
                 
                 Start-Sleep -Seconds 5
 
-                Remove-Item -Path "$TOOL\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path "$Env:TOOL:\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
             }
 
             else {
                 
-                continue
+                #Script continua.
             }
     
         }
@@ -1139,6 +1238,13 @@ function PerfilTheme {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+   
+    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    function RefreshUser {
+
+        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+        Stop-Process -Name explorer        
+    }
 
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
 
@@ -1160,11 +1266,19 @@ function PerfilTheme {
     #Adiciona ícones de sistema a Área de Trabalho.
     $DESKINCONSREG = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
 
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{018D5C66-4533-4307-9B53-224DE2ED1FE6}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{20D04FE0-3AEA-1069-A2D8-08002B30309D}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
-    New-ItemProperty -Path "$DESKINCONSREG" -Name '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}' -PropertyType dword -Value 00000000 -ErrorAction SilentlyContinue
+    # Lista de ícones de sistema.
+    $ICONS = @(
+        '{018D5C66-4533-4307-9B53-224DE2ED1FE6}', #OneDrive
+        '{20D04FE0-3AEA-1069-A2D8-08002B30309D}', #Este Computador
+        '{59031a47-3f72-44a7-89c5-5595fe6b30ee}', #Rede
+        '{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}', #Grupo Doméstico
+        '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}'  #Painel de Controle
+    )
+
+    # Adiciona ou modifica propriedades no registro para exibir ícones.
+    foreach ($ICON in $ICONS) {
+        New-ItemProperty -Path "$DESKINCONSREG" -Name $ICON -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
+    }    
 
     #Mostra e atualiza a Área de Trabalho.    
     for ($i = 0; $i -le 1; $i++) {
@@ -1177,21 +1291,39 @@ function PerfilTheme {
     }
 
     #Define as opções de Efeitos Visuais do Windows para personalizado.
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewShadow' -Type DWord -Value 1
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewAlphaSelect' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'AlwaysHibernateThumbnails' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarAnimations' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'IconsOnly' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'EnableAeroPeek' -Type DWord -Value 0
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'AlwaysHibernateThumbnails' -Type DWord -Value 0
-    #Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'ShellState' -Value ([byte[]] (24, 00, 00, 00, 3E, 28, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 00, 00, 13, 00, 00, 00, 00, 00, 00, 00, 72, 00, 00, 00))
+    $settings = @{
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' = @{
+            'VisualFXSetting'           = 3
+            'AlwaysHibernateThumbnails' = 0
+            'IconsOnly'                 = 0
+        }
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'      = @{
+            'ListviewShadow'      = 1
+            'ListviewAlphaSelect' = 0
+            'TaskbarAnimations'   = 0
+        }
+        'HKCU:\Software\Microsoft\Windows\DWM'                                   = @{
+            'EnableAeroPeek'            = 0
+            'AlwaysHibernateThumbnails' = 0
+        }
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'               = @{
+            'ShellState' = [byte[]](24, 0, 0, 0, 62, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 114, 0, 0, 0)
+        }
+    }
    
+    foreach ($path in $settings.Keys) {
+        foreach ($name in $settings[$path].Keys) {
+            Set-ItemProperty -Path $path -Name $name -Value $settings[$path][$name] -Type DWord -ErrorAction SilentlyContinue
+        }
+    }
+
+    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
+        
     #Remove Widgets.    
     Get-AppxPackage *WebExperience* | Remove-AppxPackage
     
-    #Reinicia o Explorer.exe
-    Stop-Process -Name 'explorer'
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    RefreshUser
 
     #Finaliza janela de personalização do Windows.
     if (Get-Process -Name 'systemsettings') {
@@ -1201,15 +1333,9 @@ function PerfilTheme {
 
     else {
         #Script continua.
-    }      
-    
-    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    function RefreshUser {
-
-        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
-        Stop-Process -Name explorer        
-    }
-
+    }    
+       
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     RefreshUser
     
     Clear-Host
@@ -1220,9 +1346,15 @@ function PinIcons {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > PINICONS'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+   
+    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    function RefreshUser {
+
+        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+        Stop-Process -Name explorer        
+    }
 
     #Fixa os ícones dos softwares Google Chrome, Acrobat Reader, Microsoft Word e do Windows Explorer na barra de tarefas e remove os demais ícones.
-
     $taskbar_layout =
     @"
 <?xml version="1.0" encoding="utf-8"?>
@@ -1247,7 +1379,7 @@ function PinIcons {
 </LayoutModificationTemplate>
 "@
 
-    [System.IO.FileInfo]$provisioning = "$($env:ProgramData)\provisioning\tasbar_layout.xml"
+    [System.IO.FileInfo]$provisioning = "$($env:ProgramData)\provisioning\taskbar_layout.xml"
     if (!$provisioning.Directory.Exists) {
         $provisioning.Directory.Create()
     }
@@ -1308,7 +1440,6 @@ function PinIcons {
     function TrayIcons {
 
         #Define e personaliza as configurações dos ícones da barra de tarefas.
-
         $property = @{
             "Start_SearchFiles"           = 2
             "ServerAdminUI"               = 0
@@ -1355,7 +1486,8 @@ function PinIcons {
     
     TrayIcons
 
-    Stop-Process -Name 'explorer'
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    RefreshUser
 
     #Mostra e atualiza a Área de Trabalho.    
     for ($i = 0; $i -le 2; $i++) {
@@ -1376,6 +1508,9 @@ function PinIcons {
 
     #Ativa plano de energia para Alto Desempenho.    
     POWERCFG /SETACTIVE SCHEME_MIN
+
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    RefreshUser
           
 }
 
@@ -1511,8 +1646,8 @@ function StartSoftwares {
     }
 
     Start-Process ACROBAT
-    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/
-    
+    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/    
+    Start-Process -FilePath "C:\Windows\System32\SystemPropertiesPerformance.exe"    
 
 }
 
@@ -1570,9 +1705,46 @@ function Pro {
 
 }
 
+function Install-DeviceDrivers {
+    # Adicionar Serviço de Atualização do Windows
+    $UpdateSvc = New-Object -ComObject Microsoft.Update.ServiceManager
+    $UpdateSvc.AddService2("7971f918-a847-4430-9279-4a52d1efe18d", 7, "")
+
+    # Buscar Atualizações de Drivers
+    $Session = New-Object -ComObject Microsoft.Update.Session
+    $Searcher = $Session.CreateUpdateSearcher()
+    $Searcher.ServiceID = '7971f918-a847-4430-9279-4a52d1efe18d'
+    $Searcher.SearchScope = 1 # Somente na máquina
+    $Searcher.ServerSelection = 3 # Terceiros
+    $Criteria = "IsInstalled=0 and Type='Driver'"
+    $SearchResult = $Searcher.Search($Criteria)
+    $Updates = $SearchResult.Updates
+
+    # Exibir Atualizações de Drivers Disponíveis
+    $Updates | Select-Object Title, DriverModel, DriverVerDate, DriverClass, DriverManufacturer | Format-List
+
+    # Baixar e Instalar as Atualizações
+    $UpdatesToDownload = New-Object -Com Microsoft.Update.UpdateColl
+    $Updates | ForEach-Object { $UpdatesToDownload.Add($_) | Out-Null }
+    $Downloader = $Session.CreateUpdateDownloader()
+    $Downloader.Updates = $UpdatesToDownload
+    $Downloader.Download()
+    $UpdatesToInstall = New-Object -Com Microsoft.Update.UpdateColl
+    $Updates | ForEach-Object { if ($_.IsDownloaded) { $UpdatesToInstall.Add($_) | Out-Null } }
+    $Installer = $Session.CreateUpdateInstaller()
+    $Installer.Updates = $UpdatesToInstall
+    $InstallationResult = $Installer.Install()
+
+    # Reiniciar se Necessário
+    if ($InstallationResult.RebootRequired) {
+        Write-Host "Reinicialização necessária. Por favor, reinicie o computador."
+    }
+}
+
+
 ClockDate
 
-EnvTool
+MachineEnvTool
 
 DisplayMenu 
 
