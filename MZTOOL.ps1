@@ -74,7 +74,7 @@ else {
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
          
-        Start-Process Powershell -WindowStyle Hidden {
+        Start-Process Powershell <#-WindowStyle Hidden#> {
 
             #Verifica e cria o perfil do PowerShell se não existir.
             if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
@@ -175,21 +175,21 @@ ______________________________________________________
 '            
             #ToolDir           
 
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function <#RemoveMStoreApps,#> PerfilTheme).Definition
                 ))
             )
 
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function AnyDesk <#, DownloadMztool DriverBooster, NetFx3, Office2007#> ).Definition
                 ))
             )
 
-            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WingetModule, WingetInstall, Microsoft365).Definition
@@ -204,7 +204,7 @@ ______________________________________________________
 
             StartSoftwares
 
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth <#DefaultSoftwares,#>).Definition
@@ -422,7 +422,7 @@ ______________________________________________________
 '
                         WingetUpdate
       
-                        Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+                        Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
                         ([Convert]::ToBase64String(
                             [Text.Encoding]::Unicode.GetBytes(
                               (Get-Command -Type Function RemoveGhostDrivers, WinUpdate).Definition
@@ -727,7 +727,7 @@ function ClockDate {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
     #Define um novo servidor e sincroniza o relógio e a data do sistema.    
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell <#-WindowStyle Hidden#> {
 
         w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
         net start w32time 
@@ -742,7 +742,7 @@ function MachineEnvTool {
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     
     #Adiciona variáveis de ambiente.
-    Start-Process PowerShell -WindowStyle Hidden {        
+    Start-Process PowerShell <#-WindowStyle Hidden#> {        
 
         # Define as variáveis de ambiente para o ambiente de máquina.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
@@ -989,7 +989,7 @@ function WingetInstall {
 function WingetUpdate { 
 
     #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell <#-WindowStyle Hidden#> {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1123,7 +1123,7 @@ function DriverBooster {
     
     #Extrai e inicializa o software Driver Booster.   
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell <#-WindowStyle Hidden#> {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -1179,7 +1179,7 @@ function DriverBooster {
 
 function RemoveMStoreApps {
 
-    Start-Process PowerShell -WindowStyle Hidden {
+    Start-Process PowerShell <#-WindowStyle Hidden#> {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEMSTOREAPPS'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
