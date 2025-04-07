@@ -173,19 +173,18 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            #ToolDir           
-
+                  
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function <#RemoveMStoreApps,#> PerfilTheme).Definition
+                    (Get-Command -Type Function PerfilTheme).Definition
                 ))
             )
 
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function AnyDesk <#, DownloadMztool DriverBooster, NetFx3, Office2007#> ).Definition
+                    (Get-Command -Type Function AnyDesk).Definition
                 ))
             )
 
@@ -207,7 +206,7 @@ ______________________________________________________
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth <#DefaultSoftwares,#>).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth).Definition
                 ))
             )
             
@@ -779,7 +778,7 @@ function DownloadMztool {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-    
+
     Add-Type -AssemblyName "System.Net.Http"
      
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
@@ -871,8 +870,7 @@ function Diagnostics64 {
         "AIDA_64\aida64.exe",
         "BLUE_SCREEN_VIEW\BlueScreenView.exe",
         "CORE_TEMP\Core_Temp_64.exe",
-        "CPU_Z\cpuz_x64.exe",
-        #"CRYSTAL_DISK\DiskInfo64.exe",
+        "CPU_Z\cpuz_x64.exe",        
         "HDSENTINEL\HDSentinel.exe",
         "HWINFO\HWiNFO64.exe",
         "GPU_Z.exe"
@@ -897,7 +895,6 @@ function Diagnostics32 {
         "BLUE_SCREEN_VIEW\BlueScreenView.exe",
         "CORE_TEMP\Core_Temp_32.exe",
         "CPU_Z\cpuz_x32.exe",
-        #"CRYSTAL_DISK\DiskInfo32.exe",
         "HDSENTINEL\HDSentinel.exe",
         "HWINFO\HWiNFO32.exe",
         "GPU_Z.exe"
@@ -1087,8 +1084,6 @@ function AnyDesk {
 
     $wc = New-Object System.Net.WebClient
     $wc.DownloadFile('https://download.anydesk.com/AnyDesk-CM.exe', "$env:DESKTOP\AnyDesk.exe")
-
-    #Start-BitsTransfer -Source 'https://download.anydesk.com/AnyDesk-CM.exe' -Destination "$env:DESKTOP\AnyDesk.exe"  
 
     Clear-Host
     
