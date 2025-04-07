@@ -811,17 +811,17 @@ function DownloadMztool {
         $GOOGLEDRIVESTATUS = TESTLINK -url $GOOGLEDRIVELINK
 
         if ($ONEDRIVESTATUS -eq "ONLINE") {
-            Write-Host "           ONEDRIVE = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Green
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Green
         }
         else {
-            Write-Host "           ONEDRIVE = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Red
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Red
         }
 
         if ($GOOGLEDRIVESTATUS -eq "ONLINE") {
-            Write-Host "           GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Green
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Green
         }
         else {
-            Write-Host "           GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Red
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Red
         }
 
         $httpClient.Dispose()
