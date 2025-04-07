@@ -236,11 +236,9 @@ ______________________________________________________
     
             #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
 
-            $OSARCHITECTURE = get-wmiobject -class win32_operatingsystem | format-list osarchitecture
-           
-            Write-Host "ARQUITETURA DO SISTEMA - $OSARCHITECTURE"
-           
-            if ($OSARCHITECTURE = '64 bits') {
+            $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+                                
+            if ($OSARCHITECTURE -eq '64 bits') {
                
                 Clear-Host
                 Write-Host '
@@ -295,7 +293,7 @@ ______________________________________________________
             
             }
         
-            elseif ($OSARCHITECTURE = '32 bits') {
+            elseif ($OSARCHITECTURE -eq '32 bits') {
 
                 Clear-Host
                 Write-Host '
