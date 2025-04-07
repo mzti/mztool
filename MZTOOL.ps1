@@ -238,7 +238,7 @@ ______________________________________________________
 
             $OSARCHITECTURE = get-wmiobject -class win32_operatingsystem | format-list osarchitecture
            
-            Write-Host "ARQUITETURA DO SISTEMA - $OSARCHITECTURE"
+            #Write-Host "ARQUITETURA DO SISTEMA - $OSARCHITECTURE"
            
             if ($OSARCHITECTURE = '64 bits') {
                
