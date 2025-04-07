@@ -779,6 +779,8 @@ function DownloadMztool {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    
+    Add-Type -AssemblyName "System.Net.Http"
      
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
@@ -786,7 +788,50 @@ function DownloadMztool {
     $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
        
     $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
-    
+    function LINKSTATUS {
+        $httpClient = New-Object System.Net.Http.HttpClient
+
+        function TESTLINK {
+            param (
+                [string]$url
+            )
+            try {
+                $response = $httpClient.GetAsync($url).Result
+                if ($response.IsSuccessStatusCode) {
+                    return "ONLINE"
+                }
+                else {
+                    return "OFFLINE"
+                }
+            }
+            catch {
+                return "OFFLINE"
+            }
+        }
+
+        $ONEDRIVESTATUS = TESTLINK -url $ONEDRIVELINK
+        $GOOGLEDRIVESTATUS = TESTLINK -url $GOOGLEDRIVELINK
+
+        if ($ONEDRIVESTATUS -eq "ONLINE") {
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Green
+        }
+        else {
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Red
+        }
+
+        if ($GOOGLEDRIVESTATUS -eq "ONLINE") {
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Green
+        }
+        else {
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Red
+        }
+
+        $httpClient.Dispose()
+    }
+
+    # Chama a função para testar os links
+    LINKSTATUS
+
     try {
         $wc = new-object System.Net.WebClient
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
