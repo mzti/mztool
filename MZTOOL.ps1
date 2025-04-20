@@ -1698,32 +1698,65 @@ function StartSoftwares {
 }
 
 function DelTemp {
-
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLEANTEMP'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Remove arquivos temporários do sistema.
-
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
-    Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue 
+    #Remove arquivos temporários.
+    function Remove-Files {
+        param (
+            [string]$Path,
+            [string]$Description
+        )
+        Write-Host "Limpando $Description"
+        Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+    }
 
-    Remove-Item -Path $env:C:\Windows\temp\* -Recurse -Force -ErrorAction SilentlyContinue
+    #Remove arquivos temporários do sistema.
+    Remove-Files -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
 
-    Remove-Item -Path $env:C:\Windows\Prefetch\* -Recurse -Force -ErrorAction SilentlyContinue
+    #Remove arquivos temporários do Windows.
+    Remove-Files -Path "C:\Windows\temp\*" -Description "arquivos temporários do Windows"
 
-    Remove-Item -Path $env:LOCALAPPDATA\CrashDumps\* -Recurse -Force -ErrorAction SilentlyContinue
+    #Remove arquivos de Prefetch.
+    Remove-Files -Path "C:\Windows\Prefetch\*" -Description "arquivos de Prefetch"
+
+    #Remove arquivos de CrashDumps.
+    Remove-Files -Path "$env:LOCALAPPDATA\CrashDumps\*" -Description "arquivos de CrashDumps"
     
-    Remove-Item -Path $env:LOCALAPPDATA\Microsoft\Windows\INetCache\* -Force -Recurse -ErrorAction SilentlyContinue
+    #Remove arquivos de Internet Temporários.
+    Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*" -Description "arquivos de Internet Temporários"
 
-    Remove-Item -Path C:\Windows\SoftwareDistribution\Download\* -Force -Recurse -ErrorAction SilentlyContinue
+    #Remove arquivos de atualização do Windows.
+    Remove-Files -Path "C:\Windows\SoftwareDistribution\Download\*" -Description "arquivos de atualização do Windows"
 
-    Remove-Item -Path C:\ProgramData\Microsoft\Windows\WER\ReportQueue\* -Force -Recurse -ErrorAction SilentlyContinue
+    #Remove relatórios de erros do Windows.
+    Remove-Files -Path "C:\ProgramData\Microsoft\Windows\WER\ReportQueue\*" -Description "relatórios de erros do Windows"
+    Remove-Files -Path "C:\ProgramData\Microsoft\Windows\WER\Temp\*" -Description "relatórios de erros do Windows"
+    
+    #Remove histórico do Microsoft Defender.
+    Remove-Files -Path "C:\ProgramData\Microsoft\Windows Defender\Scans\History\*" -Description "histórico do Microsoft Defender"
 
-    Remove-Item -Path C:\Windows\Prefetch\* -Force -Recurse -ErrorAction SilentlyContinue
-   
-    Start-Sleep 1     
+    #Remove arquivos de programas baixados.
+    Remove-Files -Path "C:\Windows\Downloaded Program Files\*" -Description "arquivos de programas baixados"
+
+    #Remove cache de sombreador DirectX.
+    Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\DirectX Shader Cache\*" -Description "cache de sombreador DirectX"
+
+    #Remove arquivos de otimização de entrega.
+    Remove-Files -Path "C:\Windows\SoftwareDistribution\DeliveryOptimization\*" -Description "arquivos de otimização de entrega"
+
+    #Remove pacotes de drivers de dispositivos.
+    Remove-Files -Path "C:\Windows\System32\DriverStore\FileRepository\*" -Description "pacotes de drivers de dispositivos"
+
+    #Remove miniaturas.
+    Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
+
+    Write-Output "Limpeza de arquivos temporários concluída."
+    Start-Sleep 1
 }
+
 
 function ImgHealth {
 
