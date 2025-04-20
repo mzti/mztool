@@ -8,7 +8,7 @@
 .NOTES
     Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
     Compatibilidade: Windows 11 e 10.
-    Versão: BETA.
+    Versão: ONLINE.
      
 .EXAMPLE
 
@@ -173,19 +173,17 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            #ToolDir           
-
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function <#RemoveMStoreApps,#> PerfilTheme).Definition
+                    (Get-Command -Type Function PerfilTheme).Definition
                 ))
             )
 
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function AnyDesk <#, DownloadMztool DriverBooster, NetFx3, Office2007#> ).Definition
+                    (Get-Command -Type Function AnyDesk).Definition
                 ))
             )
 
@@ -207,7 +205,7 @@ ______________________________________________________
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth <#DefaultSoftwares,#>).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth).Definition
                 ))
             )
             
@@ -623,7 +621,7 @@ ______________________________________________________
             Exit-PSSession
         }
 
-        # COMANDOS DE TESTE OCULTOS DO MENU.
+        #COMANDOS DE TESTE OCULTOS DO MENU.
         
         #Testa a função AnyDesk.
         any {
@@ -738,7 +736,7 @@ function MachineEnvTool {
     #Adiciona variáveis de ambiente.
     Start-Process PowerShell -WindowStyle Hidden {        
 
-        # Define as variáveis de ambiente para o ambiente de máquina.
+        #Define as variáveis de ambiente para o ambiente de máquina.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
         [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
         
@@ -771,7 +769,7 @@ function ToolDir {
 
 function DownloadMztool {
      
-    #Download do arquivo MZTOOL.zip
+    #Download do arquivo MZTOOL.zip.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -825,7 +823,7 @@ function DownloadMztool {
         $httpClient.Dispose()
     }
 
-    # Chama a função para testar os links
+    #Executa a função LINKSTATUS.
     LINKSTATUS
 
     try {
@@ -870,7 +868,6 @@ function Diagnostics64 {
         "BLUE_SCREEN_VIEW\BlueScreenView.exe",
         "CORE_TEMP\Core_Temp_64.exe",
         "CPU_Z\cpuz_x64.exe",
-        #"CRYSTAL_DISK\DiskInfo64.exe",
         "HDSENTINEL\HDSentinel.exe",
         "HWINFO\HWiNFO64.exe",
         "GPU_Z.exe"
@@ -895,7 +892,6 @@ function Diagnostics32 {
         "BLUE_SCREEN_VIEW\BlueScreenView.exe",
         "CORE_TEMP\Core_Temp_32.exe",
         "CPU_Z\cpuz_x32.exe",
-        #"CRYSTAL_DISK\DiskInfo32.exe",
         "HDSENTINEL\HDSentinel.exe",
         "HWINFO\HWiNFO32.exe",
         "GPU_Z.exe"
@@ -912,7 +908,7 @@ function Diagnostics32 {
 
 function WinUpdateModule {
     
-    #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
+    #IMPLEMENTAÇÃO DO MÓDULO WINDOWS UPDATE.       
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATEMODULE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'   
@@ -930,12 +926,12 @@ function WinUpdateModule {
 }
 
 function WingetModule {
+
+    #IMPLEMENTAÇÃO DO MÓDULO WINGET.
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETMODULE'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'  
-   
-    #Módulo WINGET.
-
+       
     #Obtém a versão do Windows.
     $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
     $ErrorActionPreference = 'SilentlyContinue'
@@ -989,41 +985,23 @@ function WingetModule {
 
 function WingetInstall {
     
-    #WINGET - Instalação dos softwares Acrobat Reader, Google Chrome, Microsoft Powershell 7+.
+    #Instalação dos softwares Acrobat Reader, Google Chrome, Microsoft Powershell 7+ através do Winget.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-
-    #Testa se existe uma instalação do Microsoft Office 2007 em andamento e aguarda a finalização para evitar conflitos do Windows Install.
-    function WaitOffice2007Winget {
-            
-        if (Get-Process -Name setup -ErrorAction SilentlyContinue) {
-            Wait-Process -Name setup
-        }
-
-    }
-        
-    WaitOffice2007Winget
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'    
     
     #Instala os softwares Google Chrome, Microsoft Powershell e Acrobat Reader 64Bit através do Winget.
     for ($i = 0; $i -le 2; $i++) {
-
-        WaitOffice2007Winget
-                 
+                        
         Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-
-        WaitOffice2007Winget
-        
+             
         Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-
-        WaitOffice2007Winget
-        
+               
         Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
         Clear-Host
             
-    }            
-        
+    }        
           
 }
 
@@ -1058,12 +1036,12 @@ function WinUpdate {
 }
 
 function RemoveGhostDrivers {
+
+    #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos).
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEGHOSTDEVICES'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-
-    #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
-   
+      
     #Obtem a lista de drivers de Dispositivos Ocultos.
     $DISPOSITIVOSOCULTOS = Get-PnpDevice | Where-Object { $_.Status -eq 'Unknown' } 
 
@@ -1284,7 +1262,7 @@ function PerfilTheme {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
    
-    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
 
         Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
@@ -1311,7 +1289,7 @@ function PerfilTheme {
     #Adiciona ícones de sistema a Área de Trabalho.
     $DESKINCONSREG = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
 
-    # Lista de ícones de sistema.
+    #Lista de ícones de sistema.
     $ICONS = @(
         '{018D5C66-4533-4307-9B53-224DE2ED1FE6}', #OneDrive
         '{20D04FE0-3AEA-1069-A2D8-08002B30309D}', #Este Computador
@@ -1320,7 +1298,7 @@ function PerfilTheme {
         '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}'  #Painel de Controle
     )
 
-    # Adiciona ou modifica propriedades no registro para exibir ícones.
+    #Adiciona ou modifica propriedades no registro para exibir ícones.
     foreach ($ICON in $ICONS) {
         New-ItemProperty -Path "$DESKINCONSREG" -Name $ICON -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
     }    
@@ -1392,7 +1370,7 @@ function PinIcons {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > PINICONS'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
    
-    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
 
         Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
@@ -1573,7 +1551,7 @@ function DefaultSoftwares {
     $chromeProgId = "ChromeHTML"
     $registryPath = "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations"
 
-    # Define protocolos.
+    #Define protocolos.
     $protocols = @("http", "https")
     foreach ($protocol in $protocols) {
         $regPath = "$registryPath\$protocol\UserChoice"
@@ -1581,7 +1559,7 @@ function DefaultSoftwares {
         Set-ItemProperty -Path $regPath -Name "ProgId" -Value $chromeProgId
     }
 
-    # Define extensões de arquivo.
+    #Define extensões de arquivo.
     $fileExtensions = @(".html", ".htm")
     $registryPathExtensions = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts"
     foreach ($extension in $fileExtensions) {
@@ -1590,9 +1568,9 @@ function DefaultSoftwares {
         Set-ItemProperty -Path $regPath -Name "ProgId" -Value $chromeProgId
     }
 
-    Clear-Host
+    #Clear-Host
 
-    # Define o Acrobat Reader como leitor de PDF padrão.
+    #Define o Acrobat Reader como leitor de PDF padrão.
     $pdfRegistryPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pdf\UserChoice"
     Set-ItemProperty -Path $pdfRegistryPath -Name "ProgId" -Value "Acrobat.Document.DC"
     #>
@@ -1751,24 +1729,24 @@ function Pro {
 }
 
 function Install-DeviceDrivers {
-    # Adicionar Serviço de Atualização do Windows
+    #Adiciona Serviço de Atualização do Windows
     $UpdateSvc = New-Object -ComObject Microsoft.Update.ServiceManager
     $UpdateSvc.AddService2("7971f918-a847-4430-9279-4a52d1efe18d", 7, "")
 
-    # Buscar Atualizações de Drivers
+    #Busca Atualizações de Drivers
     $Session = New-Object -ComObject Microsoft.Update.Session
     $Searcher = $Session.CreateUpdateSearcher()
     $Searcher.ServiceID = '7971f918-a847-4430-9279-4a52d1efe18d'
-    $Searcher.SearchScope = 1 # Somente na máquina
-    $Searcher.ServerSelection = 3 # Terceiros
+    $Searcher.SearchScope = 1 
+    $Searcher.ServerSelection = 3 
     $Criteria = "IsInstalled=0 and Type='Driver'"
     $SearchResult = $Searcher.Search($Criteria)
     $Updates = $SearchResult.Updates
 
-    # Exibir Atualizações de Drivers Disponíveis
+    #Exibe Atualizações de Drivers Disponíveis
     $Updates | Select-Object Title, DriverModel, DriverVerDate, DriverClass, DriverManufacturer | Format-List
 
-    # Baixar e Instalar as Atualizações
+    #Baixa e Instala as Atualizações
     $UpdatesToDownload = New-Object -Com Microsoft.Update.UpdateColl
     $Updates | ForEach-Object { $UpdatesToDownload.Add($_) | Out-Null }
     $Downloader = $Session.CreateUpdateDownloader()
@@ -1777,13 +1755,8 @@ function Install-DeviceDrivers {
     $UpdatesToInstall = New-Object -Com Microsoft.Update.UpdateColl
     $Updates | ForEach-Object { if ($_.IsDownloaded) { $UpdatesToInstall.Add($_) | Out-Null } }
     $Installer = $Session.CreateUpdateInstaller()
-    $Installer.Updates = $UpdatesToInstall
-    $InstallationResult = $Installer.Install()
-
-    # Reiniciar se Necessário
-    if ($InstallationResult.RebootRequired) {
-        Write-Host "Reinicialização necessária. Por favor, reinicie o computador."
-    }
+    $Installer.Updates = $UpdatesToInstall    
+    
 }
 
 
