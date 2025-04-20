@@ -1709,7 +1709,8 @@ function DelTemp {
             [string]$Path,
             [string]$Description
         )
-        Write-Host "Limpando $Description"
+        
+        Write-Host "`rLimpando $Description" -NoNewline       
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
     }
 
@@ -1753,7 +1754,7 @@ function DelTemp {
     #Remove miniaturas.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
 
-    Write-Output "Limpeza de arquivos temporários concluída."
+    Write-Output "Limpeza de arquivos temporários concluída." -NoNewline
     Start-Sleep 1
 }
 
