@@ -1753,8 +1753,7 @@ function DelTemp {
 
     #Remove miniaturas.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
-
-    Write-Output "Limpeza de arquivos temporários concluída." -NoNewline
+    
     Start-Sleep 1
 }
 
