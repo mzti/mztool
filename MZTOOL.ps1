@@ -1716,11 +1716,11 @@ function DelTemp {
     
     Remove-Item -Path $env:LOCALAPPDATA\Microsoft\Windows\INetCache\* -Force -Recurse -ErrorAction SilentlyContinue
 
-    Remove-Item -Path C:\Windows\SoftwareDistribution\Download\* -Force -Recurse 
+    Remove-Item -Path C:\Windows\SoftwareDistribution\Download\* -Force -Recurse -ErrorAction SilentlyContinue
 
-    Remove-Item -Path C:\ProgramData\Microsoft\Windows\WER\ReportQueue\* -Force -Recurse 
+    Remove-Item -Path C:\ProgramData\Microsoft\Windows\WER\ReportQueue\* -Force -Recurse -ErrorAction SilentlyContinue
 
-    Remove-Item -Path C:\Windows\Prefetch\* -Force -Recurse 
+    Remove-Item -Path C:\Windows\Prefetch\* -Force -Recurse -ErrorAction SilentlyContinue
    
     Start-Sleep 1     
 }
