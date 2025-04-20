@@ -1704,6 +1704,8 @@ function DelTemp {
 
     #Remove arquivos temporários do sistema.
 
+    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
+
     Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue 
 
     Remove-Item -Path $env:C:\Windows\temp\* -Recurse -Force -ErrorAction SilentlyContinue
@@ -1711,9 +1713,15 @@ function DelTemp {
     Remove-Item -Path $env:C:\Windows\Prefetch\* -Recurse -Force -ErrorAction SilentlyContinue
 
     Remove-Item -Path $env:LOCALAPPDATA\CrashDumps\* -Recurse -Force -ErrorAction SilentlyContinue
+    
+    Remove-Item -Path $env:LOCALAPPDATA\Microsoft\Windows\INetCache\* -Force -Recurse -ErrorAction SilentlyContinue
 
-    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
+    Remove-Item -Path C:\Windows\SoftwareDistribution\Download\* -Force -Recurse 
 
+    Remove-Item -Path C:\ProgramData\Microsoft\Windows\WER\ReportQueue\* -Force -Recurse 
+
+    Remove-Item -Path C:\Windows\Prefetch\* -Force -Recurse 
+   
     Start-Sleep 1     
 }
 
