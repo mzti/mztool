@@ -260,7 +260,7 @@ ______________________________________________________
                 Start-Sleep -Seconds 1
 
                 DownloadMztool 
-
+                Pause
                 Start-Sleep -Seconds 1
                 
                 Clear-Host
