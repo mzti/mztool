@@ -844,14 +844,16 @@ function DownloadMztool {
         }
        
         catch {
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
-            Write-Host "                 TODOS OS SERVIDORES ESTÃO OFFLINES"
-            Write-Host "                 |1| TENTAR NOVAMENTE"
-            Write-Host "                 |2| VOLTAR AO MENU PRINCIPAL"
-            Write-Host "                 |0| ENCERRAR DO MZTOOL"
+            
             
             do {
+                
+                Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
+                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
+                Write-Host "        TODOS OS SERVIDORES ESTÃO OFFLINES"
+                Write-Host "                 |1| TENTAR NOVAMENTE"
+                Write-Host "                 |2| VOLTAR AO MENU PRINCIPAL"
+                Write-Host "                 |0| ENCERRAR DO MZTOOL"
                 
                 $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
                 
