@@ -844,7 +844,6 @@ function DownloadMztool {
         }
        
         catch {
-            CLEAR-HOST
             Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
             Write-Host "                 TODOS OS SERVIDORES ESTÃO OFFLINES"
