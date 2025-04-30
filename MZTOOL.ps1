@@ -1710,7 +1710,8 @@ function DelTemp {
             [string]$Description
         )
         
-        Write-Host "`rLimpando $Description" -NoNewline        
+        Write-Host "`rLimpando $Description" -NoNewline   
+        Write-Host "`r                                                              " -NoNewline      
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
     }
 
@@ -1747,10 +1748,6 @@ function DelTemp {
 
     # Remove arquivos de otimização de entrega.
     Remove-Files -Path "C:\Windows\SoftwareDistribution\DeliveryOptimization\*" -Description "arquivos de otimização de entrega"
-
-    # Removido para evitar problemas críticos: pacotes de drivers de dispositivos.
-    # O diretório "C:\Windows\System32\DriverStore\FileRepository\*" contém drivers essenciais para o sistema.
-    # Remove-Files -Path "C:\Windows\System32\DriverStore\FileRepository\*" -Description "pacotes de drivers de dispositivos"
 
     # Remove miniaturas.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
