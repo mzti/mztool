@@ -505,7 +505,7 @@ ______________________________________________________
 
                             $2007Folder = 'C:\TOOL\OFFICE\2007' 
             
-                            if (Test-Path -Path $2007Folder) {
+                            if (Test-Path -Path $2007Folder -ErrorAction SilentlyContinue) {
 
                                 #Script continua.
 
@@ -611,7 +611,7 @@ ______________________________________________________
             
             DelTemp
 
-            if (Test-Path -Path $env:TOOL) {
+            if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
                 Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
             }
@@ -761,7 +761,7 @@ function ToolDir {
     $ErrorActionPreference = 'silentlycontinue'
      
     #Se o diretório C:\TOOL já existir, é deletado.
-    if (Test-Path -Path $env:TOOL) {
+    if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
         Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -1546,8 +1546,8 @@ function PinIcons {
     }   
 
     #Desabilita as notificações da central de ações.    
-    If (!(Test-Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer')) {
-        New-Item -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer'
+    If (!(Test-Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -ErrorAction SilentlyContinue)) {
+        New-Item -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -ErrorAction SilentlyContinue
     }
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -Name 'DisableNotificationCenter' -Type DWord -Value 1
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'ToastEnabled' -Type DWord -Value 0
