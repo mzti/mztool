@@ -235,17 +235,15 @@ ______________________________________________________
     
             #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
 
-            $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
-                                
-            if ($OSARCHITECTURE -eq '64 bits') {
+            
                
-                Clear-Host
-                Write-Host '
+            Clear-Host
+            Write-Host '
 ______________________________________________________
 |                                                    |
 |                      MZTOOL                        |
 | _________________________________________________  | 
-|           FERRAMENTAS DE DIAGNÓSTICOS X64          |
+|            FERRAMENTAS DE DIAGNÓSTICOS             |
 |                                                    |
 |                                                    |
 |               DOWNLOAD EM ANDAMENTO                |
@@ -255,21 +253,21 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '                               
-                ToolDir 
+            ToolDir 
 
-                Start-Sleep -Seconds 1
+            Start-Sleep -Seconds 1
 
-                DownloadMztool 
+            DownloadMztool            
+          
+            Start-Sleep -Seconds 1
                 
-                Start-Sleep -Seconds 1
-                
-                Clear-Host
-                Write-Host '
+            Clear-Host
+            Write-Host '
 ______________________________________________________
 |                                                    |
 |                      MZTOOL                        |
 | _________________________________________________  | 
-|           FERRAMENTAS DE DIAGNÓSTICOS X64          |
+|            FERRAMENTAS DE DIAGNÓSTICOS             |
 |                                                    |
 |                                                    |
 |        FERRAMENTAS DE DIAGNÓSTICO INICIADAS        |
@@ -279,69 +277,23 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '     
-                        
-                Diagnostics64
-                                                
-                Start-Sleep -Seconds 1              
-        
-                Clear-Host
-        
-                DisplayMenu
             
+            $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+                                
+            if ($OSARCHITECTURE -eq '64 bits') {
+                Diagnostics64
             }
-        
+
             elseif ($OSARCHITECTURE -eq '32 bits') {
-
-                Clear-Host
-                Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|           FERRAMENTAS DE DIAGNÓSTICOS X32          |
-|                                                    |
-|                                                    |
-|               DOWNLOAD EM ANDAMENTO                |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'
-                                          
-                ToolDir 
-
-                Start-Sleep -Seconds 1
-
-                DownloadMztool 
-
-                Start-Sleep -Seconds 1 
-                
-                Clear-Host
-                Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|           FERRAMENTAS DE DIAGNÓSTICOS X32          |
-|                                                    |
-|                                                    |
-|        FERRAMENTAS DE DIAGNÓSTICO INICIADAS        |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-' 
-                
                 Diagnostics32
-                                                
-                Start-Sleep -Seconds 1
-
-                Clear-Host
-        
-                DisplayMenu
             }
+
+            Start-Sleep -Seconds 1              
+        
+            Clear-Host
+
+            DisplayMenu         
+                         
         }
 
         3 {
@@ -783,108 +735,89 @@ function DownloadMztool {
     $ONEDRIVELINK = 'https://it.ly/MZTZIP'
        
     $GOOGLEDRIVELINK = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
-    <#function LINKSTATUS {
-        $httpClient = New-Object System.Net.Http.HttpClient
-
-        function TESTLINK {
-            param (
-                [string]$url
-            )
-            try {
-                $response = $httpClient.GetAsync($url).Result
-                if ($response.IsSuccessStatusCode) {
-                    return "ONLINE"
-                }
-                else {
-                    return "OFFLINE"
-                }
-            }
-            catch {
-                return "OFFLINE"
-            }
-        }
-
-        $ONEDRIVESTATUS = TESTLINK -url $ONEDRIVELINK
-        $GOOGLEDRIVESTATUS = TESTLINK -url $GOOGLEDRIVELINK
-
-        if ($ONEDRIVESTATUS -eq "ONLINE") {
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Green
-        }
-        else {
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "$ONEDRIVESTATUS" -ForegroundColor Red
-        }
-
-        if ($GOOGLEDRIVESTATUS -eq "ONLINE") {
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Green
-        }
-        else {
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "$GOOGLEDRIVESTATUS" -ForegroundColor Red
-        }
-
-        $httpClient.Dispose()
-    }
-
-    # Chama a função para testar os links
-    LINKSTATUS#>
-
+    
     try {
+
         $wc = new-object System.Net.WebClient
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
         Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+        ExpandMZTOOLZIP
+
     }
     
     catch [System.Net.WebException] , [System.IO.IOException] {
          
         try {
+
             $wc = new-object System.Net.WebClient
             $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")
             Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
-            
+            ExpandMZTOOLZIP
+
         }
        
         catch {
             
-            
-            do {
-                
-                Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
-                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
-                Write-Host "        TODOS OS SERVIDORES ESTÃO OFFLINES"
-                Write-Host "                 |1| TENTAR NOVAMENTE"
-                Write-Host "                 |2| VOLTAR AO MENU PRINCIPAL"
-                Write-Host "                 |0| ENCERRAR DO MZTOOL"
-                
-                $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
-                
-                switch ($choice) {
-                    '1' {
+            DownloadMztoolError
+       
+        }
+    }     
+    function ExpandMZTOOLZIP {
+        
+        #Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
+        Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue     
+        #Deleta o arquivo MZTOOL.zip.
+        Remove-Item $MZTOOLZIP
+
+    }
+
+    function DownloadMztoolError {
+        do {
+            Clear-Host
+            Write-Host '
+                ______________________________________________________
+                |                                                    |
+                |                       MZTOOL                       |
+                | _______________________BETA_______________________ | 
+                |                                                    | 
+                |                                                    |
+                |  DOWNLOAD FALHOU. ESCOLHA UMA OPÇÃO:               |
+                |                                                    |
+                | |1| TENTAR NOVAMENTE                               |
+                | |2| VOLTAR AO MENU PRINCIPAL                       |
+                | |0| ENCERRAR MZTOOL                                |
+                |                                                    |
+                |                 MOZART INFORMÁTICA | DANIEL MOZART |
+                |____________________________________________________|
+                '
+            $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+                        
+            switch ($choice) {
+                '1' {
+                    try {
                         DownloadMztool
                         break
                     }
-                    '2' {
-                        DisplayMenu
-                        break
-                    }
-                    '0' {
-                        Exit
-                    }
-                    default {
-                        Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
+                    catch {
+                        Write-Host "TENTATIVA DE DOWNLOAD FALHOU NOVAMENTE." -ForegroundColor Red
                         Start-Sleep -Seconds 3
                     }
                 }
-            } while ($true)
-        }
+                '2' {
+                    DisplayMenu
+                    break
+                }
+                '0' {
+                    Exit
+                }
+                default {
+                    Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
+                    Start-Sleep -Seconds 3
+                }
+            }
+        } while ($true)
     }
-    
-    Clear-Host
-            
-    #Extrai o conteúdo arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.    
-    Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL
-
-    #Deleta o arquivo MZTOOL.zip.
-    Remove-Item $MZTOOLZIP
 
     Clear-Host
 }
@@ -1022,30 +955,22 @@ function WingetInstall {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-    #Testa se existe uma instalação do Microsoft Office 2007 em andamento e aguarda a finalização para evitar conflitos do Windows Install.
-    function WaitOffice2007Winget {
-            
-        if (Get-Process -Name setup -ErrorAction SilentlyContinue) {
-            Wait-Process -Name setup
-        }
-
+    #Verifica se o módulo Winget está instalado e atualizado.
+    if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
+        #Script Continua.
     }
-        
-    WaitOffice2007Winget
-    
+         
+    else {
+        WingetModule               
+    }
+
     #Instala os softwares Google Chrome, Microsoft Powershell e Acrobat Reader 64Bit através do Winget.
-    for ($i = 0; $i -le 2; $i++) {
+    1..3 | ForEach-Object {
 
-        WaitOffice2007Winget
-                 
         Winget Install --Id Google.Chrome --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-
-        WaitOffice2007Winget
-        
+         
         Winget Install --Id Microsoft.Powershell --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-
-        WaitOffice2007Winget
-        
+              
         Winget Install --Id Adobe.Acrobat.Reader.64-bit --Accept-Source-Agreements --Accept-Package-Agreements --Silent
                                  
         Clear-Host
