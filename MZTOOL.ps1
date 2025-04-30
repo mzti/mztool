@@ -734,14 +734,14 @@ function DownloadMztool {
 
     $ONEDRIVELINK = 'https://it.ly/MZTZIP'
        
-    $GOOGLEDRIVELINK = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     try {
 
         $wc = new-object System.Net.WebClient
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
         Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
-        ExpandMZTOOLZIP
+        
 
     }
     
@@ -753,72 +753,73 @@ function DownloadMztool {
             $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")
             Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
-            ExpandMZTOOLZIP
+            
 
         }
        
         catch {
             
-            DownloadMztoolError
-       
-        }
-    }     
-    function ExpandMZTOOLZIP {
-        
-        #Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
-        Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue     
-        #Deleta o arquivo MZTOOL.zip.
-        Remove-Item $MZTOOLZIP
-
-    }
-
-    function DownloadMztoolError {
-        do {
-            Clear-Host
-            Write-Host '
-                ______________________________________________________
-                |                                                    |
-                |                       MZTOOL                       |
-                | _______________________BETA_______________________ | 
-                |                                                    | 
-                |                                                    |
-                |  DOWNLOAD FALHOU. ESCOLHA UMA OPÇÃO:               |
-                |                                                    |
-                | |1| TENTAR NOVAMENTE                               |
-                | |2| VOLTAR AO MENU PRINCIPAL                       |
-                | |0| ENCERRAR MZTOOL                                |
-                |                                                    |
-                |                 MOZART INFORMÁTICA | DANIEL MOZART |
-                |____________________________________________________|
-                '
-            $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+            do {
+                #Caso o download falhe, exibe uma mensagem de erro e oferece opções para tentar novamente ou voltar ao menu principal.
+                    
+                Clear-Host
+                Write-Host '
+                    ______________________________________________________
+                    |                                                    |
+                    |                       MZTOOL                       |
+                    | __________________________________________________ | 
+                    |            FERRAMENTAS DE DIAGNÓSTICOS             | 
+                    |                                                    |'
+                Write-Host '                    |  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
+                Write-Host '                    |  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
+                Write-Host '                    |                                                    |
+                    |                                                    |
+                    | |1| TENTAR NOVAMENTE                               |
+                    | |2| VOLTAR AO MENU PRINCIPAL                       |
+                    | |0| ENCERRAR MZTOOL                                |
+                    |                                                    |
+                    |                 MOZART INFORMÁTICA | DANIEL MOZART |
+                    |____________________________________________________|
+                    '
+                
+                $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
                         
-            switch ($choice) {
-                '1' {
-                    try {
+                switch ($choice) {
+                    '1' {                        
                         DownloadMztool
                         break
                     }
-                    catch {
-                        Write-Host "TENTATIVA DE DOWNLOAD FALHOU NOVAMENTE." -ForegroundColor Red
+                    '2' {
+                        DisplayMenu
+                        break
+                    }
+                    '0' {
+                        Exit
+                    }
+                    default {
+                        Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
                         Start-Sleep -Seconds 3
                     }
                 }
-                '2' {
-                    DisplayMenu
-                    break
-                }
-                '0' {
-                    Exit
-                }
-                default {
-                    Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                    Start-Sleep -Seconds 3
-                }
-            }
-        } while ($true)
-    }
+            } while ($true)
+       
+        }
+    }     
+        
+    # Verifica se o arquivo MZTOOL.zip existe antes de extrair.
+    if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {
+            
+        # Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
+        Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue     
+        # Deleta o arquivo MZTOOL.zip.
+        Remove-Item $MZTOOLZIP
 
+    }
+    else {
+            
+        #Script continua.
+    }
+   
     Clear-Host
 }
 
