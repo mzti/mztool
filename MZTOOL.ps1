@@ -260,7 +260,7 @@ ______________________________________________________
                 Start-Sleep -Seconds 1
 
                 DownloadMztool 
-                Pause
+                
                 Start-Sleep -Seconds 1
                 
                 Clear-Host
@@ -282,9 +282,7 @@ ______________________________________________________
                         
                 Diagnostics64
                                                 
-                Start-Sleep -Seconds 1
-
-                DelTemp
+                Start-Sleep -Seconds 1              
         
                 Clear-Host
         
@@ -339,8 +337,6 @@ ______________________________________________________
                 Diagnostics32
                                                 
                 Start-Sleep -Seconds 1
-
-                DelTemp
 
                 Clear-Host
         
