@@ -780,10 +780,10 @@ function DownloadMztool {
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
+    $ONEDRIVELINK = 'https://it.ly/MZTZIP'
        
-    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
-    function LINKSTATUS {
+    $GOOGLEDRIVELINK = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    <#function LINKSTATUS {
         $httpClient = New-Object System.Net.Http.HttpClient
 
         function TESTLINK {
@@ -825,11 +825,12 @@ function DownloadMztool {
     }
 
     # Chama a função para testar os links
-    LINKSTATUS
+    LINKSTATUS#>
 
     try {
         $wc = new-object System.Net.WebClient
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
     }
     
     catch [System.Net.WebException] , [System.IO.IOException] {
@@ -837,11 +838,42 @@ function DownloadMztool {
         try {
             $wc = new-object System.Net.WebClient
             $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+            
         }
        
         catch {
             CLEAR-HOST
-            "A CONEXÃO COM O ONEDRIVE E GOOGLE DRIVE NÃO PUDERAM SER CONCLUÍDAS. VERIFIQUE A SUA CONEXÃO E TENTE NOVAMENTE"
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
+            Write-Host "                 TODOS OS SERVIDORES ESTÃO OFFLINES"
+            Write-Host "                 |1| TENTAR NOVAMENTE"
+            Write-Host "                 |2| VOLTAR AO MENU PRINCIPAL"
+            Write-Host "                 |0| ENCERRAR DO MZTOOL"
+            
+            do {
+                
+                $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+                
+                switch ($choice) {
+                    '1' {
+                        DownloadMztool
+                        break
+                    }
+                    '2' {
+                        DisplayMenu
+                        break
+                    }
+                    '0' {
+                        Exit
+                    }
+                    default {
+                        Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
+                        Start-Sleep -Seconds 3
+                    }
+                }
+            } while ($true)
         }
     }
     
