@@ -53,9 +53,12 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     #Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
     
+    #Define as variáveis de ambiente para a sessão atual.
+    [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Process')
+    [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'Process')
+    
     #Executando como administrador. Formatação e estilo aplicadas.
-        
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
     $Win = $H.UI.RawUI.WindowSize
@@ -71,25 +74,21 @@ else {
     
     #Não está executando como administrador.        
     
-    #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
+    #Implementa variáveis de ambiente do MZTOOL na biblioteca PowerShell.
     function PwshEnvTool { 
          
-        Start-Process Powershell -WindowStyle Hidden {
-
-            #Verifica e cria o perfil do PowerShell se não existir.
-            if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-           
-                New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-            }
-
-            #Adiciona as variáveis de ambiente ao perfil do PowerShell.
-            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 
-            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue             
-
-            #Define as variável de ambiente para o ambiente de usuário.            
-            [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
-            [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User') 
+        #Verifica e cria o perfil do PowerShell se não existir.
+        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
+            New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue
         }
+
+        #Adiciona as variáveis de ambiente ao perfil do PowerShell.
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue
+
+        #Define as variáveis de ambiente para o ambiente de usuário.
+        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
+        [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User') 
     }
 
     PwshEnvTool
@@ -129,7 +128,7 @@ OpSys
 
 function DisplayMenu {
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'      
     
     Clear-Host
