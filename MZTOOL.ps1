@@ -734,13 +734,14 @@ function DownloadMztool {
 
     $ONEDRIVELINK = 'https://it.ly/MZTZIP'
        
-    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $GOOGLEDRIVELINK = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     try {
 
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+        
         $wc = new-object System.Net.WebClient
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
         
 
     }
@@ -748,11 +749,10 @@ function DownloadMztool {
     catch [System.Net.WebException] , [System.IO.IOException] {
          
         try {
-
-            $wc = new-object System.Net.WebClient
-            $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")
             Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+            $wc = new-object System.Net.WebClient
+            $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")           
             
 
         }
