@@ -40,7 +40,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #Define a política de execução para permitir scripts assinados.
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-#function StartMZTool {
+
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 $myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID)
@@ -61,25 +61,24 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     $Win.Height = 20
     $Win.Width = 58
     $H.UI.RawUI.Set_WindowSize($Win)
-    PAUSE
+
 } 
     
 else {
     # Não está executando como administrador.
     function PwshEnvTool {
         if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-            Start-Process Powershell <#-WindowStyle Hidden#> -Wait {
+            Start-Process Powershell -WindowStyle Hidden -Wait {
+                
                 # Verifica e cria o perfil do PowerShell se não existir.
                 if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
                     New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
                 }
+            
             }
-
-            Pause
-                
+                          
         }
-
-           
+          
         # Adiciona as variáveis de ambiente ao perfil do PowerShell.
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
@@ -88,8 +87,7 @@ else {
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')
         [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')
 
-        Pause
-      
+             
     }
 
     PwshEnvTool
@@ -101,7 +99,7 @@ else {
     [System.Diagnostics.Process]::Start($newProcess) | Out-Null
     exit
 }
-#}
+
 
 
 function OpSys {
