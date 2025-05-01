@@ -55,7 +55,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     
     #Executando como administrador. Formatação e estilo aplicadas.
         
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
     $Win = $H.UI.RawUI.WindowSize
@@ -129,7 +129,7 @@ OpSys
 
 function DisplayMenu {
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL ⭡'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'      
     
     Clear-Host
