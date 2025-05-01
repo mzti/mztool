@@ -757,7 +757,9 @@ function DownloadMztool {
         catch {
             
             do {
-                #Caso o download falhe, exibe uma mensagem de erro e oferece opções para tentar novamente ou voltar ao menu principal.
+                
+                #Caso AS DUAS NUVENS ESTEJAM FORA DO AR OFERECE UM MENU DE OPÇÕES.
+                
                 Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
                 
                 Start-Sleep -Seconds 3
