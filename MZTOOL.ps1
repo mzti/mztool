@@ -795,6 +795,7 @@ ______________________________________________________
                         break
                     }
                     '0' {
+                        
                         #OPÇÃO 0 - ENCERRAR MZTOOL.
 
                         $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
