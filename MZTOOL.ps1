@@ -74,24 +74,42 @@ else {
     #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
     function PwshEnvTool { 
          
-        Start-Process Powershell -WindowStyle Hidden {
+        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
+        
+            Start-Process Powershell -WindowStyle Hidden -Wait {
 
-            #Verifica e cria o perfil do PowerShell se não existir.
-            if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
+                #Verifica e cria o perfil do PowerShell se não existir.
+                if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
            
-                New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                }
+                  
             }
 
-            #Adiciona as variáveis de ambiente ao perfil do PowerShell.
-            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 
-            Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue             
+            $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+            $newProcess.Arguments = $myInvocation.MyCommand.Definition
+            $newProcess.Verb = 'runas'
+            [System.Diagnostics.Process]::Start($newProcess) | Out-Null 
 
-            #Define as variável de ambiente para o ambiente de usuário.            
-            [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
-            [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User') 
+            exit
+
+        }
+            
+        If (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue) {
+            
+            Start-Process Powershell -WindowStyle Hidden -Wait {
+                #Adiciona as variáveis de ambiente ao perfil do PowerShell.
+                Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 
+                Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue             
+
+                #Define as variável de ambiente para o ambiente de usuário.            
+                [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
+                [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User') 
+                      
+               
+            }
         }
     }
-
     PwshEnvTool
 
     #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
