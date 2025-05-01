@@ -53,9 +53,9 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     #Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
     
-    #Define as variáveis de ambiente para a sessão atual.
-    [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Process')
-    [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'Process')
+    #Define as variáveis de ambiente para a sessão atual sem exibir mensagens.
+    [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Process') | Out-Null
+    [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'Process') | Out-Null
     
     #Executando como administrador. Formatação e estilo aplicadas.
     $Host.UI.RawUI.WindowTitle = 'MZTOOL'
