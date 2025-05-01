@@ -564,7 +564,7 @@ ______________________________________________________
                 Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
             }
 
-            Start-Sleep -Seconds 3
+            Start-Sleep -Seconds 2
             Exit
             Exit-PSHostProcess
             Exit-PSSession
@@ -797,7 +797,39 @@ ______________________________________________________
                         break
                     }
                     '0' {
+                        #OPÇÃO 0 - ENCERRAR MZTOOL.
+
+                        $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
+                        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+
+                        Clear-Host
+                        Write-Host '
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| _________________________________________________  | 
+|                                                    |
+|                                                    |
+|                                                    |
+|                 ENCERRANDO MZTOOL                  |
+|                                                    |
+|                                                    |
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|
+'
+            
+                        DelTemp
+
+                        if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+
+                            Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+                        }
+
+                        Start-Sleep -Seconds 2
                         Exit
+                        Exit-PSHostProcess
+                        Exit-PSSession
                     }
                     default {
                         Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
