@@ -764,23 +764,22 @@ function DownloadMztool {
                     
                 Clear-Host
                 Write-Host '
-                    ______________________________________________________
-                    |                                                    |
-                    |                       MZTOOL                       |
-                    | __________________________________________________ | 
-                    |            FERRAMENTAS DE DIAGNÓSTICOS             | 
-                    |                                                    |'
-                Write-Host '                    |  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-                Write-Host '                    |  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-                Write-Host '                    |                                                    |
-                    |                                                    |
-                    | |1| TENTAR NOVAMENTE                               |
-                    | |2| VOLTAR AO MENU PRINCIPAL                       |
-                    | |0| ENCERRAR MZTOOL                                |
-                    |                                                    |
-                    |                 MOZART INFORMÁTICA | DANIEL MOZART |
-                    |____________________________________________________|
-                    '
+______________________________________________________
+|                                                    |
+|                       MZTOOL                       |
+| __________________________________________________ | 
+|            FERRAMENTAS DE DIAGNÓSTICOS             | 
+|                                                    |'
+                Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
+                Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
+                Write-Host '|                                                    |
+|                                                    |
+| |1| TENTAR NOVAMENTE                               |
+| |2| VOLTAR AO MENU PRINCIPAL                       |
+| |0| ENCERRAR MZTOOL                                |
+|                                                    |
+|                 MOZART INFORMÁTICA | DANIEL MOZART |
+|____________________________________________________|'
                 
                 $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
                         
