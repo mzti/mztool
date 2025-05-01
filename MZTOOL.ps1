@@ -40,21 +40,20 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #Define a política de execução para permitir scripts assinados.
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-#Obtém o ID e o Objeto de Segurança do usuário atual.
+#function StartMZTool {
+# Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 $myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID)
 
-#Obtém o Objeto de Segurança do usuário Administrador.
+# Obtém o Objeto de Segurança do usuário Administrador.
 $adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
-  
-#Verifica se o script está sendo executado como administrador.
+
+# Verifica se o script está sendo executado como administrador.
 if ($myWindowsPrincipal.IsInRole($adminRole)) {
-    
-    #Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
+    # Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-    
-    #Executando como administrador. Formatação e estilo aplicadas.
-        
+
+    # Executando como administrador. Formatação e estilo aplicadas.
     $Host.UI.RawUI.WindowTitle = 'MZTOOL'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
@@ -62,65 +61,49 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     $Win.Height = 20
     $Win.Width = 58
     $H.UI.RawUI.Set_WindowSize($Win)
-  
-    Clear-Host
-
-}
-
+    PAUSE
+} 
+    
 else {
-    
-    #Não está executando como administrador.        
-    
-    #Implementa varáveis de ambiente do MZTOOL na biblioteca Powershell.
-    function PwshEnvTool { 
-         
+    # Não está executando como administrador.
+    function PwshEnvTool {
         if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-        
             Start-Process Powershell <#-WindowStyle Hidden#> -Wait {
-
-                #Verifica e cria o perfil do PowerShell se não existir.
+                # Verifica e cria o perfil do PowerShell se não existir.
                 if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-           
                     New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
                 }
-                  
             }
 
-            $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-            $newProcess.Arguments = $myInvocation.MyCommand.Definition
-            $newProcess.Verb = 'runas'
-            [System.Diagnostics.Process]::Start($newProcess) | Out-Null 
-
-            exit
-
+            Pause
+                
         }
-            
-        If (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue) {
-            
-            Start-Process Powershell <#-WindowStyle Hidden#> -Wait {
-                #Adiciona as variáveis de ambiente ao perfil do PowerShell.
-                Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 
-                Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue             
 
-                #Define as variável de ambiente para o ambiente de usuário.            
-                [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User') 
-                [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User') 
-                    
-               
-            }
-        }
+           
+        # Adiciona as variáveis de ambiente ao perfil do PowerShell.
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+
+        # Define as variáveis de ambiente para o ambiente de usuário.
+        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')
+        [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')
+
+        Pause
+      
     }
 
     PwshEnvTool
 
-    #Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.  
+    # Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($newProcess) | Out-Null              
-    exit 
+    [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+    exit
 }
- 
+#}
+
+
 function OpSys {
 
     #Verifica se o sistema operacional é suportado.
@@ -142,7 +125,17 @@ function OpSys {
     }
 }
 
+
+
+function Adm {
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL - ADMINISTRADOR'
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        
+    Write-Host 'ADMINISTRADOR - MZTOOL'
+}
+#StartMZTool
 OpSys
+    
 
 #MENU MZTOOL -----------------------------------------------------
 
