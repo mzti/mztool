@@ -732,9 +732,9 @@ function DownloadMztool {
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $ONEDRIVELINK = 'https://it.ly/MZTZIP'
+    $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
        
-    $GOOGLEDRIVELINK = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     $wc = new-object System.Net.WebClient 
     try {
