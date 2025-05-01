@@ -738,10 +738,11 @@ function DownloadMztool {
     
     try {
 
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
-        
         $wc = new-object System.Net.WebClient
+      
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+       
         
 
     }
@@ -750,10 +751,10 @@ function DownloadMztool {
          
         try {
             Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+            
             $wc = new-object System.Net.WebClient
             $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")           
-            
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
 
         }
        
@@ -761,7 +762,10 @@ function DownloadMztool {
             
             do {
                 #Caso o download falhe, exibe uma mensagem de erro e oferece opções para tentar novamente ou voltar ao menu principal.
-                    
+                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
+                
+                Start-Sleep -Seconds 3
+                
                 Clear-Host
                 Write-Host '
 ______________________________________________________
