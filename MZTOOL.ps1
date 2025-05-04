@@ -744,10 +744,10 @@ function DownloadMztool {
 
     $wc = new-object System.Net.WebClient 
     try {
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "CONECTANDO" -ForegroundColor Gray
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "CONECTANDO " -NoNewline -ForegroundColor Gray
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
         Set-CursorToStart 
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
 
     }
     
@@ -755,11 +755,11 @@ function DownloadMztool {
          
         try {
             Set-CursorToStart 
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "CONECTANDO" -ForegroundColor Gray
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "CONECTANDO " -NoNewline -ForegroundColor Gray
             $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")           
             Set-CursorToStart 
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
 
         }
        
@@ -769,7 +769,7 @@ function DownloadMztool {
                 
                 #CASO AS DUAS NUVENS ESTEJAM FORA DO AR OFERECE UM MENU DE OPÇÕES.
                 
-                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
+                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
                 
                 Start-Sleep -Seconds 3
                 
