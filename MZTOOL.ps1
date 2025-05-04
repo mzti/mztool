@@ -734,7 +734,7 @@ function DownloadMztool {
 
     $ONEDRIVELINK = 'https://it.ly/MZTZIP'
        
-    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $GOOGLEDRIVELINK = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     function Set-CursorToStart {
         $cursor = $host.UI.RawUI.CursorPosition
@@ -771,7 +771,7 @@ function DownloadMztool {
                 
                 Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
                 
-                Start-Sleep -Seconds 3
+                Start-Sleep -Seconds 2
                 
                 Clear-Host
                 Write-Host '
