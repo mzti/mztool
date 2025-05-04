@@ -841,7 +841,7 @@ ______________________________________________________
                         }
                         default {
                             Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                            Start-Sleep -Seconds 3
+                            Start-Sleep -Seconds 2
                             DisplayMenuDownloadError
                         }
                     }
