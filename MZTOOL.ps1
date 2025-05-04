@@ -859,6 +859,38 @@ ______________________________________________________
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
+        # Função para exibir a barra de progresso customizada na última linha
+        function Show-CustomProgress {
+            param(
+                [Parameter(Mandatory = $true)]
+                [int]$PercentComplete
+            )
+    
+            $rawUI = $Host.UI.RawUI
+            $windowSize = $rawUI.WindowSize
+
+            # Posiciona o cursor na última linha da janela
+            $cursorPos = $rawUI.CursorPosition
+            $cursorPos.X = 0
+            $cursorPos.Y = $windowSize.Height - 1
+            $rawUI.CursorPosition = $cursorPos
+
+            # Define o tamanho da barra (por exemplo, 50 caracteres)
+            $barWidth = 50
+            $filled = [math]::Round($PercentComplete * $barWidth / 100)
+            $empty = $barWidth - $filled
+
+            $bar = ("#" * $filled) + ("-" * $empty)
+            $progressText = "Progresso: {0,3}% [{1}]" -f $PercentComplete, $bar
+
+            # Limpa a última linha e escreve a barra de progresso
+            $clearLine = " " * $windowSize.Width
+            Write-Host $clearLine -NoNewline
+            $rawUI.CursorPosition = $cursorPos
+            Write-Host $progressText -NoNewline
+        }
+
+        # Função auxiliar para extrair uma entrada via streams (caso ExtractToFile não esteja disponível)
         function Expand-ArchiveEntryStream {
             param (
                 [Parameter(Mandatory = $true)]
@@ -873,14 +905,14 @@ ______________________________________________________
             }
             catch {
                 if (-not $Quiet) {
-                    Write-Host "Falha ao criar o arquivo '$DestinationPath': $_" -ForegroundColor Red
+                    Write-Host "Falha ao criar '$DestinationPath': $_" -ForegroundColor Red
                 }
                 return
             }
     
             if (-not $fileStream) {
                 if (-not $Quiet) {
-                    Write-Host "O fileStream não foi criado para '$DestinationPath'." -ForegroundColor Red
+                    Write-Host "fileStream nulo para '$DestinationPath'." -ForegroundColor Red
                 }
                 return
             }
@@ -894,24 +926,23 @@ ______________________________________________________
             $stream.Dispose()
         }
 
-        function Expand-Archive-WithProgress {
+        # Função principal para extrair o ZIP com a barra de progresso customizada na parte inferior
+        function Expand-Archive-WithCustomProgress {
             [CmdletBinding()]
-            param (
+            param(
                 [Parameter(Mandatory = $true)]
                 [string]$Path,
-        
                 [Parameter(Mandatory = $true)]
                 [string]$DestinationPath,
-        
                 [switch]$Force,
-                [switch]$Quiet  # parâmetro para suprimir saídas (exceto o progresso)
+                [switch]$Quiet
             )
 
             # Cria o diretório de destino, se não existir
             if (-not (Test-Path $DestinationPath)) {
                 New-Item -Path $DestinationPath -ItemType Directory | Out-Null
             }
-    
+
             # Carrega a assembly para manipulação de arquivos ZIP
             Add-Type -AssemblyName System.IO.Compression.FileSystem
 
@@ -923,15 +954,14 @@ ______________________________________________________
             foreach ($entry in $zipArchive.Entries) {
                 $currentEntry++
                 $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
-                Write-Progress -Activity "EXTRAINDO MZTOOL.ZIP" `
-                    -Status "PROCESSANDO: $($entry.FullName)" `
-                    -PercentComplete $percentComplete
+                # Atualiza a barra de progresso customizada na última linha
+                Show-CustomProgress -PercentComplete $percentComplete
 
-                # Define o caminho completo de destino para esta entrada
+                # Define o caminho completo de destino para a entrada
                 $destPath = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
 
-                # Se a entrada for um diretório (Name vazio ou FullName terminando com "/")
                 if ([string]::IsNullOrEmpty($entry.Name) -or $entry.FullName.EndsWith("/")) {
+                    # Trata diretórios
                     if (-not (Test-Path $destPath)) {
                         New-Item -Path $destPath -ItemType Directory | Out-Null
                     }
@@ -943,20 +973,20 @@ ______________________________________________________
                         New-Item -ItemType Directory -Path $directory -Force | Out-Null
                     }
             
-                    # Se o arquivo já existir e o switch -Force estiver ativo, tenta removê-lo
+                    # Se necessário, remove o arquivo existente (utilizando -Force)
                     if ((Test-Path $destPath) -and $Force.IsPresent) {
                         try {
                             Remove-Item $destPath -Force -ErrorAction Stop
                         }
                         catch {
                             if (-not $Quiet) {
-                                Write-Host "Não foi possível remover o arquivo '$destPath'. Ele pode estar em uso. Pulando esta entrada." -ForegroundColor Red
+                                Write-Host "Não foi possível remover '$destPath'. Pulando essa entrada." -ForegroundColor Red
                             }
                             continue
                         }
                     }
             
-                    # Verifica se o método ExtractToFile está disponível
+                    # Tenta usar o método ExtractToFile, se disponível
                     $methInfo = $entry.GetType().GetMethod("ExtractToFile")
                     if ($methInfo) {
                         try {
@@ -964,32 +994,39 @@ ______________________________________________________
                         }
                         catch {
                             if (-not $Quiet) {
-                                Write-Host "Erro ao extrair '$($entry.FullName)' com ExtractToFile: $_" -ForegroundColor Red
-                                Write-Host "Utilizando extração via stream para '$($entry.FullName)'." -ForegroundColor Yellow
+                                Write-Host "Erro em ExtractToFile para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
                             }
                             Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
                         }
                     }
                     else {
                         if (-not $Quiet) {
-                            Write-Host "Método ExtractToFile não encontrado para '$($entry.FullName)'. Utilizando extração via stream." -ForegroundColor Yellow
+                            Write-Host "Método ExtractToFile indisponível para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
                         }
                         Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
                     }
                 }
             }
 
-            # Libera os recursos do ZIP e finaliza a barra de progresso
+            # Fecha o arquivo ZIP
             $zipArchive.Dispose()
-            Write-Progress -Activity "Extraindo $Path" -Completed
+
+            # Limpa a última linha da janela após a conclusão
+            $rawUI = $Host.UI.RawUI
+            $windowSize = $rawUI.WindowSize
+            $cursorPos = $rawUI.CursorPosition
+            $cursorPos.X = 0
+            $cursorPos.Y = $windowSize.Height - 1
+            $rawUI.CursorPosition = $cursorPos
+            Write-Host (" " * $windowSize.Width)
+    
             if (-not $Quiet) {
-                Write-Host "Extração de '$Path' concluída com sucesso no diretório '$DestinationPath'." -ForegroundColor Green
+                Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
             }
-        }
+        } 
 
-        # Exemplo de uso (apenas a barra de progresso será exibida):
-        Expand-Archive-WithProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
-
+        # Exemplo de uso:
+        Expand-Archive-WithCustomProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
 
 
         #Extrai o arquivo MZTOOL.zip para a pasta $Env:TOOL.
