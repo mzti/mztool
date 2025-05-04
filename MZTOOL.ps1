@@ -853,41 +853,12 @@ ______________________________________________________
             } while ($true)
                
         }
-    }     
+    } 
+    
             
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
-    if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {
-       
-     
-            
-          
-           
-
-
-
-        $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
-
-        #Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
-        
-                
-           
-        Clear-Host
-        Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                                                    |
-|                 ENCERRANDO MZTOOL                  |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'
-
+    if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
+  
         function Expand-Archive-WithProgress {
             [CmdletBinding()]
             param (
@@ -948,10 +919,8 @@ ______________________________________________________
 
         #Extrai o arquivo MZTOOL.zip para a pasta $Env:TOOL.
         Expand-Archive-WithProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
-        #Expand-Archive -LiteralPath $Env:TOOL\MZTOOL.zip -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
-            
-        
-        
+        #Expand-Archive -LiteralPath $Env:TOOL\MZTOOL.zip -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue          
+              
         #Deleta o arquivo MZTOOL.zip.
         Remove-Item $MZTOOLZIP
 
