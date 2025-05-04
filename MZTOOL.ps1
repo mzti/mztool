@@ -61,6 +61,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     $Win.Height = 20
     $Win.Width = 58
     $H.UI.RawUI.Set_WindowSize($Win)
+    $H.UI.RawUI.Set_BufferSize($Win)
 
 } 
     
@@ -857,27 +858,21 @@ ______________________________________________________
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {
        
-        function a {
+     
             
-            $Host.UI.RawUI.WindowTitle = 'MZTOOL'
-            $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-            $H = Get-Host
-            $Win = $H.UI.RawUI.WindowSize
-            $Win.Height = 20
-            $Win.Width = 58
-            $H.UI.RawUI.Set_WindowSize($Win)
-            $H.UI.RawUI.Set_BufferSize($Win)
+          
+           
 
 
 
-            #$MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
+        $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-            #Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
+        #Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
         
                 
            
-            Clear-Host
-            Write-Host '
+        Clear-Host
+        Write-Host '
 ______________________________________________________
 |                                                    |
 |                      MZTOOL                        |
@@ -893,74 +888,72 @@ ______________________________________________________
 |____________________________________________________|
 '
 
-            function Expand-Archive-WithProgress {
-                [CmdletBinding()]
-                param (
-                    [Parameter(Mandatory = $true)]
-                    [string]$Path,
+        function Expand-Archive-WithProgress {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory = $true)]
+                [string]$Path,
         
-                    [Parameter(Mandatory = $true)]
-                    [string]$DestinationPath,
+                [Parameter(Mandatory = $true)]
+                [string]$DestinationPath,
         
-                    [switch]$Force
-                )
+                [switch]$Force
+            )
                    
-                # Carrega a assembly necessária
-                Add-Type -AssemblyName System.IO.Compression.FileSystem
+            # Carrega a assembly necessária
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-                # Abre o arquivo ZIP para leitura
-                $zipArchive = [System.IO.Compression.ZipFile]::OpenRead($Path)
-                $totalEntries = $zipArchive.Entries.Count
-                $currentEntry = 0
+            # Abre o arquivo ZIP para leitura
+            $zipArchive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+            $totalEntries = $zipArchive.Entries.Count
+            $currentEntry = 0
 
-                foreach ($entry in $zipArchive.Entries) {
-                    $currentEntry++
-                    $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
-                    Write-Progress -Activity "Extraindo $Path" `
-                        -Status "Processando: $($entry.FullName)" `
-                        -PercentComplete $percentComplete
+            foreach ($entry in $zipArchive.Entries) {
+                $currentEntry++
+                $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
+                Write-Progress -Activity "Extraindo $Path" `
+                    -Status "Processando: $($entry.FullName)" `
+                    -PercentComplete $percentComplete
 
-                    # Define o caminho completo de extração para cada entrada
-                    $fullDestination = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
+                # Define o caminho completo de extração para cada entrada
+                $fullDestination = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
 
-                    # Se a entrada for um diretório (nome vazio indica diretório)
-                    if ([string]::IsNullOrEmpty($entry.Name)) {
-                        if (!(Test-Path $fullDestination)) {
-                            New-Item -ItemType Directory -Path $fullDestination | Out-Null
-                        }
-                    }
-                    else {
-                        # Cria o diretório pai, se necessário
-                        $directory = Split-Path -Path $fullDestination -Parent
-                        if (!(Test-Path $directory)) {
-                            New-Item -ItemType Directory -Path $directory -Force | Out-Null
-                        }
-                        # Se o arquivo existir e o parâmetro -Force foi passado, remove-o
-                        if (Test-Path $fullDestination -and $Force) {
-                            Remove-Item $fullDestination -Force
-                        }
-                        # Extrai o arquivo; o segundo parâmetro sobrescreve se for $true
-                        $entry.ExtractToFile($fullDestination, $Force)
+                # Se a entrada for um diretório (nome vazio indica diretório)
+                if ([string]::IsNullOrEmpty($entry.Name)) {
+                    if (!(Test-Path $fullDestination)) {
+                        New-Item -ItemType Directory -Path $fullDestination | Out-Null
                     }
                 }
-                # Libera os recursos
-                $zipArchive.Dispose()
-
-                # Conclui a barra de progresso
-                Write-Progress -Activity "Extraindo $Path" -Completed
-                Write-Host "Extração de '$Path' concluída com sucesso no diretório '$DestinationPath'." -ForegroundColor Green
+                else {
+                    # Cria o diretório pai, se necessário
+                    $directory = Split-Path -Path $fullDestination -Parent
+                    if (!(Test-Path $directory)) {
+                        New-Item -ItemType Directory -Path $directory -Force | Out-Null
+                    }
+                    # Se o arquivo existir e o parâmetro -Force foi passado, remove-o
+                    if (Test-Path $fullDestination -and $Force) {
+                        Remove-Item $fullDestination -Force
+                    }
+                    # Extrai o arquivo; o segundo parâmetro sobrescreve se for $true
+                    $entry.ExtractToFile($fullDestination, $Force)
+                }
             }
+            # Libera os recursos
+            $zipArchive.Dispose()
 
-            # Exemplo de uso:
-            Expand-Archive-WithProgress -Path $Env:TOOL\MZTOOL.zip -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
-
-
-            #  Expand-Archive -LiteralPath $Env:TOOL\MZTOOL.zip -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
-            pause
+            # Conclui a barra de progresso
+            Write-Progress -Activity "Extraindo $Path" -Completed
+            Write-Host "Extração de '$Path' concluída com sucesso no diretório '$DestinationPath'." -ForegroundColor Green
         }
+
+        #Extrai o arquivo MZTOOL.zip para a pasta $Env:TOOL.
+        Expand-Archive-WithProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
+        #Expand-Archive -LiteralPath $Env:TOOL\MZTOOL.zip -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
+            
+        
         
         #Deleta o arquivo MZTOOL.zip.
-        #Remove-Item $MZTOOLZIP
+        Remove-Item $MZTOOLZIP
 
     }
     else {
