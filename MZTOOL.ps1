@@ -992,7 +992,7 @@ ______________________________________________________
             $empty = $barWidth - $filled
 
             $bar = ("#" * $filled) + ("-" * $empty)
-            $progressText = "EXTRAINDO MZTOOL.ZIP: {0,3}% [{1}]" -f $PercentComplete, $bar
+            $progressText = "EXTRAINDO: {0,3}% [{1}]" -f $PercentComplete, $bar
 
             # Limpa a última linha e escreve a barra de progresso
             $clearLine = " " * $windowSize.Width
