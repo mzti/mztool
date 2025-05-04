@@ -767,7 +767,7 @@ function DownloadMztool {
             
             do {
                 
-                #CASO AS DUAS NUVENS ESTEJAM FORA DO AR OFERECE UM MENU DE OPÇÕES.
+                #Caso as duas nuvens estejam fora do ar oferece um menu de opções.
                 
                 Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
                 
