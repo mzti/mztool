@@ -123,18 +123,8 @@ function OpSys {
     }
 }
 
-
-
-function Adm {
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL - ADMINISTRADOR'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-        
-    Write-Host 'ADMINISTRADOR - MZTOOL'
-}
-#StartMZTool
 OpSys
     
-
 #MENU MZTOOL -----------------------------------------------------
 
 function DisplayMenu {
