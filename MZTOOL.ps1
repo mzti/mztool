@@ -924,7 +924,7 @@ ______________________________________________________
                 $currentEntry++
                 $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
                 Write-Progress -Activity "EXTRAINDO MZTOOL.ZIP" `
-                    -Status "POR FAVOR AGUARDE."` <#$($entry.FullName)"#> 
+                    -Status "POR FAVOR AGUARDE." ` <#$($entry.FullName)"#> 
                 -PercentComplete $percentComplete
 
                 # Define o caminho completo de destino para esta entrada
