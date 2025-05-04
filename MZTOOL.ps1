@@ -859,6 +859,41 @@ ______________________________________________________
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
+        function Expand-ArchiveEntryStream {
+            param (
+                [Parameter(Mandatory = $true)]
+                $Entry,
+                [Parameter(Mandatory = $true)]
+                [string]$DestinationPath,
+                [switch]$Quiet
+            )
+    
+            try {
+                $fileStream = [System.IO.File]::Create($DestinationPath)
+            }
+            catch {
+                if (-not $Quiet) {
+                    Write-Host "Falha ao criar o arquivo '$DestinationPath': $_" -ForegroundColor Red
+                }
+                return
+            }
+    
+            if (-not $fileStream) {
+                if (-not $Quiet) {
+                    Write-Host "O fileStream não foi criado para '$DestinationPath'." -ForegroundColor Red
+                }
+                return
+            }
+    
+            $stream = $Entry.Open()
+            $buffer = New-Object byte[] 8192
+            while (($bytesRead = $stream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+                $fileStream.Write($buffer, 0, $bytesRead)
+            }
+            $fileStream.Dispose()
+            $stream.Dispose()
+        }
+
         function Expand-Archive-WithProgress {
             [CmdletBinding()]
             param (
@@ -868,10 +903,16 @@ ______________________________________________________
                 [Parameter(Mandatory = $true)]
                 [string]$DestinationPath,
         
-                [switch]$Force
+                [switch]$Force,
+                [switch]$Quiet  # parâmetro para suprimir saídas (exceto o progresso)
             )
-                   
-            # Carrega a assembly necessária
+
+            # Cria o diretório de destino, se não existir
+            if (-not (Test-Path $DestinationPath)) {
+                New-Item -Path $DestinationPath -ItemType Directory | Out-Null
+            }
+    
+            # Carrega a assembly para manipulação de arquivos ZIP
             Add-Type -AssemblyName System.IO.Compression.FileSystem
 
             # Abre o arquivo ZIP para leitura
@@ -882,43 +923,77 @@ ______________________________________________________
             foreach ($entry in $zipArchive.Entries) {
                 $currentEntry++
                 $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
-                Write-Progress -Activity "Extraindo $Path" `
-                    -Status "Processando: $($entry.FullName)" `
-                    -PercentComplete $percentComplete
+                Write-Progress -Activity "EXTRAINDO MZTOOL.ZIP" `
+                    -Status "POR FAVOR AGUARDE."` <#$($entry.FullName)"#> 
+                -PercentComplete $percentComplete
 
-                # Define o caminho completo de extração para cada entrada
-                $fullDestination = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
+                # Define o caminho completo de destino para esta entrada
+                $destPath = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
 
-                # Se a entrada for um diretório (nome vazio indica diretório)
-                if ([string]::IsNullOrEmpty($entry.Name)) {
-                    if (!(Test-Path $fullDestination)) {
-                        New-Item -ItemType Directory -Path $fullDestination | Out-Null
+                # Se a entrada for um diretório (Name vazio ou FullName terminando com "/")
+                if ([string]::IsNullOrEmpty($entry.Name) -or $entry.FullName.EndsWith("/")) {
+                    if (-not (Test-Path $destPath)) {
+                        New-Item -Path $destPath -ItemType Directory | Out-Null
                     }
                 }
                 else {
-                    # Cria o diretório pai, se necessário
-                    $directory = Split-Path -Path $fullDestination -Parent
-                    if (!(Test-Path $directory)) {
+                    # Garante que o diretório pai exista
+                    $directory = Split-Path -Path $destPath -Parent
+                    if (-not (Test-Path $directory)) {
                         New-Item -ItemType Directory -Path $directory -Force | Out-Null
                     }
-                    # Se o arquivo existir e o parâmetro -Force foi passado, remove-o
-                    if (Test-Path $fullDestination -and $Force) {
-                        Remove-Item $fullDestination -Force
+            
+                    # Se o arquivo já existir e o switch -Force estiver ativo, tenta removê-lo
+                    if ((Test-Path $destPath) -and $Force.IsPresent) {
+                        try {
+                            Remove-Item $destPath -Force -ErrorAction Stop
+                        }
+                        catch {
+                            if (-not $Quiet) {
+                                Write-Host "Não foi possível remover o arquivo '$destPath'. Ele pode estar em uso. Pulando esta entrada." -ForegroundColor Red
+                            }
+                            continue
+                        }
                     }
-                    # Extrai o arquivo; o segundo parâmetro sobrescreve se for $true
-                    $entry.ExtractToFile($fullDestination, $Force)
+            
+                    # Verifica se o método ExtractToFile está disponível
+                    $methInfo = $entry.GetType().GetMethod("ExtractToFile")
+                    if ($methInfo) {
+                        try {
+                            $entry.ExtractToFile($destPath, $Force.IsPresent)
+                        }
+                        catch {
+                            if (-not $Quiet) {
+                                Write-Host "Erro ao extrair '$($entry.FullName)' com ExtractToFile: $_" -ForegroundColor Red
+                                Write-Host "Utilizando extração via stream para '$($entry.FullName)'." -ForegroundColor Yellow
+                            }
+                            Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+                        }
+                    }
+                    else {
+                        if (-not $Quiet) {
+                            Write-Host "Método ExtractToFile não encontrado para '$($entry.FullName)'. Utilizando extração via stream." -ForegroundColor Yellow
+                        }
+                        Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+                    }
                 }
             }
-            # Libera os recursos
-            $zipArchive.Dispose()
 
-            # Conclui a barra de progresso
+            # Libera os recursos do ZIP e finaliza a barra de progresso
+            $zipArchive.Dispose()
             Write-Progress -Activity "Extraindo $Path" -Completed
-            Write-Host "Extração de '$Path' concluída com sucesso no diretório '$DestinationPath'." -ForegroundColor Green
+            if (-not $Quiet) {
+                Write-Host "Extração de '$Path' concluída com sucesso no diretório '$DestinationPath'." -ForegroundColor Green
+            }
         }
 
+        # Exemplo de uso (apenas a barra de progresso será exibida):
+        Expand-Archive-WithProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
+
+
+
         #Extrai o arquivo MZTOOL.zip para a pasta $Env:TOOL.
-        Expand-Archive-WithProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
+        #Expand-Archive-WithProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
         #Expand-Archive -LiteralPath $Env:TOOL\MZTOOL.zip -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue          
               
         #Deleta o arquivo MZTOOL.zip.
