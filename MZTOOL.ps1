@@ -860,8 +860,8 @@ ______________________________________________________
         #Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
 
         #Ajusta a largura da janela para exibir o progresso de forma clara.
-        $Host.UI.RawUI.WindowSize = [System.Management.Automation.Host.Size]::new(80, 25)
-        $Host.UI.RawUI.BufferSize = [System.Management.Automation.Host.Size]::new(80, 300)
+        $Host.UI.RawUI.WindowSize = [System.Management.Automation.Host.Size]::new(58, 20)
+        $Host.UI.RawUI.BufferSize = [System.Management.Automation.Host.Size]::new(58, 300)
         
         Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
 
