@@ -1320,11 +1320,11 @@ function WingetUpdate {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        1..3 | ForEach-Object {
+            Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
-        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
-
-        Clear-Host
-
+            Clear-Host
+        }
     }
 }
 
