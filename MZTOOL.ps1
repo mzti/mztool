@@ -755,8 +755,8 @@ function DownloadMztool {
          
         try {
             Set-CursorToStart 
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
-            Write-Host "                 GOOGLE DRIVE = "; Write-Host "CONECTANDO " -NoNewline -ForegroundColor Gray
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "CONECTANDO " -NoNewline -ForegroundColor Gray
             $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")           
             Set-CursorToStart 
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
