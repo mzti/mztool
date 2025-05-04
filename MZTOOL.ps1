@@ -748,7 +748,7 @@ function DownloadMztool {
     
     $wc = new-object System.Net.WebClient 
     try {
-        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "CONECTANDO" -ForegroundColor Gray
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "CONECTANDO" -ForegroundColor Gray
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
         Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
 
