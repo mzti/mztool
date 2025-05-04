@@ -748,28 +748,31 @@ function DownloadMztool {
     
     $wc = new-object System.Net.WebClient 
     try {
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "CONECTANDO" -ForegroundColor Gray
+        # Atualiza o status do OneDrive para "CONECTANDO"
+        Write-Host "`r                 ONEDRIVE     = CONECTANDO       " -ForegroundColor Gray
         $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
-
-    }
     
-    catch [System.Net.WebException] , [System.IO.IOException] {
-         
+        # Atualiza o status do OneDrive para "ONLINE"
+        Write-Host "`r                 ONEDRIVE     = ONLINE           " -ForegroundColor Green
+    }
+    catch [System.Net.WebException], [System.IO.IOException] {
         try {
-            
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "CONECTANDO" -ForegroundColor Gray
-            $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")           
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE" -ForegroundColor Green
-
+            # Atualiza o status do OneDrive para "OFFLINE"
+            Write-Host "`r                 ONEDRIVE     = OFFLINE          " -ForegroundColor Red
+        
+            # Atualiza o status do Google Drive para "CONECTANDO"
+            Write-Host "`r                 GOOGLE DRIVE = CONECTANDO       " -ForegroundColor Gray
+            $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")
+        
+            # Atualiza o status do Google Drive para "ONLINE"
+            Write-Host "`r                 GOOGLE DRIVE = ONLINE           " -ForegroundColor Green
         }
-       
+    
         catch {
             
             do {
                 
-                #Caso AS DUAS NUVENS ESTEJAM FORA DO AR OFERECE UM MENU DE OPÇÕES.
+                #CASO AS DUAS NUVENS ESTEJAM FORA DO AR OFERECE UM MENU DE OPÇÕES.
                 
                 Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE" -ForegroundColor Red
                 
