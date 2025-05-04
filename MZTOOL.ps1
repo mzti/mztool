@@ -854,28 +854,19 @@ ______________________________________________________
         }
     }     
             
-    # Verifica se o arquivo MZTOOL.zip existe antes de extrair.
+    #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {
             
-        # Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
-        # Obtém as dimensões da janela do console
-        $consoleWidth = $Host.UI.RawUI.WindowSize.Width
-        $consoleHeight = $Host.UI.RawUI.WindowSize.Height
+        #Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
 
-        # Calcula o progresso com base na largura da janela
-        $progressBarWidth = [math]::Floor($consoleWidth * 0.6) # 60% da largura da janela
-        $progressBar = New-Object System.Text.StringBuilder
+        #Ajusta a largura da janela para exibir o progresso de forma clara.
+        $Host.UI.RawUI.WindowSize = [System.Management.Automation.Host.Size]::new(80, 25)
+        $Host.UI.RawUI.BufferSize = [System.Management.Automation.Host.Size]::new(80, 300)
+        
+        Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
 
-        # Exibe o progresso enquanto extrai o arquivo
-        Write-Host "Extraindo arquivo MZTOOL.zip..."
-        Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue -PassThru | ForEach-Object {
-            $progressBar.Clear()
-            $progressBar.Append("=" * [math]::Floor($_.Progress * $progressBarWidth / 100))
-            Write-Host ("[{0,-" + $progressBarWidth + "}]" -f $progressBar.ToString()) -NoNewline
-        }
-        Write-Host "`nExtração concluída com sucesso."
-        # Deleta o arquivo MZTOOL.zip.
-        Remove-Item $MZTOOLZIP
+        #Deleta o arquivo MZTOOL.zip.
+        #Remove-Item $MZTOOLZIP
 
     }
     else {
