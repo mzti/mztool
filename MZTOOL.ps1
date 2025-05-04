@@ -876,7 +876,7 @@ ______________________________________________________
             $rawUI.CursorPosition = $cursorPos
 
             # Define o tamanho da barra (por exemplo, 50 caracteres)
-            $barWidth = 50
+            $barWidth = 30
             $filled = [math]::Round($PercentComplete * $barWidth / 100)
             $empty = $barWidth - $filled
 
