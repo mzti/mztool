@@ -737,54 +737,161 @@ function DownloadMztool {
        
     $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
-    function Set-CursorToStart {
-        $cursor = $host.UI.RawUI.CursorPosition
-        $cursor.X = 0
-        $host.UI.RawUI.CursorPosition = $cursor
-    }
+    # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
-    $wc = new-object System.Net.WebClient 
-    try {
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "CONECTANDO " -NoNewline -ForegroundColor Gray
-        $wc.DownloadFile("$ONEDRIVELINK", "$MZTOOLZIP")
-        Set-CursorToStart 
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
-
-    }
-    
-    catch [System.Net.WebException] , [System.IO.IOException] {
-         
+    # Função para testar se um link está online (usando o método GET para evitar problemas de redirecionamento)
+    function Test-LinkOnline {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$Url
+        )
         try {
-            Set-CursorToStart 
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "CONECTANDO " -NoNewline -ForegroundColor Gray
-            $wc.DownloadFile("$GOOGLEDRIVELINK", "$MZTOOLZIP")           
-            Set-CursorToStart 
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
-
+            $req = [System.Net.HttpWebRequest]::Create($Url)
+            $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"  # Simula um navegador
+            $req.AllowAutoRedirect = $true  # Permite seguir redirecionamentos automaticamente
+            $req.Method = "GET"  # Usa GET ao invés de HEAD para capturar corretamente a URI final
+            $resp = $req.GetResponse()
+            $resp.Close()
+            return $true
         }
-       
         catch {
-            
-            do {
+            return $false
+        }
+    }
+
+    # Exibe o status dos links
+    if (Test-LinkOnline -Url $ONEDRIVELINK) {
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
+    }
+    else {
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
+    }
+
+    if (Test-LinkOnline -Url $GOOGLEDRIVELINK) {
+        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
+    }
+    else {
+        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
+    }
+
+    # Função para exibir uma barra de progresso customizada na última linha do console
+    function Show-CustomProgress {
+        param(
+            [Parameter(Mandatory = $true)]
+            [int]$PercentComplete,
+            [int]$BarWidth = 30
+        )
+    
+        $rawUI = $Host.UI.RawUI
+        $winSize = $rawUI.WindowSize
+
+        # Posiciona o cursor na última linha
+        $cursorPos = $rawUI.CursorPosition
+        $cursorPos.X = 0
+        $cursorPos.Y = $winSize.Height - 1
+        $rawUI.CursorPosition = $cursorPos
+
+        $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+        $empty = $BarWidth - $filled
+        $bar = ("#" * $filled) + ("-" * $empty)
+        $progress = "BAIXANDO: {0,3}% [{1}]" -f $PercentComplete, $bar
+
+        $clearLine = " " * $winSize.Width
+        Write-Host $clearLine -NoNewline
+        $rawUI.CursorPosition = $cursorPos
+        Write-Host $progress -NoNewline
+    }
+
+    # Função para efetuar o download via HttpWebRequest e atualizar a barra de progresso
+    function Invoke-DownloadFileWithProgress {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$Url,
+            [Parameter(Mandatory = $true)]
+            [string]$Destination,
+            [int]$BarWidth = 30
+        )
+    
+        try {
+            $req = [System.Net.HttpWebRequest]::Create($Url)
+            $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            $req.AllowAutoRedirect = $true
+            $resp = $req.GetResponse()
+        }
+        catch {
+            return
+        }
+    
+        $totalBytes = $resp.ContentLength
+        if ($totalBytes -eq -1) {
+            return
+        }
+    
+        $inputStream = $resp.GetResponseStream()
+    
+        try {
+            $fileStream = [System.IO.File]::Create($Destination)
+        }
+        catch {
+            return
+        }
+    
+        $buffer = New-Object byte[] 8192
+        $totalRead = 0
+        $lastPercent = 0
+    
+        while (($read = $inputStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+            $fileStream.Write($buffer, 0, $read)
+            $totalRead += $read
+            if ($totalBytes -gt 0) {
+                $percent = [math]::Round(($totalRead / $totalBytes) * 100)
+                if ($percent -ne $lastPercent) {
+                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth
+                    $lastPercent = $percent
+                }
+            }
+        }
+    
+        $fileStream.Dispose()
+        $inputStream.Dispose()
+        $resp.Dispose()
+    }
+
+    # Função que tenta baixar de uma lista de URLs (ordem de prioridade)
+    function Invoke-DownloadFileWithRedundancy {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string[]]$Urls,
+            [Parameter(Mandatory = $true)]
+            [string]$Destination,
+            [int]$BarWidth = 30
+        )
+    
+        foreach ($url in $Urls) {
+            if (Test-LinkOnline -Url $url) {
+                Invoke-DownloadFileWithProgress -Url $url -Destination $Destination -BarWidth $BarWidth
+                return
+            }
+
+            else {
+                do {
                 
-                #Caso as duas nuvens estejam fora do ar oferece um menu de opções.
-                
-                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
-                
-                Start-Sleep -Seconds 2
-                function DisplayMenuDownloadError {           
-                    Clear-Host
-                    Write-Host '
+                    #Caso as duas nuvens estejam fora do ar oferece um menu de opções.
+                                                  
+                    Start-Sleep -Seconds 1
+                    function DisplayMenuDownloadError {           
+                        Clear-Host
+                        Write-Host '
 ______________________________________________________
 |                                                    |
 |                       MZTOOL                       |
 | __________________________________________________ | 
 |            FERRAMENTAS DE DIAGNÓSTICOS             | 
 |                                                    |'
-                    Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-                    Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-                    Write-Host '|                                                    |
+                        Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
+                        Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
+                        Write-Host '|                                                    |
 |                                                    |
 | |1| TENTAR NOVAMENTE                               |
 | |2| VOLTAR AO MENU PRINCIPAL                       |
@@ -793,26 +900,26 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|'
                
-                    $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+                        $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
                         
-                    switch ($choice) {
-                        '1' {                        
-                            DownloadMztool
-                            break
-                        }
-                        '2' {
-                            DisplayMenu
-                            break
-                        }
-                        '0' {
+                        switch ($choice) {
+                            '1' {                        
+                                DownloadMztool
+                                break
+                            }
+                            '2' {
+                                DisplayMenu
+                                break
+                            }
+                            '0' {
                         
-                            #OPÇÃO 0 - ENCERRAR MZTOOL.
+                                #OPÇÃO 0 - ENCERRAR MZTOOL.
 
-                            $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
-                            $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+                                $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
+                                $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-                            Clear-Host
-                            Write-Host '
+                                Clear-Host
+                                Write-Host '
 ______________________________________________________
 |                                                    |
 |                      MZTOOL                        |
@@ -828,32 +935,36 @@ ______________________________________________________
 |____________________________________________________|
 '
             
-                            DelTemp
+                                DelTemp
 
-                            if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+                                if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
-                                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+                                    Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+                                }
+
+                                Start-Sleep -Seconds 2
+                                Exit
+                                Exit-PSHostProcess
+                                Exit-PSSession
                             }
-
-                            Start-Sleep -Seconds 2
-                            Exit
-                            Exit-PSHostProcess
-                            Exit-PSSession
-                        }
-                        default {
-                            Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                            Start-Sleep -Seconds 2
-                            DisplayMenuDownloadError
+                            default {
+                                Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
+                                Start-Sleep -Seconds 2
+                                DisplayMenuDownloadError
+                            }
                         }
                     }
-                }
             
-                DisplayMenuDownloadError
+                    DisplayMenuDownloadError
         
-            } while ($true)
-               
+                } while ($true)<# Action when all if and elseif conditions are false #>
+            }
         }
-    } 
+    }
+
+    # Lista de URLs para teste (OneDrive + Google Drive como fallback)
+    $DRIVEURLS = @($ONEDRIVELINK, $GOOGLEDRIVELINK)
+    Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
     
             
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
@@ -1025,14 +1136,9 @@ ______________________________________________________
             }
         } 
 
-        # Exemplo de uso:
-        Expand-Archive-WithCustomProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
-
-
         #Extrai o arquivo MZTOOL.zip para a pasta $Env:TOOL.
-        #Expand-Archive-WithProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue
-        #Expand-Archive -LiteralPath $Env:TOOL\MZTOOL.zip -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue          
-              
+        Expand-Archive-WithCustomProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
+                      
         #Deleta o arquivo MZTOOL.zip.
         Remove-Item $MZTOOLZIP
 
@@ -2062,3 +2168,5 @@ MachineEnvTool
 DisplayMenu 
 
 EXIT   
+
+
