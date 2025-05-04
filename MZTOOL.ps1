@@ -772,18 +772,18 @@ function DownloadMztool {
                 Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
                 
                 Start-Sleep -Seconds 2
-                
-                Clear-Host
-                Write-Host '
+                function DisplayMenuDownloadError {           
+                    Clear-Host
+                    Write-Host '
 ______________________________________________________
 |                                                    |
 |                       MZTOOL                       |
 | __________________________________________________ | 
 |            FERRAMENTAS DE DIAGNÓSTICOS             | 
 |                                                    |'
-                Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-                Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-                Write-Host '|                                                    |
+                    Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
+                    Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
+                    Write-Host '|                                                    |
 |                                                    |
 | |1| TENTAR NOVAMENTE                               |
 | |2| VOLTAR AO MENU PRINCIPAL                       |
@@ -791,27 +791,27 @@ ______________________________________________________
 |                                                    |
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|'
-                
-                $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+               
+                    $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
                         
-                switch ($choice) {
-                    '1' {                        
-                        DownloadMztool
-                        break
-                    }
-                    '2' {
-                        DisplayMenu
-                        break
-                    }
-                    '0' {
+                    switch ($choice) {
+                        '1' {                        
+                            DownloadMztool
+                            break
+                        }
+                        '2' {
+                            DisplayMenu
+                            break
+                        }
+                        '0' {
                         
-                        #OPÇÃO 0 - ENCERRAR MZTOOL.
+                            #OPÇÃO 0 - ENCERRAR MZTOOL.
 
-                        $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
-                        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+                            $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
+                            $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 
-                        Clear-Host
-                        Write-Host '
+                            Clear-Host
+                            Write-Host '
 ______________________________________________________
 |                                                    |
 |                      MZTOOL                        |
@@ -827,33 +827,53 @@ ______________________________________________________
 |____________________________________________________|
 '
             
-                        DelTemp
+                            DelTemp
 
-                        if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+                            if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
-                            Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+                                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+                            }
+
+                            Start-Sleep -Seconds 2
+                            Exit
+                            Exit-PSHostProcess
+                            Exit-PSSession
                         }
-
-                        Start-Sleep -Seconds 2
-                        Exit
-                        Exit-PSHostProcess
-                        Exit-PSSession
-                    }
-                    default {
-                        Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                        Start-Sleep -Seconds 3
+                        default {
+                            Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
+                            Start-Sleep -Seconds 3
+                            DisplayMenuDownloadError
+                        }
                     }
                 }
+            
+                DisplayMenuDownloadError
+        
             } while ($true)
-       
+               
         }
     }     
-        
+            
     # Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {
             
         # Extrai o conteúdo do arquivo compactado MZTOOL.zip para a pasta $Env:TOOL.
-        Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue     
+        # Obtém as dimensões da janela do console
+        $consoleWidth = $Host.UI.RawUI.WindowSize.Width
+        $consoleHeight = $Host.UI.RawUI.WindowSize.Height
+
+        # Calcula o progresso com base na largura da janela
+        $progressBarWidth = [math]::Floor($consoleWidth * 0.6) # 60% da largura da janela
+        $progressBar = New-Object System.Text.StringBuilder
+
+        # Exibe o progresso enquanto extrai o arquivo
+        Write-Host "Extraindo arquivo MZTOOL.zip..."
+        Expand-Archive -LiteralPath $MZTOOLZIP -DestinationPath $env:TOOL -Force -ErrorAction SilentlyContinue -PassThru | ForEach-Object {
+            $progressBar.Clear()
+            $progressBar.Append("=" * [math]::Floor($_.Progress * $progressBarWidth / 100))
+            Write-Host ("[{0,-" + $progressBarWidth + "}]" -f $progressBar.ToString()) -NoNewline
+        }
+        Write-Host "`nExtração concluída com sucesso."
         # Deleta o arquivo MZTOOL.zip.
         Remove-Item $MZTOOLZIP
 
