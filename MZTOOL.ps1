@@ -63,13 +63,14 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
 
     # Executando como administrador. Formatação e estilo aplicadas.
     $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force 
+    <#$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
     $Win = $H.UI.RawUI.WindowSize
     $Win.Height = 20
     $Win.Width = 58
     $H.UI.RawUI.Set_WindowSize($Win)
-    $H.UI.RawUI.Set_BufferSize($Win)
+    $H.UI.RawUI.Set_BufferSize($Win)#>
 
 } 
     
@@ -99,7 +100,51 @@ else {
              
     }
 
+    function MZTOOLMODULE {
+        # Define o nome do módulo
+        $moduleName = "MZTOOL"
+
+        # Define o caminho onde o módulo será instalado (diretório padrão de módulos do usuário)
+        $moduleDir = Join-Path -Path $env:USERPROFILE -ChildPath "Documents\WindowsPowerShell\Modules\$moduleName"
+
+        # Cria o diretório, se não existir
+        if (!(Test-Path $moduleDir)) {
+            New-Item -Path $moduleDir -ItemType Directory -Force | Out-Null
+        }
+
+        # Define o caminho completo para o arquivo de módulo (.psm1)
+        $modulePath = Join-Path -Path $moduleDir -ChildPath "$moduleName.psm1"
+
+        # Conteúdo do módulo com as customizações e as funções
+        $moduleContent = @'
+# MZTOOL.psm1
+# Este módulo aplica customizações no console e define funções personalizadas
+
+# Customização do console
+$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+$H = Get-Host
+$Win = $H.UI.RawUI.WindowSize
+$Win.Height = 20
+$Win.Width = 58
+$H.UI.RawUI.Set_WindowSize($Win)
+$H.UI.RawUI.Set_BufferSize($Win)
+    
+Write-Output "Módulo MZTOOL carregado com sucesso!"
+'@
+
+        # Grava o conteúdo no arquivo .psm1 (sobrescreve, se necessário)
+        Set-Content -Path $modulePath -Value $moduleContent -Force
+
+        Write-Output "Módulo '$moduleName' criado com sucesso em: $moduleDir"
+        Write-Output "Para importar o módulo utilize: Import-Module $moduleName"
+    
+    
+
+    }
+    
+    MZTOOLMODULE
     PwshEnvTool
+    Import-Module MZTOOL -Force 
 
     # Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
