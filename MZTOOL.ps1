@@ -192,22 +192,22 @@ ______________________________________________________
             Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule, WingetInstall, Microsoft365).Definition
+                    (Get-Command -Type Function WingetModule, WinUpdateModule).Definition
                 ))
             )
-         
-            PinIcons
-
-            DefaultSoftwares
-
-            WingetUpdate
-
-            StartSoftwares
 
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth).Definition
+                    (Get-Command -Type Function WingetInstall, PinIcons, StartSoftwares, DefaultSoftwares, WingetUpdate).Definition
+                ))
+            )  
+              
+
+            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function RemoveGhostDrivers, WinUpdate, ImgHealth).Definition
                 ))
             )
             
@@ -1305,6 +1305,8 @@ function WingetInstall {
             Winget Install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent
             Clear-Host
         }
+
+        Microsoft365
 
         Clear-Host
             
