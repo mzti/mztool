@@ -60,7 +60,12 @@ function MZTOOLMODULE {
     # Conteúdo do módulo MZTOOL.psm1
     $moduleContent = @'
 # MZTOOL.psm1
-# Módulo para customização do console e fixação do tamanho da janela.
+# Módulo para customização do console:
+# - Fixação do tamanho da janela (20 linhas x 58 colunas) e remoção dos estilos que permitem redimensionamento via mouse.
+# - Alinhamento automático das janelas de forma cascata para que cada nova não atrapalhe a visibilidade das anteriores.
+# - O posicionamento é baseado em um contador salvo em um arquivo no diretório TEMP.
+
+#region Fixar tamanho e remover redimensionamento
 
 # Importa as funções da API do Windows para manipulação dos estilos da janela
 Add-Type @"
@@ -68,12 +73,10 @@ using System;
 using System.Runtime.InteropServices;
 public class Win32 {
     public const int GWL_STYLE = -16;
-    // WS_SIZEBOX (ou WS_THICKFRAME) permite o redimensionamento com o mouse
     public const int WS_SIZEBOX = 0x00040000;
-    // WS_MAXIMIZEBOX permite maximizar a janela, o que pode modificar seu tamanho
     public const int WS_MAXIMIZEBOX = 0x00010000;
     
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport("user32.dll", SetLastError=true)]
     public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
     
     [DllImport("user32.dll")]
@@ -88,13 +91,12 @@ public class Win32 {
 $hwnd = (Get-Process -Id $PID).MainWindowHandle
 
 if ($hwnd -ne [IntPtr]::Zero) {
-    # Obtém o estilo atual da janela
     $style = [Win32]::GetWindowLong($hwnd, [Win32]::GWL_STYLE)
-    # Remove os estilos WS_SIZEBOX e WS_MAXIMIZEBOX para impedir o redimensionamento com o mouse
+    # Remove os estilos que permitem redimensionamento via mouse: WS_SIZEBOX e WS_MAXIMIZEBOX
     $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
     [Win32]::SetWindowLong($hwnd, [Win32]::GWL_STYLE, $newStyle)
     
-    # Força a atualização da janela para aplicar os novos estilos
+    # Atualiza a janela para aplicar os novos estilos
     $SWP_NOMOVE = 0x0002
     $SWP_NOSIZE = 0x0001
     $SWP_NOZORDER = 0x0004
@@ -102,17 +104,67 @@ if ($hwnd -ne [IntPtr]::Zero) {
     $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
     [Win32]::SetWindowPos($hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
 }
+#endregion
 
-# Customização do console
+#region Customização do console
+# Define a cor de fundo e o tamanho fixo do console
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 $H = Get-Host
 $Win = $H.UI.RawUI.WindowSize
+# Tamanho fixo: 20 linhas por 58 colunas
 $Win.Height = 20
 $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
+#endregion
 
-Write-Output "Módulo CustomModule carregado com sucesso!"
+#region Alinhamento Automático das Janelas
+
+# Função para obter o índice de posicionamento,
+# utilizando um arquivo em $env:TEMP para armazenar o contador.
+function Get-MZTOOLIndex {
+    $counterFile = Join-Path $env:TEMP "MZTOOL_Index.txt"
+    if (-Not (Test-Path $counterFile)) {
+         1 | Out-File -FilePath $counterFile -Encoding ASCII
+         return 1
+    } else {
+         try {
+             $index = [int](Get-Content $counterFile -Raw)
+         } catch {
+             $index = 1
+         }
+         $newIndex = $index + 1
+         $newIndex | Out-File -FilePath $counterFile -Encoding ASCII
+         return $index
+    }
+}
+
+# Função para posicionar a janela automaticamente em cascata
+function Set-AutoAlignedWindow {
+    param (
+        [int]$BaseX = 50,
+        [int]$BaseY = 50,
+        [int]$OffsetX = 30,
+        [int]$OffsetY = 30
+    )
+    $index = Get-MZTOOLIndex
+    $left = $BaseX + (($index - 1) * $OffsetX)
+    $top = $BaseY + (($index - 1) * $OffsetY)
+    
+    if ($hwnd -ne [IntPtr]::Zero) {
+        $SWP_NOSIZE     = 0x0001
+        $SWP_NOZORDER   = 0x0004
+        $SWP_SHOWWINDOW = 0x0040
+        $flags = $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_SHOWWINDOW
+        [Win32]::SetWindowPos($hwnd, [IntPtr]::Zero, $left, $top, 0, 0, $flags)
+    }
+}
+
+# Chama a função para alinhar automaticamente a janela
+Set-AutoAlignedWindow
+#endregion
+
+Write-Output "Módulo MZTOOL carregado com sucesso!"
 '@
 
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
