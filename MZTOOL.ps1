@@ -359,7 +359,7 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            function Invoke-EncodedFunctionGroup {
+            function NEWPWSH {
                 param(
                     [Parameter(Mandatory = $true)]
                     [string[]]$FunctionNames,
@@ -389,13 +389,13 @@ ______________________________________________________
             }
 
             # Execução dos grupos na ordem desejada:
-            Invoke-EncodedFunctionGroup -FunctionNames 'PerfilTheme'
-            Invoke-EncodedFunctionGroup -FunctionNames 'AnyDesk'
-            Invoke-EncodedFunctionGroup -FunctionNames 'WingetModule' -Wait
-            Invoke-EncodedFunctionGroup -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-            Invoke-EncodedFunctionGroup -FunctionNames 'WingetInstall', 'WingetUpdate'
-            Invoke-EncodedFunctionGroup -FunctionNames 'Microsoft365' -Wait
-            Invoke-EncodedFunctionGroup -FunctionNames 'PinIcons', 'StartSoftwares'
+            NEWPWSH -FunctionNames 'PerfilTheme'
+            NEWPWSH -FunctionNames 'AnyDesk'
+            NEWPWSH -FunctionNames 'WingetModule' -Wait
+            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+            NEWPWSH -FunctionNames 'Microsoft365' -Wait
+            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
 
 
                      
