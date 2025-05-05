@@ -217,7 +217,7 @@ ______________________________________________________
                     (Get-Command -Type Function WingetInstall, PinIcons, StartSoftwares, DefaultSoftwares, WingetUpdate).Definition
                 ))
             )  
-            
+            Pause
             Clear-Host
             Write-Host '
 ______________________________________________________
