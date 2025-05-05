@@ -40,7 +40,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #Define a política de execução para permitir scripts assinados.
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-$Host.UI.RawUI.WindowTitle = 'MZTOOL'
+$Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 $H = Get-Host
 $Win = $H.UI.RawUI.WindowSize
@@ -62,7 +62,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
     # Executando como administrador. Formatação e estilo aplicadas.
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
     $H = Get-Host
     $Win = $H.UI.RawUI.WindowSize
