@@ -506,7 +506,24 @@ ______________________________________________________
             DownloadMztool            
           
             Start-Sleep -Seconds 1
+
+            function StartFerramentas {
+                $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+                                                
+                if ($OSARCHITECTURE -eq '64 bits') {
+                    Diagnostics64
+                }
+
+                elseif ($OSARCHITECTURE -eq '32 bits') {
+                    Diagnostics32
+                }
+            }
             function MENUFERRAMENTAS {
+                
+                $Host.UI.RawUI.WindowTitle = 'MZTOOL> FERRAMENTAS DE DIAGNÓSTICO'
+                Import-Module MZTOOL -Force
+                Reset-MZTOOLLayout
+
                 Clear-Host
                 Write-Host '
                 ______________________________________________________
@@ -527,15 +544,7 @@ ______________________________________________________
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 Switch ($CHOICE) {
                     1 {
-                        $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
-                                                
-                        if ($OSARCHITECTURE -eq '64 bits') {
-                            Diagnostics64
-                        }
-
-                        elseif ($OSARCHITECTURE -eq '32 bits') {
-                            Diagnostics32
-                        }
+                        StartFerramentas
 
                         Start-Sleep -Seconds 1
                             
