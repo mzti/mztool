@@ -437,17 +437,14 @@ ______________________________________________________
                 # Restaura o layout após a execução do grupo (certifique-se de que a função Reset-MZTOOLLayout esteja definida)
                 Reset-MZTOOLLayout
             }
-
-            # ----------------------------------------------------------------------
-            # Exemplo de uso na ordem de execução desejada:
-            # ----------------------------------------------------------------------
+      
             NEWPWSH -FunctionNames 'PerfilTheme'
             NEWPWSH -FunctionNames 'AnyDesk'
             NEWPWSH -FunctionNames 'WingetModule' -Wait
             NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
             NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
             NEWPWSH -FunctionNames 'Microsoft365' -Wait
-            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares', 'DelTemp'
                      
             Clear-Host
             Write-Host '
@@ -466,7 +463,9 @@ ______________________________________________________
 |____________________________________________________|
 '
             
-            Start-Sleep -Seconds 50
+            Start-Sleep -Seconds 5
+
+            DisplayMenu
             
         }
 
@@ -2264,7 +2263,44 @@ function ImgHealth {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> IMGHEALTH'
     Import-Module MZTOOL -Force
 
-    # Verifica e repara arquivos corrompidos do sistema operacional em paralelo.
+    # ----------------------------------------------------------------------
+    # Função para exibir uma barra de progresso customizada na última linha do console.
+    # Pode ser utilizada globalmente para informar andamento, download, extração, etc.
+    # ----------------------------------------------------------------------
+    function Show-CustomProgress {
+        param(
+            [Parameter(Mandatory = $true)]
+            [int]$PercentComplete,
+            [int]$BarWidth = 30,
+            [string]$Message = "EXECUTANDO"
+        )
+    
+        $rawUI = $Host.UI.RawUI
+        $winSize = $rawUI.WindowSize
+
+        # Posiciona o cursor na última linha da janela
+        $cursorPos = $rawUI.CursorPosition
+        $cursorPos.X = 0
+        $cursorPos.Y = $winSize.Height - 1
+        $rawUI.CursorPosition = $cursorPos
+
+        $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+        $empty = $BarWidth - $filled
+        $bar = ("#" * $filled) + ("-" * $empty)
+        # Usa ${Message} para que a variável seja avaliada corretamente
+        $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
+
+        $clearLine = " " * $winSize.Width
+        Write-Host $clearLine -NoNewline
+        $rawUI.CursorPosition = $cursorPos
+        Write-Host $progress -NoNewline
+    }
+
+    # ----------------------------------------------------------------------
+    # Script para verificar e reparar arquivos corrompidos em paralelo
+    # ----------------------------------------------------------------------
+
+    # Define as tarefas com nome e bloco de script
     $tasks = @(
         @{
             Name        = "SFC /SCANNOW"
@@ -2280,40 +2316,69 @@ function ImgHealth {
         }
     )
 
+    # Inicia os jobs para cada tarefa
     $jobs = @()
     foreach ($task in $tasks) {
         $jobs += Start-Job -Name $task.Name -ScriptBlock $task.ScriptBlock
     }
 
-    # Monitora o andamento de cada tarefa com porcentagem.
-    while ($jobs.State -contains 'Running') {
-        Clear-Host
+    # Monitoramento dos jobs em paralelo, com atualização de status e barra de progresso global.
+    while ($jobs | Where-Object { $_.State -eq 'Running' }) {
+
+        # Cria um array para armazenar o status individual de cada job
+        $statusLines = @()
+        $somaProgress = 0
         foreach ($job in $jobs) {
-            $status = if ($job.State -eq 'Running') { 'Em andamento' } else { 'Concluído' }
-            $progress = if ($job.State -eq 'Running') {
-                # Simula progresso em porcentagem (substituir por lógica real se disponível).
-                (Get-Random -Minimum 1 -Maximum 100)
+            if ($job.State -eq 'Running') {
+                # Aqui, o progresso é simulado; substitua essa lógica se conseguir dados reais.
+                $jobProgress = Get-Random -Minimum 1 -Maximum 100
+                $status = "[$($job.Name)]: Em andamento ($jobProgress%)"
             }
             else {
-                100
+                $jobProgress = 100
+                $status = "[$($job.Name)]: Concluído (100%)"
             }
-            Write-Host "$($job.Name): $status ($progress%)"
+            $statusLines += $status
+            $somaProgress += $jobProgress
         }
+    
+        # Calcula o progresso global como a média do progresso das tarefas.
+        if ($jobs.Count -gt 0) {
+            $globalProgress = [math]::Round($somaProgress / $jobs.Count)
+        }
+        else {
+            $globalProgress = 100
+        }
+
+        # Limpa a tela e exibe os status individuais na parte superior.
+        Clear-Host
+        foreach ($line in $statusLines) {
+            Write-Host $line
+        }
+    
+        # Exibe a barra de progresso global na última linha do console.
+        Show-CustomProgress -PercentComplete $globalProgress -BarWidth 40 -Message "Progresso Global"
+    
         Start-Sleep -Seconds 2
     }
 
-    # Exibe o status final de cada tarefa.
+    # Exibe o status final de cada tarefa ao concluir todos os jobs.
     Clear-Host
     foreach ($job in $jobs) {
-        $status = if ($job.State -eq 'Completed') { 'Concluído com sucesso' } else { 'Falhou' }
-        Write-Host "$($job.Name): $status (100%)"
+        if ($job.State -eq 'Completed') {
+            Write-Host "[$($job.Name)] Concluído com sucesso (100%)"
+        }
+        else {
+            Write-Host "[$($job.Name)] Falhou (100%)"
+        }
     }
 
-    # Obtém os resultados e limpa os trabalhos.
+    # Obtém os resultados dos jobs (para descarte) e remove-os.
     foreach ($job in $jobs) {
         Receive-Job -Job $job | Out-Null
         Remove-Job -Job $job
     }
+
 
     Clear-Host
 }
