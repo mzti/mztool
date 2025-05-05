@@ -365,30 +365,30 @@ ______________________________________________________
                     [string[]]$FunctionNames,
                     [switch]$Wait
                 )
-    
+
                 # Combina as definições de todas as funções do grupo, preservando a ordem
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
-    
+
                 # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
                 $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
-    
+
                 # Prepara os argumentos sem e com -Wait conforme o caso
                 $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
-    
+
                 if ($Wait) {
-                    Start-Process powershell -ArgumentList $arguments -Wait
+                    [void](Start-Process powershell -ArgumentList $arguments -Wait)
                 }
                 else {
-                    Start-Process powershell -ArgumentList $arguments
+                    [void](Start-Process powershell -ArgumentList $arguments)
                 }
-    
-                # Reseta o layout após cada execução do grupo
-                Reset-MZTOOLLayout
+
+                # Suprime a saída de Reset-MZTOOLLayout, assumindo que já está pré-carregada
+                Reset-MZTOOLLayout | Out-Null
             }
 
-            # Execução dos grupos na ordem desejada:
+            # Execução dos grupos na ordem desejada (todas as saídas serão suprimidas):
             NEWPWSH -FunctionNames 'PerfilTheme'
             NEWPWSH -FunctionNames 'AnyDesk'
             NEWPWSH -FunctionNames 'WingetModule' -Wait
@@ -396,6 +396,7 @@ ______________________________________________________
             NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
             NEWPWSH -FunctionNames 'Microsoft365' -Wait
             NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+
 
 
                      
