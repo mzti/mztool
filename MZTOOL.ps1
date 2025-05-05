@@ -404,7 +404,11 @@ ______________________________________________________
                 NEWPWSH -FunctionNames 'Microsoft365' -Wait
                 NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
             }
-
+            function Set-CursorToStart {
+                $cursor = $host.UI.RawUI.CursorPosition
+                $cursor.X = 0
+                $host.UI.RawUI.CursorPosition = $cursor
+            }
             $FN = (Get-Command -Name NEWPWSH).Definition | Select-String -Pattern "NEWPWSH" | Measure-Object | Select-Object -ExpandProperty Count
             for ($N = 1; $N -le $FN; $N++) {
                 STARTNEWPWSH -OptionalParameters "LINE $N"
