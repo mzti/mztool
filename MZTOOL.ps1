@@ -1720,7 +1720,7 @@ function Microsoft365 {
         $wc.DownloadFile($365URL, $365EXE)
         Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
     }
-    PAUSE
+    
     #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
     $APPS = @("Word.lnk", "Excel.lnk", "PowerPoint.lnk")
