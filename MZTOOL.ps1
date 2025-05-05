@@ -359,55 +359,88 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
+            # ----------------------------------------------------------------------
+            # Função Customizada para exibir a barra de progresso na última linha, com mensagem customizada
+            # ----------------------------------------------------------------------
+            function Show-CustomProgress {
+                param(
+                    [Parameter(Mandatory = $true)]
+                    [int]$PercentComplete,
+                    [int]$BarWidth = 30,
+                    [string]$Message = "EXECUTANDO"
+                )
+    
+                $rawUI = $Host.UI.RawUI
+                $winSize = $rawUI.WindowSize
+
+                # Posiciona o cursor na última linha da janela
+                $cursorPos = $rawUI.CursorPosition
+                $cursorPos.X = 0
+                $cursorPos.Y = $winSize.Height - 1
+                $rawUI.CursorPosition = $cursorPos
+
+                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+                $empty = $BarWidth - $filled
+                $bar = ("#" * $filled) + ("-" * $empty)
+                # Use ${Message} para garantir que a variável seja avaliada corretamente
+                $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
+
+                $clearLine = " " * $winSize.Width
+                Write-Host $clearLine -NoNewline
+                $rawUI.CursorPosition = $cursorPos
+                Write-Host $progress -NoNewline
+            }
+
+            # ----------------------------------------------------------------------
+            # Função NEWPWSH que agrupa execuções de funções com progressão customizada
+            # ----------------------------------------------------------------------
             function NEWPWSH {
                 [CmdletBinding()]
                 param(
                     [Parameter(Mandatory = $true)]
                     [string[]]$FunctionNames,
-                    [switch]$Wait
+                    [switch]$Wait,
+                    [int]$BarWidth = 30
                 )
     
-                # Descrição do grupo para exibição na barra de progresso
-                $groupDescription = "IMPLEMENTANDO: " + ($FunctionNames -join ", ")
-    
-                # Exibe a barra de progresso inicial (0%)
-                Write-Progress -Activity "AGUARDE" -Status $groupDescription -PercentComplete 0
+                # Cria uma descrição para o grupo e a utiliza na barra de progresso
+                $groupDescription = "Executando funções: " + ($FunctionNames -join ", ")
+                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message $groupDescription
 
-                # Combina as definições das funções preservando a ordem
+                # Combina as definições de todas as funções do grupo, mantendo a ordem
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
     
-                # Converte o conteúdo para Base64 com codificação Unicode
+                # Converte o conteúdo combinado para Base64 (usado por -EncodedCommand)
                 $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
                 $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
     
                 if ($Wait) {
                     # Inicia o processo e captura o objeto para monitoramento
                     $proc = Start-Process powershell -ArgumentList $arguments -PassThru
-        
-                    # Atualiza progressivamente a barra enquanto aguarda o término do processo
                     $progress = 0
                     while (-not $proc.HasExited) {
-                        Write-Progress -Activity "AGUARDE" -Status $groupDescription -PercentComplete $progress
+                        Show-CustomProgress -PercentComplete $progress -BarWidth $BarWidth -Message $groupDescription
                         Start-Sleep -Seconds 1
-                        # Incrementa o progresso sem ultrapassar 95% (para deixar o 100% para o término)
+                        # Incrementa o progresso até 95% (reservamos os 100% para o fim)
                         $progress = [Math]::Min($progress + 10, 95)
                     }
-                    # Conclui a barra de progresso
-                    Write-Progress -Activity "CONCLUÍDO" -Status $groupDescription -PercentComplete 100 -Completed
+                    Show-CustomProgress -PercentComplete 100 -BarWidth $BarWidth -Message $groupDescription
                 }
                 else {
-                    # Se não for aguardado, só inicia o processo e finaliza a barra de progresso
+                    # Para processos não bloqueantes, inicia o processo e finaliza a barra imediatamente
                     Start-Process powershell -ArgumentList $arguments
-                    Write-Progress -Activity "EM EXECUÇÃO" -Status $groupDescription -PercentComplete 100 -Completed
+                    Show-CustomProgress -PercentComplete 100 -BarWidth $BarWidth -Message $groupDescription
                 }
     
-                # Restaura o layout após a execução do grupo
+                # Restaura o layout após a execução do grupo (certifique-se de que a função Reset-MZTOOLLayout esteja definida)
                 Reset-MZTOOLLayout
             }
 
-            #Executa as funções em paralelo com barra de progresso.
+            # ----------------------------------------------------------------------
+            # Exemplo de uso na ordem de execução desejada:
+            # ----------------------------------------------------------------------
             NEWPWSH -FunctionNames 'PerfilTheme'
             NEWPWSH -FunctionNames 'AnyDesk'
             NEWPWSH -FunctionNames 'WingetModule' -Wait
@@ -415,7 +448,6 @@ ______________________________________________________
             NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
             NEWPWSH -FunctionNames 'Microsoft365' -Wait
             NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
-
                      
             Clear-Host
             Write-Host '
