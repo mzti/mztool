@@ -414,7 +414,7 @@ ______________________________________________________
                     (Get-Command -Type Function PinIcons, StartSoftwares).Definition
                 ))
             )
-            
+
             Write-Host "Finalizando... (100%)"
            
             Clear-Host
@@ -1560,17 +1560,17 @@ function WingetInstall {
 function WingetUpdate { 
 
     #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
-    Start-Process PowerShell <#-WindowStyle Hidden#> {
+    #Start-Process PowerShell <#-WindowStyle Hidden#> {
 
-        $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
-        Import-Module MZTOOL -Force
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
+    Import-Module MZTOOL -Force
 
-        1..3 | ForEach-Object {
+    1..3 | ForEach-Object {
             
-            Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
+        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
-            Clear-Host
-        }
+        Clear-Host
+        #    }
     }
 }
 
