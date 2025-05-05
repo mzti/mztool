@@ -388,15 +388,30 @@ ______________________________________________________
                 #Reset-MZTOOLLayout | Out-Null
             }
 
-            # Execução dos grupos na ordem desejada (todas as saídas serão suprimidas):
-            NEWPWSH -FunctionNames 'PerfilTheme'
-            NEWPWSH -FunctionNames 'AnyDesk'
-            NEWPWSH -FunctionNames 'WingetModule' -Wait
-            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
-            Start-Sleep -SECONDS 5
-            NEWPWSH -FunctionNames 'Microsoft365' -Wait
-            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+            function STARTNEWPWSH {
+                param (
+                    [Parameter(Mandatory = $false)]
+                    [string[]]$OptionalParameters
+                )
+          
+                # Execução dos grupos na ordem desejada (todas as saídas serão suprimidas):
+                NEWPWSH -FunctionNames 'PerfilTheme'
+                NEWPWSH -FunctionNames 'AnyDesk'
+                NEWPWSH -FunctionNames 'WingetModule' -Wait
+                NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+                NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+                Start-Sleep -SECONDS 5
+                NEWPWSH -FunctionNames 'Microsoft365' -Wait
+                NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+            }
+
+            $FN = (Get-Command -Name NEWPWSH).Definition | Select-String -Pattern "NEWPWSH" | Measure-Object | Select-Object -ExpandProperty Count
+            for ($N = 1; $N -le $FN; $N++) {
+                STARTNEWPWSH -OptionalParameters "LINE $N"
+                $FUNCTIONNAME = "Function $N"
+                Set-CursorToStart
+                Write-Output "IMPLEMENTANDO ($FUNCTIONNAME) TOOL $N/$FN"
+            }
 
 
 
