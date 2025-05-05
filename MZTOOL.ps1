@@ -45,8 +45,6 @@ $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
 function MZTOOLMODULE {
     # Define o nome do módulo
     $moduleName = "MZTOOL"
-    # Define o nome do módulo
-    $moduleName = "CustomModule"
 
     # Define o caminho do diretório do módulo (pasta padrão para módulos do usuário)
     $moduleDir = Join-Path -Path $env:USERPROFILE -ChildPath "Documents\WindowsPowerShell\Modules\$moduleName"
@@ -62,7 +60,7 @@ function MZTOOLMODULE {
     # Conteúdo do módulo CustomModule.psm1
     $moduleContent = @'
 # MZTOOL.psm1
-# Módulo para customização do console e funções personalizadas.
+# Módulo para customização do console e fixação do tamanho da janela.
 
 # Importa as funções da API do Windows para manipulação dos estilos da janela
 Add-Type @"
@@ -70,22 +68,39 @@ using System;
 using System.Runtime.InteropServices;
 public class Win32 {
     public const int GWL_STYLE = -16;
+    // WS_SIZEBOX (ou WS_THICKFRAME) permite o redimensionamento com o mouse
     public const int WS_SIZEBOX = 0x00040000;
+    // WS_MAXIMIZEBOX permite maximizar a janela, o que pode modificar seu tamanho
+    public const int WS_MAXIMIZEBOX = 0x00010000;
+    
     [DllImport("user32.dll", SetLastError = true)]
     public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    
     [DllImport("user32.dll")]
     public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+    
+    [DllImport("user32.dll")]
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 }
 "@
 
 # Obtém o handle da janela do console atual
 $hwnd = (Get-Process -Id $PID).MainWindowHandle
 
-# Se o handle for válido, remove o estilo WS_SIZEBOX para impedir o redimensionamento com o mouse
 if ($hwnd -ne [IntPtr]::Zero) {
+    # Obtém o estilo atual da janela
     $style = [Win32]::GetWindowLong($hwnd, [Win32]::GWL_STYLE)
-    $newStyle = $style -band (-bnot [Win32]::WS_SIZEBOX)
+    # Remove os estilos WS_SIZEBOX e WS_MAXIMIZEBOX para impedir o redimensionamento com o mouse
+    $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
     [Win32]::SetWindowLong($hwnd, [Win32]::GWL_STYLE, $newStyle)
+    
+    # Força a atualização da janela para aplicar os novos estilos
+    $SWP_NOMOVE = 0x0002
+    $SWP_NOSIZE = 0x0001
+    $SWP_NOZORDER = 0x0004
+    $SWP_FRAMECHANGED = 0x0020
+    $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
+    [Win32]::SetWindowPos($hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
 }
 
 # Customização do console
@@ -96,9 +111,12 @@ $Win.Height = 20
 $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
+
+Write-Output "Módulo CustomModule carregado com sucesso!"
 '@
-    # Grava o conteúdo no arquivo .psm1 (sobrescreve, se necessário)
-    Set-Content -Path $modulePath -Value $moduleContent -Force  
+
+    # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
+    Set-Content -Path $modulePath -Value $moduleContent -Force
 
 }
 
@@ -199,6 +217,7 @@ Write-Output "Módulo MZTOOL carregado com sucesso!"
     #Importa o módulo MZTOOL para a sessão atual.
     Import-Module MZTOOL -Force
     #>
+
     #Chama a função PwshEnvTool para definir as variáveis de ambiente.
     PwshEnvTool
   
