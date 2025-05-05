@@ -142,8 +142,8 @@ function Get-MZTOOLIndex {
 # Função para posicionar a janela automaticamente em cascata
 function Set-AutoAlignedWindow {
     param (
-        [int]$BaseX = 05,
-        [int]$BaseY = 05,
+        [int]$BaseX = 20,
+        [int]$BaseY = 20,
         [int]$OffsetX = 300,
         [int]$OffsetY = 30
     )
