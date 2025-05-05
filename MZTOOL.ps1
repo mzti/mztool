@@ -1959,13 +1959,21 @@ function DelTemp {
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
+    # Função para definir o cursor na posição inicial.
+    function Set-CursorToStart {
+        $cursor = $host.UI.RawUI.CursorPosition
+        $cursor.X = 0
+        $host.UI.RawUI.CursorPosition = $cursor
+    }
+
     # Função para remoção de arquivos temporários.
     function Remove-Files {
         param (
             [string]$Path,
             [string]$Description
         )
-        
+      
+        Set-CursorToStart
         Write-Host "`rLimpando $Description" -NoNewline   
         Write-Host "`r                                                              " -NoNewline      
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
