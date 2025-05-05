@@ -163,8 +163,6 @@ function Set-AutoAlignedWindow {
 # Chama a função para alinhar automaticamente a janela
 Set-AutoAlignedWindow
 #endregion
-
-Write-Output "Módulo MZTOOL carregado com sucesso!"
 '@
 
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
