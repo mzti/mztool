@@ -360,68 +360,44 @@ ______________________________________________________
 |____________________________________________________|
 '            
            
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function PerfilTheme).Definition
-                ))
-            )
-            
-            Reset-MZTOOLLayout
-         
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function AnyDesk).Definition
-                ))
-            )
+            function Invoke-EncodedFunctionGroup {
+                param(
+                    [Parameter(Mandatory = $true)]
+                    [string[]]$FunctionNames,
+                    [switch]$Wait
+                )
+    
+                # Combina as definições de todas as funções do grupo, preservando a ordem
+                $combinedDefinitions = foreach ($fn in $FunctionNames) {
+        (Get-Command -Type Function $fn).Definition
+                } -join "`n"
+    
+                # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
+                $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+    
+                # Prepara os argumentos sem e com -Wait conforme o caso
+                $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+                if ($Wait) {
+                    Start-Process powershell -ArgumentList $arguments -Wait
+                }
+                else {
+                    Start-Process powershell -ArgumentList $arguments
+                }
+    
+                # Reseta o layout após cada execução do grupo
+                Reset-MZTOOLLayout
+            }
 
-            Reset-MZTOOLLayout
-          
-            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule).Definition
-                ))
-            )
+            # Execução dos grupos na ordem desejada:
+            Invoke-EncodedFunctionGroup -FunctionNames 'PerfilTheme'
+            Invoke-EncodedFunctionGroup -FunctionNames 'AnyDesk'
+            Invoke-EncodedFunctionGroup -FunctionNames 'WingetModule' -Wait
+            Invoke-EncodedFunctionGroup -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+            Invoke-EncodedFunctionGroup -FunctionNames 'WingetInstall', 'WingetUpdate'
+            Invoke-EncodedFunctionGroup -FunctionNames 'Microsoft365' -Wait
+            Invoke-EncodedFunctionGroup -FunctionNames 'PinIcons', 'StartSoftwares'
 
-            Reset-MZTOOLLayout
-
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
-                ))
-            )
-
-            Reset-MZTOOLLayout
-            
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetInstall, WingetUpdate).Definition
-                ))
-            )
-
-            Reset-MZTOOLLayout
-            
-            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function Microsoft365).Definition
-                ))
-            )
-
-            Reset-MZTOOLLayout
-            
-            Start-Process powershell -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function PinIcons, StartSoftwares).Definition
-                ))
-            )
-
-            Reset-MZTOOLLayout
            
            
             Clear-Host
