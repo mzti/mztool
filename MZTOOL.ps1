@@ -360,13 +360,14 @@ ______________________________________________________
 |____________________________________________________|
 '            
             # ----------------------------------------------------------------------
-            # Função Customizada para exibir a barra de progresso na última linha, com mensagem customizada
+            # Função para exibir uma barra de progresso customizada na última linha do console.
+            # Essa função pode ser utilizada universalmente para informar andamento de qualquer processo.
             # ----------------------------------------------------------------------
             function Show-CustomProgress {
                 param(
                     [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
-                    [int]$BarWidth = 20,
+                    [int]$BarWidth = 30,
                     [string]$Message = "EXECUTANDO"
                 )
     
@@ -382,9 +383,10 @@ ______________________________________________________
                 $filled = [math]::Round($PercentComplete * $BarWidth / 100)
                 $empty = $BarWidth - $filled
                 $bar = ("#" * $filled) + ("-" * $empty)
-                # Use ${Message} para garantir que a variável seja avaliada corretamente
+                # Delimita a variável ${Message} para evitar problemas de interpretação
                 $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
 
+                # Limpa a linha inteira e mostra a barra na última linha
                 $clearLine = " " * $winSize.Width
                 Write-Host $clearLine -NoNewline
                 $rawUI.CursorPosition = $cursorPos
@@ -392,7 +394,8 @@ ______________________________________________________
             }
 
             # ----------------------------------------------------------------------
-            # Função NEWPWSH que agrupa execuções de funções com progressão customizada
+            # Função NEWPWSH para agrupar e executar funções definidas via -EncodedCommand.
+            # Essa função suprime a maioria das saídas, focando apenas na execução.
             # ----------------------------------------------------------------------
             function NEWPWSH {
                 [CmdletBinding()]
@@ -400,51 +403,74 @@ ______________________________________________________
                     [Parameter(Mandatory = $true)]
                     [string[]]$FunctionNames,
                     [switch]$Wait,
-                    [int]$BarWidth = 20
+                    [int]$BarWidth = 30
                 )
     
-                # Cria uma descrição para o grupo e a utiliza na barra de progresso
-                $groupDescription = "EXECUTANDO: " + ($FunctionNames -join ", ")
-                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message $groupDescription
-
-                # Combina as definições de todas as funções do grupo, mantendo a ordem
+                # Combina as definições das funções, preservando a ordem em que foram passadas
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
     
-                # Converte o conteúdo combinado para Base64 (usado por -EncodedCommand)
-                $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+                # Converte o conteúdo combinado para Base64, necessário para -EncodedCommand
+                $encodedCommand = [Convert]::ToBase64String(
+                    [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
+                )
                 $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
     
                 if ($Wait) {
-                    # Inicia o processo e captura o objeto para monitoramento
-                    $proc = Start-Process powershell -ArgumentList $arguments -PassThru
-                    $progress = 0
-                    while (-not $proc.HasExited) {
-                        Show-CustomProgress -PercentComplete $progress -BarWidth $BarWidth -Message $groupDescription
-                        Start-Sleep -Seconds 1
-                        # Incrementa o progresso até 95% (reservamos os 100% para o fim)
-                        $progress = [Math]::Min($progress + 10, 95)
-                    }
-                    Show-CustomProgress -PercentComplete 100 -BarWidth $BarWidth -Message $groupDescription
+                    Start-Process powershell -ArgumentList $arguments -Wait
                 }
                 else {
-                    # Para processos não bloqueantes, inicia o processo e finaliza a barra imediatamente
                     Start-Process powershell -ArgumentList $arguments
-                    Show-CustomProgress -PercentComplete 100 -BarWidth $BarWidth -Message $groupDescription
                 }
-    
-                # Restaura o layout após a execução do grupo (certifique-se de que a função Reset-MZTOOLLayout esteja definida)
+
                 Reset-MZTOOLLayout
             }
-      
-            NEWPWSH -FunctionNames 'PerfilTheme'
-            NEWPWSH -FunctionNames 'AnyDesk'
-            NEWPWSH -FunctionNames 'WingetModule' -Wait
-            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
-            NEWPWSH -FunctionNames 'Microsoft365' -Wait
-            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares', 'DelTemp'
+
+            # ----------------------------------------------------------------------
+            # Função Invoke-AllGroups que executa os grupos de funções em sequência 
+            # e atualiza uma barra de progresso única que reflete o avanço global.
+            # ----------------------------------------------------------------------
+            function Invoke-AllGroups {
+                param(
+                    [int]$BarWidth = 40
+                )
+                # Define os grupos a serem executados (cada grupo é composto por funções e a flag Wait, se necessário)
+                $groups = @(
+                    @{ Functions = 'PerfilTheme' },
+                    @{ Functions = 'AnyDesk' },
+                    @{ Functions = 'WingetModule'; Wait = $true },
+                    @{ Functions = 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp' },
+                    @{ Functions = 'WingetInstall', 'WingetUpdate' },
+                    @{ Functions = 'Microsoft365'; Wait = $true },
+                    @{ Functions = 'PinIcons', 'StartSoftwares' }
+                )
+    
+                $total = $groups.Count
+                $completed = 0
+
+                # Exibe a barra de progresso inicial (0%)
+                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "Progresso Geral"
+    
+                foreach ($group in $groups) {
+                    if ($group.ContainsKey("Wait") -and $group.Wait) {
+                        NEWPWSH -FunctionNames $group.Functions -Wait -BarWidth $BarWidth
+                    }
+                    else {
+                        NEWPWSH -FunctionNames $group.Functions -BarWidth $BarWidth
+                    }
+                    $completed++
+                    $percent = [math]::Round(($completed * 100) / $total)
+                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Progresso Geral"
+                }
+            }
+
+            # ----------------------------------------------------------------------
+            # Chamada final para executar os grupos com a barra de progresso unificada.
+            # ----------------------------------------------------------------------
+            Invoke-AllGroups -BarWidth 40
+
+
                      
             Clear-Host
             Write-Host '
@@ -2262,122 +2288,14 @@ function DelTemp {
 function ImgHealth {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> IMGHEALTH'
     Import-Module MZTOOL -Force
+    # Executa o comando SFC para verificar e reparar arquivos corrompidos do sistema.
+    SFC /SCANNOW
 
-    # ----------------------------------------------------------------------
-    # Função para exibir uma barra de progresso customizada na última linha do console.
-    # Pode ser utilizada globalmente para informar andamento, download, extração, etc.
-    # ----------------------------------------------------------------------
-    function Show-CustomProgress {
-        param(
-            [Parameter(Mandatory = $true)]
-            [int]$PercentComplete,
-            [int]$BarWidth = 20,
-            [string]$Message = "EXECUTANDO"
-        )
-    
-        $rawUI = $Host.UI.RawUI
-        $winSize = $rawUI.WindowSize
+    # Verifica a integridade da imagem do sistema.
+    DISM /Online /Cleanup-Image /CheckHealth
 
-        # Posiciona o cursor na última linha da janela
-        $cursorPos = $rawUI.CursorPosition
-        $cursorPos.X = 0
-        $cursorPos.Y = $winSize.Height - 1
-        $rawUI.CursorPosition = $cursorPos
-
-        $filled = [math]::Round($PercentComplete * $BarWidth / 100)
-        $empty = $BarWidth - $filled
-        $bar = ("#" * $filled) + ("-" * $empty)
-        # Usa ${Message} para que a variável seja avaliada corretamente
-        $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
-
-        $clearLine = " " * $winSize.Width
-        Write-Host $clearLine -NoNewline
-        $rawUI.CursorPosition = $cursorPos
-        Write-Host $progress -NoNewline
-    }
-
-    # ----------------------------------------------------------------------
-    # Script para verificar e reparar arquivos corrompidos em paralelo
-    # ----------------------------------------------------------------------
-
-    # Define as tarefas com nome e bloco de script
-    $tasks = @(
-        @{
-            Name        = "SFC /SCANNOW"
-            ScriptBlock = { SFC /SCANNOW }
-        },
-        @{
-            Name        = "DISM /CHECKHEALTH"
-            ScriptBlock = { DISM /Online /Cleanup-Image /CheckHealth }
-        },
-        @{
-            Name        = "DISM /RESTOREHEALTH"
-            ScriptBlock = { DISM /Online /Cleanup-Image /RestoreHealth }
-        }
-    )
-
-    # Inicia os jobs para cada tarefa
-    $jobs = @()
-    foreach ($task in $tasks) {
-        $jobs += Start-Job -Name $task.Name -ScriptBlock $task.ScriptBlock
-    }
-
-    # Monitoramento dos jobs em paralelo, com atualização de status e barra de progresso global.
-    while ($jobs | Where-Object { $_.State -eq 'Running' }) {
-
-        # Cria um array para armazenar o status individual de cada job
-        $statusLines = @()
-        $somaProgress = 0
-        foreach ($job in $jobs) {
-            if ($job.State -eq 'Running') {
-                # Aqui, o progresso é simulado; substitua essa lógica se conseguir dados reais.
-                $jobProgress = Get-Random -Minimum 1 -Maximum 100
-                $status = "[$($job.Name)]: Em andamento ($jobProgress%)"
-            }
-            else {
-                $jobProgress = 100
-                $status = "[$($job.Name)]: Concluído (100%)"
-            }
-            $statusLines += $status
-            $somaProgress += $jobProgress
-        }
-    
-        # Calcula o progresso global como a média do progresso das tarefas.
-        if ($jobs.Count -gt 0) {
-            $globalProgress = [math]::Round($somaProgress / $jobs.Count)
-        }
-        else {
-            $globalProgress = 100
-        }
-
-        # Limpa a tela e exibe os status individuais na parte superior.
-        Clear-Host
-        foreach ($line in $statusLines) {
-            Write-Host $line
-        }
-    
-        # Exibe a barra de progresso global na última linha do console.
-        Show-CustomProgress -PercentComplete $globalProgress -BarWidth 40 -Message "Progresso Global"
-    
-        Start-Sleep -Seconds 2
-    }
-
-    # Exibe o status final de cada tarefa ao concluir todos os jobs.
-    Clear-Host
-    foreach ($job in $jobs) {
-        if ($job.State -eq 'Completed') {
-            Write-Host "[$($job.Name)] Concluído com sucesso (100%)"
-        }
-        else {
-            Write-Host "[$($job.Name)] Falhou (100%)"
-        }
-    }
-
-    # Obtém os resultados dos jobs (para descarte) e remove-os.
-    foreach ($job in $jobs) {
-        Receive-Job -Job $job | Out-Null
-        Remove-Job -Job $job
-    }
+    # Repara a imagem do sistema, se necessário.
+    DISM /Online /Cleanup-Image /RestoreHealth
 
 
     Clear-Host
