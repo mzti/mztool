@@ -138,7 +138,7 @@ OpSys
 
 function DisplayMenu {
 
-    $Host.UI.RawUI.WindowTitle = 'MZTOOL'
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'      
     
     Clear-Host
