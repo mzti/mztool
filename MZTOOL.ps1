@@ -45,22 +45,48 @@ $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
 function MZTOOLMODULE {
     # Define o nome do módulo
     $moduleName = "MZTOOL"
+    # Define o nome do módulo
+    $moduleName = "CustomModule"
 
-    # Define o caminho onde o módulo será instalado (diretório padrão de módulos do usuário)
+    # Define o caminho do diretório do módulo (pasta padrão para módulos do usuário)
     $moduleDir = Join-Path -Path $env:USERPROFILE -ChildPath "Documents\WindowsPowerShell\Modules\$moduleName"
 
     # Cria o diretório, se não existir
-    if (!(Test-Path $moduleDir)) {
+    if (-Not (Test-Path $moduleDir)) {
         New-Item -Path $moduleDir -ItemType Directory -Force | Out-Null
     }
 
-    # Define o caminho completo para o arquivo de módulo (.psm1)
+    # Define o caminho completo para o arquivo .psm1 do módulo
     $modulePath = Join-Path -Path $moduleDir -ChildPath "$moduleName.psm1"
 
-    # Conteúdo do módulo com as customizações e as funções
+    # Conteúdo do módulo CustomModule.psm1
     $moduleContent = @'
 # MZTOOL.psm1
-# Este módulo aplica customizações no console e define funções personalizadas
+# Módulo para customização do console e funções personalizadas.
+
+# Importa as funções da API do Windows para manipulação dos estilos da janela
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class Win32 {
+    public const int GWL_STYLE = -16;
+    public const int WS_SIZEBOX = 0x00040000;
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    [DllImport("user32.dll")]
+    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+}
+"@
+
+# Obtém o handle da janela do console atual
+$hwnd = (Get-Process -Id $PID).MainWindowHandle
+
+# Se o handle for válido, remove o estilo WS_SIZEBOX para impedir o redimensionamento com o mouse
+if ($hwnd -ne [IntPtr]::Zero) {
+    $style = [Win32]::GetWindowLong($hwnd, [Win32]::GWL_STYLE)
+    $newStyle = $style -band (-bnot [Win32]::WS_SIZEBOX)
+    [Win32]::SetWindowLong($hwnd, [Win32]::GWL_STYLE, $newStyle)
+}
 
 # Customização do console
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -70,13 +96,9 @@ $Win.Height = 20
 $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
-    
-Write-Output "Módulo MZTOOL carregado com sucesso!"
 '@
-
     # Grava o conteúdo no arquivo .psm1 (sobrescreve, se necessário)
-    Set-Content -Path $modulePath -Value $moduleContent -Force
-   
+    Set-Content -Path $modulePath -Value $moduleContent -Force  
 
 }
 
