@@ -1305,6 +1305,13 @@ function WingetInstall {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $H = Get-Host
+    $Win = $H.UI.RawUI.WindowSize
+    $Win.Height = 20
+    $Win.Width = 58
+    $H.UI.RawUI.Set_WindowSize($Win)
+    $H.UI.RawUI.Set_BufferSize($Win)
+
 
     #Verifica se o módulo Winget está instalado e atualizado.
     if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
@@ -1343,6 +1350,7 @@ function WingetUpdate {
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
         $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
         1..3 | ForEach-Object {
+            
             Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
 
             Clear-Host
