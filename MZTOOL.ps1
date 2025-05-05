@@ -359,44 +359,21 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            # ----------------------------------------------------------------------
-            # Função para exibir uma barra de progresso customizada na última linha do console.
-            # Essa função pode ser utilizada universalmente para informar andamento de qualquer processo.
-            # ----------------------------------------------------------------------
-            function Show-CustomProgress {
+            # Função para exibir uma barra de progresso simples.
+            function Show-SimpleProgress {
                 param(
-                    [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
-                    [int]$BarWidth = 30,
-                    [string]$Message = "EXECUTANDO"
+                    [int]$BarWidth = 30
                 )
-    
-                $rawUI = $Host.UI.RawUI
-                $winSize = $rawUI.WindowSize
-
-                # Posiciona o cursor na última linha da janela
-                $cursorPos = $rawUI.CursorPosition
-                $cursorPos.X = 0
-                $cursorPos.Y = $winSize.Height - 1
-                $rawUI.CursorPosition = $cursorPos
-
+                # Calcula quantos caracteres serão "preenchidos" e "vazios"
                 $filled = [math]::Round($PercentComplete * $BarWidth / 100)
                 $empty = $BarWidth - $filled
                 $bar = ("#" * $filled) + ("-" * $empty)
-                # Delimita a variável ${Message} para evitar problemas de interpretação
-                $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
-
-                # Limpa a linha inteira e mostra a barra na última linha
-                $clearLine = " " * $winSize.Width
-                Write-Host $clearLine -NoNewline
-                $rawUI.CursorPosition = $cursorPos
-                Write-Host $progress -NoNewline
+                Write-Host "Progress: $PercentComplete% [$bar]"
             }
 
-            # ----------------------------------------------------------------------
-            # Função NEWPWSH para agrupar e executar funções definidas via -EncodedCommand.
-            # Essa função suprime a maioria das saídas, focando apenas na execução.
-            # ----------------------------------------------------------------------
+            # Função NEWPWSH que combina a definição de funções e executa-as via -EncodedCommand.
+            # Essa versão suprime a maioria das saídas, executando silenciosamente.
             function NEWPWSH {
                 [CmdletBinding()]
                 param(
@@ -406,12 +383,12 @@ ______________________________________________________
                     [int]$BarWidth = 30
                 )
     
-                # Combina as definições das funções, preservando a ordem em que foram passadas
+                # Combina as definições das funções, respeitando a ordem
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
     
-                # Converte o conteúdo combinado para Base64, necessário para -EncodedCommand
+                # Converte o script combinado para Base64 para ser executado via -EncodedCommand
                 $encodedCommand = [Convert]::ToBase64String(
                     [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
                 )
@@ -423,19 +400,16 @@ ______________________________________________________
                 else {
                     Start-Process powershell -ArgumentList $arguments
                 }
-
-                Reset-MZTOOLLayout
             }
 
-            # ----------------------------------------------------------------------
-            # Função Invoke-AllGroups que executa os grupos de funções em sequência 
-            # e atualiza uma barra de progresso única que reflete o avanço global.
-            # ----------------------------------------------------------------------
+            # Função que executa todos os grupos de funções em sequência e, após cada grupo,
+            # atualiza uma única barra de progresso que "salta" uma porcentagem fixa.
             function Invoke-AllGroups {
                 param(
                     [int]$BarWidth = 40
                 )
-                # Define os grupos a serem executados (cada grupo é composto por funções e a flag Wait, se necessário)
+    
+                # Define os grupos de funções a serem executados
                 $groups = @(
                     @{ Functions = 'PerfilTheme' },
                     @{ Functions = 'AnyDesk' },
@@ -448,9 +422,9 @@ ______________________________________________________
     
                 $total = $groups.Count
                 $completed = 0
-
-                # Exibe a barra de progresso inicial (0%)
-                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "Progresso Geral"
+    
+                # Exibe a barra inicial (0% concluído)
+                Show-SimpleProgress -PercentComplete 0 -BarWidth $BarWidth
     
                 foreach ($group in $groups) {
                     if ($group.ContainsKey("Wait") -and $group.Wait) {
@@ -460,14 +434,13 @@ ______________________________________________________
                         NEWPWSH -FunctionNames $group.Functions -BarWidth $BarWidth
                     }
                     $completed++
+                    # Calcula a porcentagem com base no número de grupos
                     $percent = [math]::Round(($completed * 100) / $total)
-                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Progresso Geral"
+                    Show-SimpleProgress -PercentComplete $percent -BarWidth $BarWidth
                 }
             }
 
-            # ----------------------------------------------------------------------
-            # Chamada final para executar os grupos com a barra de progresso unificada.
-            # ----------------------------------------------------------------------
+            # Chamada final para executar os grupos com a barra de progresso única.
             Invoke-AllGroups -BarWidth 40
 
 
