@@ -360,7 +360,7 @@ ______________________________________________________
 |____________________________________________________|
 '            
            
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function PerfilTheme).Definition
@@ -368,7 +368,7 @@ ______________________________________________________
             )
 
          
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function AnyDesk).Definition
@@ -376,7 +376,7 @@ ______________________________________________________
             )
 
           
-            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WingetModule).Definition
@@ -384,7 +384,7 @@ ______________________________________________________
             )
 
             
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
@@ -392,7 +392,7 @@ ______________________________________________________
             )
 
             
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WingetInstall, WingetUpdate).Definition
@@ -400,7 +400,7 @@ ______________________________________________________
             )
 
             
-            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function Microsoft365).Definition
@@ -408,7 +408,7 @@ ______________________________________________________
             )
 
             
-            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function PinIcons, StartSoftwares).Definition
