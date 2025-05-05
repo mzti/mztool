@@ -359,47 +359,64 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-           
-            function Invoke-EncodedFunctionGroup {
+            function NEWPWSH {
+                [CmdletBinding()]
                 param(
                     [Parameter(Mandatory = $true)]
                     [string[]]$FunctionNames,
                     [switch]$Wait
                 )
     
-                # Combina as definições de todas as funções do grupo, preservando a ordem
+                # Descrição do grupo para exibição na barra de progresso
+                $groupDescription = "Executando funções: " + ($FunctionNames -join ", ")
+    
+                # Exibe a barra de progresso inicial (0%)
+                Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 0
+
+                # Combina as definições das funções preservando a ordem
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
     
-                # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
+                # Converte o conteúdo para Base64 com codificação Unicode
                 $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
-    
-                # Prepara os argumentos sem e com -Wait conforme o caso
                 $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
     
                 if ($Wait) {
-                    Start-Process powershell -ArgumentList $arguments -Wait
+                    # Inicia o processo e captura o objeto para monitoramento
+                    $proc = Start-Process powershell -ArgumentList $arguments -PassThru
+        
+                    # Atualiza progressivamente a barra enquanto aguarda o término do processo
+                    $progress = 0
+                    while (-not $proc.HasExited) {
+                        Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete $progress
+                        Start-Sleep -Seconds 1
+                        # Incrementa o progresso sem ultrapassar 95% (para deixar o 100% para o término)
+                        $progress = [Math]::Min($progress + 10, 95)
+                    }
+                    # Conclui a barra de progresso
+                    Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 100 -Completed
                 }
                 else {
+                    # Se não for aguardado, só inicia o processo e finaliza a barra de progresso
                     Start-Process powershell -ArgumentList $arguments
+                    Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 100 -Completed
                 }
     
-                # Reseta o layout após cada execução do grupo
+                # Restaura o layout após a execução do grupo
                 Reset-MZTOOLLayout
             }
 
-            # Execução dos grupos na ordem desejada:
-            Invoke-EncodedFunctionGroup -FunctionNames 'PerfilTheme'
-            Invoke-EncodedFunctionGroup -FunctionNames 'AnyDesk'
-            Invoke-EncodedFunctionGroup -FunctionNames 'WingetModule' -Wait
-            Invoke-EncodedFunctionGroup -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-            Invoke-EncodedFunctionGroup -FunctionNames 'WingetInstall', 'WingetUpdate'
-            Invoke-EncodedFunctionGroup -FunctionNames 'Microsoft365' -Wait
-            Invoke-EncodedFunctionGroup -FunctionNames 'PinIcons', 'StartSoftwares'
+            #Executa as funções em paralelo com barra de progresso.
+            NEWPWSH -FunctionNames 'PerfilTheme'
+            NEWPWSH -FunctionNames 'AnyDesk'
+            NEWPWSH -FunctionNames 'WingetModule' -Wait
+            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+            NEWPWSH -FunctionNames 'Microsoft365' -Wait
+            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
 
-           
-           
+                     
             Clear-Host
             Write-Host '
 ______________________________________________________
