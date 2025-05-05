@@ -366,7 +366,8 @@ ______________________________________________________
                     (Get-Command -Type Function PerfilTheme).Definition
                 ))
             )
-
+            
+            Reset-MZTOOLLayout
          
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -375,6 +376,7 @@ ______________________________________________________
                 ))
             )
 
+            Reset-MZTOOLLayout
           
             Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -383,7 +385,8 @@ ______________________________________________________
                 ))
             )
 
-            
+            Reset-MZTOOLLayout
+
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -391,6 +394,7 @@ ______________________________________________________
                 ))
             )
 
+            Reset-MZTOOLLayout
             
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -399,6 +403,7 @@ ______________________________________________________
                 ))
             )
 
+            Reset-MZTOOLLayout
             
             Start-Process powershell -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -407,6 +412,7 @@ ______________________________________________________
                 ))
             )
 
+            Reset-MZTOOLLayout
             
             Start-Process powershell -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -415,6 +421,7 @@ ______________________________________________________
                 ))
             )
 
+            Reset-MZTOOLLayout
            
            
             Clear-Host
