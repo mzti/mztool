@@ -366,7 +366,7 @@ ______________________________________________________
                 param(
                     [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
-                    [int]$BarWidth = 30,
+                    [int]$BarWidth = 20,
                     [string]$Message = "EXECUTANDO"
                 )
     
@@ -400,11 +400,11 @@ ______________________________________________________
                     [Parameter(Mandatory = $true)]
                     [string[]]$FunctionNames,
                     [switch]$Wait,
-                    [int]$BarWidth = 30
+                    [int]$BarWidth = 20
                 )
     
                 # Cria uma descrição para o grupo e a utiliza na barra de progresso
-                $groupDescription = "Executando funções: " + ($FunctionNames -join ", ")
+                $groupDescription = "EXECUTANDO: " + ($FunctionNames -join ", ")
                 Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message $groupDescription
 
                 # Combina as definições de todas as funções do grupo, mantendo a ordem
@@ -2271,7 +2271,7 @@ function ImgHealth {
         param(
             [Parameter(Mandatory = $true)]
             [int]$PercentComplete,
-            [int]$BarWidth = 30,
+            [int]$BarWidth = 20,
             [string]$Message = "EXECUTANDO"
         )
     
