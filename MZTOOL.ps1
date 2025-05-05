@@ -385,7 +385,7 @@ ______________________________________________________
                 }
 
                 # Suprime a saída de Reset-MZTOOLLayout, assumindo que já está pré-carregada
-                Reset-MZTOOLLayout | Out-Null
+                #Reset-MZTOOLLayout | Out-Null
             }
 
             # Execução dos grupos na ordem desejada (todas as saídas serão suprimidas):
