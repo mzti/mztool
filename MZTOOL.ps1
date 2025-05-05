@@ -41,6 +41,28 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
+
+function MZTOOLMODULE {
+    # Define o nome do módulo
+    $moduleName = "MZTOOL"
+
+    # Define o caminho onde o módulo será instalado (diretório padrão de módulos do usuário)
+    $moduleDir = Join-Path -Path $env:USERPROFILE -ChildPath "Documents\WindowsPowerShell\Modules\$moduleName"
+
+    # Cria o diretório, se não existir
+    if (!(Test-Path $moduleDir)) {
+        New-Item -Path $moduleDir -ItemType Directory -Force | Out-Null
+    }
+
+    # Define o caminho completo para o arquivo de módulo (.psm1)
+    $modulePath = Join-Path -Path $moduleDir -ChildPath "$moduleName.psm1"
+
+    # Conteúdo do módulo com as customizações e as funções
+    $moduleContent = @'
+# MZTOOL.psm1
+# Este módulo aplica customizações no console e define funções personalizadas
+
+# Customização do console
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 $H = Get-Host
 $Win = $H.UI.RawUI.WindowSize
@@ -48,6 +70,22 @@ $Win.Height = 20
 $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
+    
+Write-Output "Módulo MZTOOL carregado com sucesso!"
+'@
+
+    # Grava o conteúdo no arquivo .psm1 (sobrescreve, se necessário)
+    Set-Content -Path $modulePath -Value $moduleContent -Force
+   
+
+}
+
+#Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
+MZTOOLMODULE
+   
+#Importa o módulo MZTOOL para a sessão atual.
+Import-Module MZTOOL -Force
+
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -94,7 +132,7 @@ else {
 
              
     }
-
+    <#
     function MZTOOLMODULE {
         # Define o nome do módulo
         $moduleName = "MZTOOL"
@@ -135,10 +173,13 @@ Write-Output "Módulo MZTOOL carregado com sucesso!"
     
     #Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
     MZTOOLMODULE
+
+    #Importa o módulo MZTOOL para a sessão atual.
+    Import-Module MZTOOL -Force
+    #>
     #Chama a função PwshEnvTool para definir as variáveis de ambiente.
     PwshEnvTool
-    #Importa o módulo MZTOOL para a sessão atual.
-    Import-Module MZTOOL -Force 
+  
 
     # Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
@@ -178,7 +219,7 @@ OpSys
 function DisplayMenu {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'      
+    Import-Module MZTOOL -Force     
     
     Clear-Host
     Write-Host '
@@ -600,7 +641,7 @@ ______________________________________________________
             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
             $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
-            $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+            Import-Module MZTOOL -Force
 
             Clear-Host
             Write-Host '
@@ -731,7 +772,7 @@ ______________________________________________________
 function ClockDate {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLOCK|DATE'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     #Define um novo servidor e sincroniza o relógio e a data do sistema.    
     Start-Process PowerShell -WindowStyle Hidden {
@@ -746,7 +787,7 @@ function ClockDate {
 function MachineEnvTool {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> MACHINE ENVTOOL'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
     
     #Adiciona variáveis de ambiente.
     Start-Process PowerShell -WindowStyle Hidden {        
@@ -764,7 +805,7 @@ function MachineEnvTool {
 function ToolDir {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     #Criação do diretório C:\TOOL.
 
@@ -787,7 +828,7 @@ function DownloadMztool {
     #Download do arquivo MZTOOL.zip
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     Add-Type -AssemblyName "System.Net.Http"
      
@@ -977,7 +1018,7 @@ ______________________________________________________
                                 #OPÇÃO 0 - ENCERRAR MZTOOL.
 
                                 $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
-                                $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+                                Import-Module MZTOOL -Force
 
                                 Clear-Host
                                 Write-Host '
@@ -1266,7 +1307,7 @@ function WinUpdateModule {
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATEMODULE'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'   
+    Import-Module MZTOOL -Force  
     
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
@@ -1283,7 +1324,7 @@ function WinUpdateModule {
 function WingetModule {
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETMODULE'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'  
+    Import-Module MZTOOL -Force  
    
     #Módulo WINGET.
 
@@ -1343,14 +1384,7 @@ function WingetInstall {
     #WINGET - Instalação dos softwares Acrobat Reader, Google Chrome, Microsoft Powershell 7+.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-    $H = Get-Host
-    $Win = $H.UI.RawUI.WindowSize
-    $Win.Height = 20
-    $Win.Width = 58
-    $H.UI.RawUI.Set_WindowSize($Win)
-    $H.UI.RawUI.Set_BufferSize($Win)
-
+    Import-Module MZTOOL -Force 
 
     #Verifica se o módulo Winget está instalado e atualizado.
     if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
@@ -1387,7 +1421,8 @@ function WingetUpdate {
     Start-Process PowerShell <#-WindowStyle Hidden#> {
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
-        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        Import-Module MZTOOL -Force
+
         1..3 | ForEach-Object {
             
             Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
@@ -1402,7 +1437,7 @@ function WinUpdate {
     #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     Import-Module PSWindowsUpdate -Force 
 
@@ -1415,7 +1450,7 @@ function WinUpdate {
 function RemoveGhostDrivers {
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEGHOSTDEVICES'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
    
@@ -1434,7 +1469,7 @@ function RemoveGhostDrivers {
 function AnyDesk {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     #Download do software Standalone AnyDesk-CM para a área de trabalho pública.           
 
@@ -1448,7 +1483,7 @@ function AnyDesk {
 function Microsoft365 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> MICROSOFT365'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
     [xml]$XML = @'
@@ -1493,7 +1528,7 @@ function Microsoft365 {
 function Office2007 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE2007'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'  
+    Import-Module MZTOOL -Force 
     
     #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
     Start-Process "$env:TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
@@ -1509,7 +1544,7 @@ function NetFx3 {
     Start-Job -Name NetFx3 -ScriptBlock { 
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> .NETFRAMEWORK3.5'
-        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        Import-Module MZTOOL -Force
 
         Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum            
         
@@ -1524,7 +1559,7 @@ function DriverBooster {
     Start-Process PowerShell <#-WindowStyle Hidden#> {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
-        $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+        Import-Module MZTOOL -Force
         
         Expand-Archive -LiteralPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER"
 
@@ -1578,7 +1613,7 @@ function DriverBooster {
 function PerfilTheme {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
@@ -1686,7 +1721,7 @@ function PerfilTheme {
 function PinIcons {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > PINICONS'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
@@ -1858,7 +1893,7 @@ function PinIcons {
 function DefaultSoftwares {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > DEFAULTSOFTWARES'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
     
     #Define o Google Chrome como navegador padrão, e Acrobat Reader como leitor de PDF padrão.
     
@@ -1900,7 +1935,7 @@ function DefaultSoftwares {
 function StartSoftwares {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> STARTSOFTWARES'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     Start-Process CHROME
     Start-Process ACROBAT
@@ -1994,7 +2029,7 @@ function StartSoftwares {
 
 function DelTemp {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLEANTEMP'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
@@ -2060,7 +2095,7 @@ function DelTemp {
 
 function ImgHealth {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> IMGHEALTH'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     # Verifica e repara arquivos corrompidos do sistema operacional em paralelo.
     $tasks = @(
@@ -2120,7 +2155,7 @@ function Pro {
 
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINDOWSPRO'
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    Import-Module MZTOOL -Force
 
     #Converte a versão do Windows para PRO. (Não ativa o sistema, para a ativação é necessário haver uma Licença Digital HWID).
 
