@@ -2166,42 +2166,7 @@ function DefaultSoftwares {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > DEFAULTSOFTWARES'
     Import-Module MZTOOL -Force
-    
-    #Define o Google Chrome como navegador padrão, e Acrobat Reader como leitor de PDF padrão.
-    
-    #Script não funciona em builds novas do Windows. 
-    
-    <#
-    # Define o Google Chrome como navegador padrão.
-    $chromeProgId = "ChromeHTML"
-    $registryPath = "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations"
-
-    # Define protocolos.
-    $protocols = @("http", "https")
-    foreach ($protocol in $protocols) {
-        $regPath = "$registryPath\$protocol\UserChoice"
-        New-Item -Path $regPath -Force | Out-Null
-        Set-ItemProperty -Path $regPath -Name "ProgId" -Value $chromeProgId
-    }
-
-    # Define extensões de arquivo.
-    $fileExtensions = @(".html", ".htm")
-    $registryPathExtensions = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts"
-    foreach ($extension in $fileExtensions) {
-        $regPath = "$registryPathExtensions\$extension\UserChoice"
-        New-Item -Path $regPath -Force | Out-Null
-        Set-ItemProperty -Path $regPath -Name "ProgId" -Value $chromeProgId
-    }
-
-    Clear-Host
-
-    # Define o Acrobat Reader como leitor de PDF padrão.
-    $pdfRegistryPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pdf\UserChoice"
-    Set-ItemProperty -Path $pdfRegistryPath -Name "ProgId" -Value "Acrobat.Document.DC"
-    #>
-    
-    Clear-Host
-
+   
 }
 
 function StartSoftwares {
