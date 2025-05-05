@@ -437,7 +437,7 @@ ______________________________________________________
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetInstall).Definition
+                    (Get-Command -Type Function WingetInstall, WingetUpdate).Definition
                 ))
             )    
             
@@ -446,14 +446,7 @@ ______________________________________________________
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function Microsoft365).Definition
                 ))
-            ) 
-           
-            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetUpdate).Definition
-                ))
-            )  
+            )                    
           
             Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
