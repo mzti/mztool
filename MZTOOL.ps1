@@ -1327,9 +1327,7 @@ function WingetInstall {
             Winget Install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent
             Clear-Host
         }
-
-        Microsoft365
-
+    
         Clear-Host
             
     }            
