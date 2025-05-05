@@ -366,51 +366,43 @@ ______________________________________________________
                     [switch]$Wait
                 )
 
-                # Combina as definições de todas as funções do grupo, preservando a ordem
-                $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
-                } -join "`n"
+                # Calcula o número total de etapas com base no número de funções
+                $TotalSteps = $FunctionNames.Count
+                $CurrentStep = 0
 
-                # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
-                $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+                foreach ($fn in $FunctionNames) {
+                    # Incrementa o contador de etapas
+                    $CurrentStep++
 
-                # Prepara os argumentos sem e com -Wait conforme o caso
-                $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+                    # Obtém a definição da função
+                    $fnDefinition = (Get-Command -Type Function $fn).Definition
 
-                if ($Wait) {
-                    [void](Start-Process powershell -ArgumentList $arguments -Wait)
+                    # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
+                    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($fnDefinition))
+
+                    # Prepara os argumentos sem e com -Wait conforme o caso
+                    $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+
+                    if ($Wait) {
+                        [void](Start-Process powershell -ArgumentList $arguments -Wait)
+                    }
+                    else {
+                        [void](Start-Process powershell -ArgumentList $arguments)
+                    }
+
+                    Write-Output "IMPLEMENTANDO $fn ($CurrentStep de $TotalSteps)"
                 }
-                else {
-                    [void](Start-Process powershell -ArgumentList $arguments)
-                }
-                $FUNCTIONNAME = "Function $N"                
-                Write-Output "IMPLEMENTANDO ($FUNCTIONNAME) TOOL $N/$FN"
-            
-                # Suprime a saída de Reset-MZTOOLLayout, assumindo que já está pré-carregada
-                #Reset-MZTOOLLayout | Out-Null
             }
 
-            function STARTNEWPWSH {
-                param (
-                    [Parameter(Mandatory = $false)]
-                    [string[]]$OptionalParameters
-                )
-          
-                # Execução dos grupos na ordem desejada (todas as saídas serão suprimidas):
-                NEWPWSH -FunctionNames 'PerfilTheme'
-                NEWPWSH -FunctionNames 'AnyDesk'
-                NEWPWSH -FunctionNames 'WingetModule' -Wait
-                NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-                NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
-                Start-Sleep -SECONDS 5
-                NEWPWSH -FunctionNames 'Microsoft365' -Wait
-                NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
-            }
-
-            # Calcula automaticamente o número total de chamadas NEWPWSH em STARTNEWPWSH
-            $FN = (Get-Command -Type Function STARTNEWPWSH).Definition -split "`n" | Select-String -Pattern 'NEWPWSH' | Measure-Object | Select-Object -ExpandProperty Count
-            
-            STARTNEWPWSH            
+            # Execução das funções na ordem desejada (todas as saídas serão suprimidas):
+            NEWPWSH -FunctionNames 'PerfilTheme'
+            NEWPWSH -FunctionNames 'AnyDesk'
+            NEWPWSH -FunctionNames 'WingetModule' -Wait
+            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+            Start-Sleep -SECONDS 5
+            NEWPWSH -FunctionNames 'Microsoft365' -Wait
+            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
 
                      
             Clear-Host
