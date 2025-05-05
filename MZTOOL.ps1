@@ -394,6 +394,7 @@ ______________________________________________________
             NEWPWSH -FunctionNames 'WingetModule' -Wait
             NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
             NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+            Start-Sleep -SECONDS 5
             NEWPWSH -FunctionNames 'Microsoft365' -Wait
             NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
 
