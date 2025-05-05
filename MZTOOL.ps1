@@ -359,7 +359,7 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            Write-Host "Iniciando personalização do tema... (10%)"
+           
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -367,7 +367,7 @@ ______________________________________________________
                 ))
             )
 
-            Write-Host "Iniciando instalação do AnyDesk... (20%)"
+         
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -375,7 +375,7 @@ ______________________________________________________
                 ))
             )
 
-            Write-Host "Configurando Winget... (30%)"
+          
             Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -383,7 +383,7 @@ ______________________________________________________
                 ))
             )
 
-            Write-Host "Executando atualizações do sistema... (50%)"
+            
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -391,7 +391,7 @@ ______________________________________________________
                 ))
             )
 
-            Write-Host "Instalando softwares via Winget... (70%)"
+            
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -399,7 +399,7 @@ ______________________________________________________
                 ))
             )
 
-            Write-Host "Instalando Microsoft 365... (85%)"
+            
             Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -407,7 +407,7 @@ ______________________________________________________
                 ))
             )
 
-            Write-Host "Finalizando personalização e inicialização de softwares... (95%)"
+            
             Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
@@ -415,7 +415,7 @@ ______________________________________________________
                 ))
             )
 
-            Write-Host "Finalizando... (100%)"
+           
            
             Clear-Host
             Write-Host '
