@@ -63,14 +63,9 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
 
     # Executando como administrador. Formatação e estilo aplicadas.
     $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
-    Import-Module MZTOOL -Force 
-    <#$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-    $H = Get-Host
-    $Win = $H.UI.RawUI.WindowSize
-    $Win.Height = 20
-    $Win.Width = 58
-    $H.UI.RawUI.Set_WindowSize($Win)
-    $H.UI.RawUI.Set_BufferSize($Win)#>
+    
+    #Importa o módulo MZTOOL para a sessão atual.
+    Import-Module MZTOOL -Force
 
 } 
     
@@ -134,16 +129,15 @@ Write-Output "Módulo MZTOOL carregado com sucesso!"
 
         # Grava o conteúdo no arquivo .psm1 (sobrescreve, se necessário)
         Set-Content -Path $modulePath -Value $moduleContent -Force
-
-        Write-Output "Módulo '$moduleName' criado com sucesso em: $moduleDir"
-        Write-Output "Para importar o módulo utilize: Import-Module $moduleName"
-    
-    
+   
 
     }
     
+    #Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
     MZTOOLMODULE
+    #Chama a função PwshEnvTool para definir as variáveis de ambiente.
     PwshEnvTool
+    #Importa o módulo MZTOOL para a sessão atual.
     Import-Module MZTOOL -Force 
 
     # Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
