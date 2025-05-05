@@ -359,89 +359,62 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-            # Função para exibir uma barra de progresso simples.
-            function Show-SimpleProgress {
-                param(
-                    [int]$PercentComplete,
-                    [int]$BarWidth = 30
-                )
-                # Calcula quantos caracteres serão "preenchidos" e "vazios"
-                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
-                $empty = $BarWidth - $filled
-                $bar = ("#" * $filled) + ("-" * $empty)
-                Write-Host "Progress: $PercentComplete% [$bar]"
-            }
-
-            # Função NEWPWSH que combina a definição de funções e executa-as via -EncodedCommand.
-            # Essa versão suprime a maioria das saídas, executando silenciosamente.
             function NEWPWSH {
                 [CmdletBinding()]
                 param(
                     [Parameter(Mandatory = $true)]
                     [string[]]$FunctionNames,
-                    [switch]$Wait,
-                    [int]$BarWidth = 30
+                    [switch]$Wait
                 )
     
-                # Combina as definições das funções, respeitando a ordem
+                # Descrição do grupo para exibição na barra de progresso
+                $groupDescription = "Executando funções: " + ($FunctionNames -join ", ")
+    
+                # Exibe a barra de progresso inicial (0%)
+                Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 0
+
+                # Combina as definições das funções preservando a ordem
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
     
-                # Converte o script combinado para Base64 para ser executado via -EncodedCommand
-                $encodedCommand = [Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
-                )
+                # Converte o conteúdo para Base64 com codificação Unicode
+                $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
                 $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
     
                 if ($Wait) {
-                    Start-Process powershell -ArgumentList $arguments -Wait
+                    # Inicia o processo e captura o objeto para monitoramento
+                    $proc = Start-Process powershell -ArgumentList $arguments -PassThru
+        
+                    # Atualiza progressivamente a barra enquanto aguarda o término do processo
+                    $progress = 0
+                    while (-not $proc.HasExited) {
+                        Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete $progress
+                        Start-Sleep -Seconds 1
+                        # Incrementa o progresso sem ultrapassar 95% (para deixar o 100% para o término)
+                        $progress = [Math]::Min($progress + 10, 95)
+                    }
+                    # Conclui a barra de progresso
+                    Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 100 -Completed
                 }
                 else {
+                    # Se não for aguardado, só inicia o processo e finaliza a barra de progresso
                     Start-Process powershell -ArgumentList $arguments
+                    Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 100 -Completed
                 }
+    
+                # Restaura o layout após a execução do grupo
+                Reset-MZTOOLLayout
             }
 
-            # Função que executa todos os grupos de funções em sequência e, após cada grupo,
-            # atualiza uma única barra de progresso que "salta" uma porcentagem fixa.
-            function Invoke-AllGroups {
-                param(
-                    [int]$BarWidth = 40
-                )
-    
-                # Define os grupos de funções a serem executados
-                $groups = @(
-                    @{ Functions = 'PerfilTheme' },
-                    @{ Functions = 'AnyDesk' },
-                    @{ Functions = 'WingetModule'; Wait = $true },
-                    @{ Functions = 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp' },
-                    @{ Functions = 'WingetInstall', 'WingetUpdate' },
-                    @{ Functions = 'Microsoft365'; Wait = $true },
-                    @{ Functions = 'PinIcons', 'StartSoftwares' }
-                )
-    
-                $total = $groups.Count
-                $completed = 0
-    
-                # Exibe a barra inicial (0% concluído)
-                Show-SimpleProgress -PercentComplete 0 -BarWidth $BarWidth
-    
-                foreach ($group in $groups) {
-                    if ($group.ContainsKey("Wait") -and $group.Wait) {
-                        NEWPWSH -FunctionNames $group.Functions -Wait -BarWidth $BarWidth
-                    }
-                    else {
-                        NEWPWSH -FunctionNames $group.Functions -BarWidth $BarWidth
-                    }
-                    $completed++
-                    # Calcula a porcentagem com base no número de grupos
-                    $percent = [math]::Round(($completed * 100) / $total)
-                    Show-SimpleProgress -PercentComplete $percent -BarWidth $BarWidth
-                }
-            }
-
-            # Chamada final para executar os grupos com a barra de progresso única.
-            Invoke-AllGroups -BarWidth 40
+            # Exemplo de uso na ordem desejada:
+            NEWPWSH -FunctionNames 'PerfilTheme'
+            NEWPWSH -FunctionNames 'AnyDesk'
+            NEWPWSH -FunctionNames 'WingetModule' -Wait
+            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+            NEWPWSH -FunctionNames 'Microsoft365' -Wait
+            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
 
 
                      
