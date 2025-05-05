@@ -383,7 +383,9 @@ ______________________________________________________
                 else {
                     [void](Start-Process powershell -ArgumentList $arguments)
                 }
-
+                $FUNCTIONNAME = "Function $N"                
+                Write-Output "IMPLEMENTANDO ($FUNCTIONNAME) TOOL $N/$FN"
+            
                 # Suprime a saída de Reset-MZTOOLLayout, assumindo que já está pré-carregada
                 #Reset-MZTOOLLayout | Out-Null
             }
@@ -404,16 +406,11 @@ ______________________________________________________
                 NEWPWSH -FunctionNames 'Microsoft365' -Wait
                 NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
             }
-            
+
             # Calcula automaticamente o número total de chamadas NEWPWSH em STARTNEWPWSH
             $FN = (Get-Command -Type Function STARTNEWPWSH).Definition -split "`n" | Select-String -Pattern 'NEWPWSH' | Measure-Object | Select-Object -ExpandProperty Count
-            for ($N = 1; $N -le $FN; $N++) {
-                STARTNEWPWSH -OptionalParameters "LINE $N"
-                $FUNCTIONNAME = "Function $N"                
-                Write-Output "IMPLEMENTANDO ($FUNCTIONNAME) TOOL $N/$FN"
-            }
-
-
+            
+            STARTNEWPWSH            
 
                      
             Clear-Host
