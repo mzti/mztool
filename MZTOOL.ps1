@@ -202,22 +202,21 @@ ______________________________________________________
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WingetModule, WinUpdateModule).Definition
                 ))
-            )
+            )                        
 
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
+                ))
+            )
+
+            Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function WingetInstall, PinIcons, StartSoftwares, DefaultSoftwares, WingetUpdate).Definition
                 ))
             )  
-              
-
-            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function RemoveGhostDrivers, WinUpdate, ImgHealth).Definition
-                ))
-            )
             
             Clear-Host
             Write-Host '
@@ -235,7 +234,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-            DelTemp
+            
             Start-Sleep -Seconds 50
             
         }
