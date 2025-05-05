@@ -218,6 +218,21 @@ ______________________________________________________
                 ))
             )  
             Pause
+            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function WingetUpdate).Definition
+                ))
+            )  
+            Pause
+            Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function PinIcons, StartSoftwares, DefaultSoftwares).Definition
+                ))
+            ) 
+
+            Pause
             Clear-Host
             Write-Host '
 ______________________________________________________
