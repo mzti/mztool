@@ -183,54 +183,38 @@ ______________________________________________________
 |____________________________________________________|
 '            
                   
-            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function PerfilTheme).Definition
-                ))
+            $functionsToRun = @(
+                @{ Name = 'PerfilTheme'; Wait = $true },
+                @{ Name = 'AnyDesk'; Wait = $false },
+                @{ Name = 'WingetModule'; Wait = $true },
+                @{ Name = 'WinUpdateModule'; Wait = $true },
+                @{ Name = 'RemoveGhostDrivers'; Wait = $false },
+                @{ Name = 'WinUpdate'; Wait = $true },
+                @{ Name = 'ImgHealth'; Wait = $true },
+                @{ Name = 'DelTemp'; Wait = $false },
+                @{ Name = 'WingetInstall'; Wait = $true },
+                @{ Name = 'WingetUpdate'; Wait = $true },
+                @{ Name = 'PinIcons'; Wait = $true },
+                @{ Name = 'StartSoftwares'; Wait = $true },
+                @{ Name = 'DefaultSoftwares'; Wait = $false }
             )
 
-            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function AnyDesk).Definition
-                ))
-            )
+            foreach ($func in $functionsToRun) {
+                $encodedCommand = [Convert]::ToBase64String(
+                    [Text.Encoding]::Unicode.GetBytes(
+                        (Get-Command -Type Function $func.Name).Definition
+                    )
+                )
 
-            Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule).Definition
-                ))
-            )                        
+                if ($func.Wait) {
+                    Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand', $encodedCommand
+                }
+                else {
+                    Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand', $encodedCommand
+                }
 
-            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
-                ))
-            )
-            Pause
-            Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetInstall).Definition
-                ))
-            )  
-            Pause
-            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetUpdate).Definition
-                ))
-            )  
-            Pause
-            Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
-            ([Convert]::ToBase64String(
-                [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function PinIcons, StartSoftwares, DefaultSoftwares).Definition
-                ))
-            ) 
+                Pause
+            }
 
             Pause
             Clear-Host
