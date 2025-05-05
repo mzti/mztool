@@ -360,7 +360,9 @@ OpSys
 function DisplayMenu {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
-    Import-Module MZTOOL -Force     
+    Import-Module MZTOOL -Force 
+    Reset-MZTOOLLayout
+    
     
     Clear-Host
     Write-Host '
