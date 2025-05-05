@@ -200,17 +200,17 @@ ______________________________________________________
             Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetModule, WinUpdateModule).Definition
+                    (Get-Command -Type Function WingetModule).Definition
                 ))
             )                        
 
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
                 ))
             )
-
+            Pause
             Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
