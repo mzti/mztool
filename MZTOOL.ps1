@@ -516,29 +516,47 @@ ______________________________________________________
 |            FERRAMENTAS DE DIAGNÓSTICOS             |
 |                                                    |
 |                                                    |
-|        FERRAMENTAS DE DIAGNÓSTICO INICIADAS        |
-|                                                    |
+| |1| INICIAR FERRAMENTAS DE DIAGNÓSTICO             |
+| |2| FECHAR TODAS AS FERRAMENTAS                    |
+| |3| VOLTAR AO MENU PRINCIPAL                       |
 |                                                    |
 |                 MOZART INFORMÁTICA                 |
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '     
-            
-            $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
-                                
-            if ($OSARCHITECTURE -eq '64 bits') {
-                Diagnostics64
+
+            $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+            Switch ($CHOICE) {
+                1 {
+                    $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+                                    
+                    if ($OSARCHITECTURE -eq '64 bits') {
+                        Diagnostics64
+                    }
+
+                    elseif ($OSARCHITECTURE -eq '32 bits') {
+                        Diagnostics32
+                    }
+
+                    Start-Sleep -Seconds 1
+                }
+                2 {
+                    # Fecha todas as ferramentas de diagnóstico se estiverem abertas
+                    $tools = @("aida64", "BlueScreenView", "Core_Temp_64", "Core_Temp_32", "cpuz_x64", "cpuz_x32", "HDSentinel", "HWiNFO64", "HWiNFO32", "GPU_Z")
+                    foreach ($tool in $tools) {
+                        Stop-Process -Name $tool -Force -ErrorAction SilentlyContinue
+                    }
+                    Write-Host "Todas as ferramentas foram fechadas." -ForegroundColor Green
+                    Start-Sleep -Seconds 2
+                }
+                3 {
+                    DisplayMenu
+                }
+                Default {
+                    Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA." -ForegroundColor Red
+                    Start-Sleep -Seconds 2
+                }
             }
-
-            elseif ($OSARCHITECTURE -eq '32 bits') {
-                Diagnostics32
-            }
-
-            Start-Sleep -Seconds 1              
-        
-            Clear-Host
-
-            DisplayMenu         
                          
         }
 
