@@ -408,7 +408,7 @@ ______________________________________________________
             )
 
             Write-Host "Finalizando personalização e inicialização de softwares... (95%)"
-            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
                     (Get-Command -Type Function PinIcons, StartSoftwares).Definition
