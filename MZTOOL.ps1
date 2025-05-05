@@ -57,7 +57,7 @@ function MZTOOLMODULE {
     # Define o caminho completo para o arquivo .psm1 do módulo
     $modulePath = Join-Path -Path $moduleDir -ChildPath "$moduleName.psm1"
 
-    # Conteúdo do módulo CustomModule.psm1
+    # Conteúdo do módulo MZTOOL.psm1
     $moduleContent = @'
 # MZTOOL.psm1
 # Módulo para customização do console e fixação do tamanho da janela.
