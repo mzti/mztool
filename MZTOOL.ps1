@@ -368,10 +368,10 @@ ______________________________________________________
                 )
     
                 # Descrição do grupo para exibição na barra de progresso
-                $groupDescription = "Executando funções: " + ($FunctionNames -join ", ")
+                $groupDescription = "IMPLEMENTANDO: " + ($FunctionNames -join ", ")
     
                 # Exibe a barra de progresso inicial (0%)
-                Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 0
+                Write-Progress -Activity "AGUARDE" -Status $groupDescription -PercentComplete 0
 
                 # Combina as definições das funções preservando a ordem
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
@@ -389,18 +389,18 @@ ______________________________________________________
                     # Atualiza progressivamente a barra enquanto aguarda o término do processo
                     $progress = 0
                     while (-not $proc.HasExited) {
-                        Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete $progress
+                        Write-Progress -Activity "AGUARDE" -Status $groupDescription -PercentComplete $progress
                         Start-Sleep -Seconds 1
                         # Incrementa o progresso sem ultrapassar 95% (para deixar o 100% para o término)
                         $progress = [Math]::Min($progress + 10, 95)
                     }
                     # Conclui a barra de progresso
-                    Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 100 -Completed
+                    Write-Progress -Activity "CONCLUÍDO" -Status $groupDescription -PercentComplete 100 -Completed
                 }
                 else {
                     # Se não for aguardado, só inicia o processo e finaliza a barra de progresso
                     Start-Process powershell -ArgumentList $arguments
-                    Write-Progress -Activity "Executando Grupo" -Status $groupDescription -PercentComplete 100 -Completed
+                    Write-Progress -Activity "EM EXECUÇÃO" -Status $groupDescription -PercentComplete 100 -Completed
                 }
     
                 # Restaura o layout após a execução do grupo
