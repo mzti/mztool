@@ -207,10 +207,10 @@ ______________________________________________________
                 )
 
                 if ($func.Wait) {
-                    Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand', $encodedCommand
+                    Start-Process powershell  -Wait -args '-noprofile', '-EncodedCommand', $encodedCommand
                 }
                 else {
-                    Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand', $encodedCommand
+                    Start-Process powershell  -args '-noprofile', '-EncodedCommand', $encodedCommand
                 }
 
                 Pause
