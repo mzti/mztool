@@ -359,119 +359,63 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
-                  
-            # Função para exibir uma barra de progresso customizada
-            function Show-CustomProgress {
-                param(
-                    [Parameter(Mandatory = $true)]
-                    [int]$PercentComplete,
-                    [int]$BarWidth = 30
-                )
-                $rawUI = $Host.UI.RawUI
-                $winSize = $rawUI.WindowSize
+            Write-Host "Iniciando personalização do tema... (10%)"
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function PerfilTheme).Definition
+                ))
+            )
 
-                # Posiciona o cursor na última linha
-                $cursorPos = $rawUI.CursorPosition
-                $cursorPos.X = 0
-                $cursorPos.Y = $winSize.Height - 1
-                $rawUI.CursorPosition = $cursorPos
+            Write-Host "Iniciando instalação do AnyDesk... (20%)"
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function AnyDesk).Definition
+                ))
+            )
 
-                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
-                $empty = $BarWidth - $filled
-                $bar = ("#" * $filled) + ("-" * $empty)
-                $progress = "PROGRESSO: {0,3}% [{1}]" -f $PercentComplete, $bar
+            Write-Host "Configurando Winget... (30%)"
+            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function WingetModule).Definition
+                ))
+            )
 
-                $clearLine = " " * $winSize.Width
-                Write-Host $clearLine -NoNewline
-                $rawUI.CursorPosition = $cursorPos
-                Write-Host $progress -NoNewline
-            }
+            Write-Host "Executando atualizações do sistema... (50%)"
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
+                ))
+            )
 
-            # Função para executar comandos com barra de progresso
-            function Invoke-WithProgress {
-                param(
-                    [Parameter(Mandatory = $true)]
-                    [ScriptBlock]$Command,
-                    [int]$ProgressDelay = 10
-                )
-                $progress = 0
-                $job = Start-Job -ScriptBlock $Command
+            Write-Host "Instalando softwares via Winget... (70%)"
+            Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function WingetInstall, WingetUpdate).Definition
+                ))
+            )
 
-                while ($job.State -eq 'Running') {
-                    Show-CustomProgress -PercentComplete $progress
-                    Start-Sleep -Milliseconds $ProgressDelay
-                    $progress = ($progress -lt 100) ? ($progress + 1) : 100
-                }
+            Write-Host "Instalando Microsoft 365... (85%)"
+            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function Microsoft365).Definition
+                ))
+            )
 
-                Show-CustomProgress -PercentComplete 100
-                Receive-Job -Job $job | Out-Null
-                Remove-Job -Job $job
-            }
-
-            # Substituindo os comandos originais com barra de progresso
-            Invoke-WithProgress -Command {
-                Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
-                ([Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes(
-                        (Get-Command -Type Function PerfilTheme).Definition
-                    ))
-                )
-            }
-
-            Execute-WithProgress -Command {
-                Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
-                ([Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes(
-                        (Get-Command -Type Function AnyDesk).Definition
-                    ))
-                )
-            }
-
-            Execute-WithProgress -Command {
-                Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
-                ([Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes(
-                        (Get-Command -Type Function WingetModule).Definition
-                    ))
-                )
-            }
-
-            Execute-WithProgress -Command {
-                Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
-                ([Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes(
-                        (Get-Command -Type Function WinUpdateModule, RemoveGhostDrivers, WinUpdate, ImgHealth, DelTemp).Definition
-                    ))
-                )
-            }
-
-            Execute-WithProgress -Command {
-                Start-Process powershell -WindowStyle Hidden -args '-noprofile', '-EncodedCommand',
-                ([Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes(
-                        (Get-Command -Type Function WingetInstall, WingetUpdate).Definition
-                    ))
-                )
-            }
-
-            Execute-WithProgress -Command {
-                Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
-                ([Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes(
-                        (Get-Command -Type Function Microsoft365).Definition
-                    ))
-                )
-            }
-
-            Execute-WithProgress -Command {
-                Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
-                ([Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes(
-                        (Get-Command -Type Function PinIcons, StartSoftwares).Definition
-                    ))
-                )
-            }
-
+            Write-Host "Finalizando personalização e inicialização de softwares... (95%)"
+            Start-Process powershell -WindowStyle Hidden -Wait -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function PinIcons, StartSoftwares).Definition
+                ))
+            )
+            
+            Write-Host "Finalizando... (100%)"
            
             Clear-Host
             Write-Host '
