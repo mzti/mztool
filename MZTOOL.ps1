@@ -404,17 +404,12 @@ ______________________________________________________
                 NEWPWSH -FunctionNames 'Microsoft365' -Wait
                 NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
             }
-            function Set-CursorToStart {
-                $cursor = $host.UI.RawUI.CursorPosition
-                $cursor.X = 0
-                $host.UI.RawUI.CursorPosition = $cursor
-            }
+            
             # Calcula automaticamente o número total de chamadas NEWPWSH em STARTNEWPWSH
             $FN = (Get-Command -Type Function STARTNEWPWSH).Definition -split "`n" | Select-String -Pattern 'NEWPWSH' | Measure-Object | Select-Object -ExpandProperty Count
             for ($N = 1; $N -le $FN; $N++) {
                 STARTNEWPWSH -OptionalParameters "LINE $N"
-                $FUNCTIONNAME = "Function $N"
-                Set-CursorToStart
+                $FUNCTIONNAME = "Function $N"                
                 Write-Output "IMPLEMENTANDO ($FUNCTIONNAME) TOOL $N/$FN"
             }
 
