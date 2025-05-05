@@ -367,7 +367,7 @@ ______________________________________________________
                 )
 
                 # Calcula o número total de etapas com base no número de funções
-                $TotalSteps = $FunctionNames.Count
+                $TotalSteps = (Get-Command -Type Function | Where-Object { $FunctionNames -contains $_.Name }).Count
                 $CurrentStep = 0
 
                 foreach ($fn in $FunctionNames) {
@@ -390,19 +390,23 @@ ______________________________________________________
                         [void](Start-Process powershell -ArgumentList $arguments)
                     }
 
-                    Write-Output "IMPLEMENTANDO $fn ($CurrentStep de $TotalSteps)"
+                    Write-Output ("IMPLEMENTANDO {0} ({1} DE {2})" -f $fn.ToUpper(), $CurrentStep, $TotalSteps).ToUpper()
                 }
             }
 
-            # Execução das funções na ordem desejada (todas as saídas serão suprimidas):
-            NEWPWSH -FunctionNames 'PerfilTheme'
-            NEWPWSH -FunctionNames 'AnyDesk'
-            NEWPWSH -FunctionNames 'WingetModule' -Wait
-            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
-            Start-Sleep -SECONDS 5
-            NEWPWSH -FunctionNames 'Microsoft365' -Wait
-            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+            function STARTNEWPWSH {
+                # Execução das funções na ordem desejada (todas as saídas serão suprimidas):
+                NEWPWSH -FunctionNames 'PerfilTheme'
+                NEWPWSH -FunctionNames 'AnyDesk'
+                NEWPWSH -FunctionNames 'WingetModule' -Wait
+                NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+                NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+                Start-Sleep -SECONDS 5
+                NEWPWSH -FunctionNames 'Microsoft365' -Wait
+                NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+            }
+
+            STARTNEWPWSH
 
                      
             Clear-Host
