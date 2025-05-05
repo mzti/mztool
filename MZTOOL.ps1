@@ -434,12 +434,19 @@ ______________________________________________________
                 ))
             )
          
+            Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
+            ([Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes(
+                    (Get-Command -Type Function WingetInstall).Definition
+                ))
+            )    
+            
             Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetInstall, Microsoft365).Definition
+                    (Get-Command -Type Function Microsoft365).Definition
                 ))
-            )  
+            ) 
            
             Start-Process powershell <#-WindowStyle Hidden#> -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
@@ -480,7 +487,10 @@ ______________________________________________________
         2 {
     
             #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
-
+ 
+            $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
+            Import-Module MZTOOL -Force
+            Reset-MZTOOLLayout
             
                
             Clear-Host
@@ -518,29 +528,31 @@ ______________________________________________________
                     Diagnostics32
                 }
             }
+            
+            StartFerramentas
             function MENUFERRAMENTAS {
                 
-                $Host.UI.RawUI.WindowTitle = 'MZTOOL> FERRAMENTAS DE DIAGNÓSTICO'
+                $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
                 Import-Module MZTOOL -Force
                 Reset-MZTOOLLayout
 
                 Clear-Host
                 Write-Host '
-                ______________________________________________________
-                |                                                    |
-                |                      MZTOOL                        |
-                | _________________________________________________  | 
-                |            FERRAMENTAS DE DIAGNÓSTICOS             |
-                |                                                    |
-                |                                                    |
-                | |1| INICIAR FERRAMENTAS DE DIAGNÓSTICO             |
-                | |2| FECHAR TODAS AS FERRAMENTAS                    |
-                | |3| VOLTAR AO MENU PRINCIPAL                       |
-                |                                                    |
-                |                 MOZART INFORMÁTICA                 |
-                |                   DANIEL MOZART                    |
-                |____________________________________________________|'
-                     
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| _________________________________________________  | 
+|            FERRAMENTAS DE DIAGNÓSTICOS             |
+|                                                    |
+|                                                    |
+| |1| INICIAR FERRAMENTAS DE DIAGNÓSTICO             |
+| |2| FECHAR TODAS AS FERRAMENTAS                    |
+| |3| VOLTAR AO MENU PRINCIPAL                       |
+|                                                    |
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|
+'                                    
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 Switch ($CHOICE) {
                     1 {
@@ -743,7 +755,7 @@ ______________________________________________________
                 
                                 ToolDir
                    
-                                DownloadMztool
+                                DownloadOffice2007
                             }
     
                         }
@@ -1690,8 +1702,25 @@ function Microsoft365 {
    
     $365XML = "$env:Temp\MICROSOFT365.xml"
 
-    Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-    
+    $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
+    $WINGETRUNNING = Get-Process -Name winget -ErrorAction SilentlyContinue
+
+    if ($WINGETAVAILABLE -and !$WINGETRUNNING) {      
+        
+        Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+    }
+    else {
+
+        #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
+        
+        $365URL = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
+        $365EXE = "$env:TEMP\MICROSOFT365.exe"
+
+        $wc = New-Object System.Net.WebClient
+        $wc.DownloadFile($365URL, $365EXE)
+        Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
+    }
+    PAUSE
     #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
     $APPS = @("Word.lnk", "Excel.lnk", "PowerPoint.lnk")
@@ -1701,7 +1730,18 @@ function Microsoft365 {
     
     Clear-Host
 }    
-
+function DownloadOffice2007 {
+    
+    #Download do arquivo de instalação do Microsoft Office 2007.
+        
+    $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADOFFICE2007'
+    Import-Module MZTOOL -Force
+    
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile('https://bit.ly/Office2007', "$env:TOOL\OFFICE\2007\Setup.exe")
+    
+    Clear-Host
+}
 function Office2007 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE2007'
