@@ -214,7 +214,7 @@ ______________________________________________________
             Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
             ([Convert]::ToBase64String(
                 [Text.Encoding]::Unicode.GetBytes(
-                    (Get-Command -Type Function WingetInstall, PinIcons, StartSoftwares, DefaultSoftwares, WingetUpdate).Definition
+                    (Get-Command -Type Function WingetInstall).Definition
                 ))
             )  
             Pause
