@@ -359,27 +359,34 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
+            # ----------------------------------------------------------------------
+            # Função para exibir uma barra de progresso no mesmo local.
+            # A barra é atualizada “in-place” na última linha do console.
+            # ----------------------------------------------------------------------
             function Show-CustomProgress {
                 param(
                     [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
-                    [int]$BarWidth = 30
+                    [int]$BarWidth = 30,
+                    [string]$Message = "Aguarde"
                 )
     
                 $rawUI = $Host.UI.RawUI
                 $winSize = $rawUI.WindowSize
 
-                # Posiciona o cursor na última linha
+                # Posiciona o cursor na última linha da janela
                 $cursorPos = $rawUI.CursorPosition
                 $cursorPos.X = 0
                 $cursorPos.Y = $winSize.Height - 1
                 $rawUI.CursorPosition = $cursorPos
 
+                # Calcula o número de caracteres preenchidos e vazios
                 $filled = [math]::Round($PercentComplete * $BarWidth / 100)
                 $empty = $BarWidth - $filled
                 $bar = ("#" * $filled) + ("-" * $empty)
-                $progress = "IMPLEMENTANDO: {0,3}% [{1}]" -f $PercentComplete, $bar
+                $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
 
+                # Limpa a linha atual e exibe a barra no mesmo local
                 $clearLine = " " * $winSize.Width
                 Write-Host $clearLine -NoNewline
                 $rawUI.CursorPosition = $cursorPos
@@ -387,16 +394,8 @@ ______________________________________________________
             }
 
             # ----------------------------------------------------------------------
-            # Função dummy para Reset-MZTOOLLayout, ajuste conforme sua lógica.
-            # ----------------------------------------------------------------------
-            function Reset-MZTOOLLayout {
-                # Coloque aqui os comandos para restaurar seu layout ou mantenha vazio.
-                return
-            }
-
-            # ----------------------------------------------------------------------
-            # Função NEWPWSH para agrupar e executar funções via -EncodedCommand.
-            # Essa versão foi ajustada para não emitir saídas adicionais.
+            # Função NEWPWSH: agrupa e executa as funções definidas via -EncodedCommand.
+            # Suprime saídas (usando [void]) e chama Reset-MZTOOLLayout, que já deve estar carregada.
             # ----------------------------------------------------------------------
             function NEWPWSH {
                 [CmdletBinding()]
@@ -407,38 +406,37 @@ ______________________________________________________
                     [int]$BarWidth = 30
                 )
     
-                # Combina as definições das funções do grupo, preservando a ordem
+                # Combina as definições das funções (preservando a ordem)
                 $combinedDefinitions = foreach ($fn in $FunctionNames) {
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
     
-                # Codifica o comando para Base64
+                # Converte o script combinado para Base64 para uso com -EncodedCommand
                 $encodedCommand = [Convert]::ToBase64String(
                     [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
                 )
                 $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
     
-                # Oculta a janela (e suprime saídas) e executa
                 if ($Wait) {
-                    Start-Process powershell -ArgumentList $arguments -Wait -WindowStyle Hidden
+                    [void](Start-Process powershell -ArgumentList $arguments -Wait)
                 }
                 else {
-                    Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden
+                    [void](Start-Process powershell -ArgumentList $arguments)
                 }
     
-                Reset-MZTOOLLayout
+                Reset-MZTOOLLayout | Out-Null
             }
 
             # ----------------------------------------------------------------------
-            # Função que executa os grupos de funções em sequência, atualizando uma única barra de progresso.
+            # Função Invoke-AllGroups:
+            # Executa os grupos de funções em sequência, atualizando uma única barra no final.
+            # A cada grupo concluído, a barra “salta” uma porcentagem baseada no número total.
             # ----------------------------------------------------------------------
             function Invoke-AllGroups {
                 param(
                     [int]$BarWidth = 30
                 )
-                # Define cada grupo a ser executado; cada item é um objeto com:
-                # - Functions: array de funções (ordem preservada)
-                # - Wait: switch indicando se a execução deve aguardar
+    
                 $groups = @(
                     @{ Functions = 'PerfilTheme' },
                     @{ Functions = 'AnyDesk' },
@@ -451,10 +449,10 @@ ______________________________________________________
     
                 $total = $groups.Count
                 $completed = 0
-
-                # Inicia a barra de progresso com 0%
-                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO"
-
+    
+                # Exibe a barra inicial (0% concluído)
+                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "Aguarde"
+    
                 foreach ($group in $groups) {
                     if ($group.ContainsKey("Wait") -and $group.Wait) {
                         NEWPWSH -FunctionNames $group.Functions -Wait -BarWidth $BarWidth
@@ -464,14 +462,15 @@ ______________________________________________________
                     }
                     $completed++
                     $percent = [math]::Round(($completed * 100) / $total)
-                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO"
+                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Aguarde"
                 }
             }
 
             # ----------------------------------------------------------------------
-            # Chamada final para executar os grupos com a barra de progresso única.
+            # Chamada final para executar todos os grupos com uma única barra de progresso.
             # ----------------------------------------------------------------------
             Invoke-AllGroups -BarWidth 30
+
             <#
             function Set-CursorToStart {
                 # Define o cursor na posição inicial (0,0) da janela do console.
