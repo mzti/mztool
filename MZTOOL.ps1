@@ -315,7 +315,7 @@ function DisplayMenu {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
     Import-Module MZTOOL -Force 
-    Reset-MZTOOLLayout
+    Reset-MZTOOLLayout | Out-Null
     
     
     Clear-Host
@@ -510,7 +510,7 @@ ______________________________________________________
  
             $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
             Import-Module MZTOOL -Force
-            Reset-MZTOOLLayout
+            Reset-MZTOOLLayout | Out-Null
             
                
             Clear-Host
@@ -554,7 +554,7 @@ ______________________________________________________
                 
                 $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
                 Import-Module MZTOOL -Force
-                Reset-MZTOOLLayout
+                Reset-MZTOOLLayout | Out-Null
 
                 Clear-Host
                 Write-Host '
