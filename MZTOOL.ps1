@@ -471,7 +471,7 @@ ______________________________________________________
             # ----------------------------------------------------------------------
             # Chamada final para executar os grupos com a barra de progresso única.
             # ----------------------------------------------------------------------
-            Invoke-AllGroups -BarWidth 40
+            Invoke-AllGroups -BarWidth 30
             <#
             function Set-CursorToStart {
                 # Define o cursor na posição inicial (0,0) da janela do console.
