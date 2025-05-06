@@ -42,12 +42,35 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
 
+function Set-PowerShellEnvironment {
+    param (
+        [string]$NovoPerfilPath = "$env:LOCALAPPDATA\Powershell",
+        [string]$NovoModulePath = "$env:LOCALAPPDATA\Powershell\Modules"
+    )
+
+    # Ajusta PSModulePath se necessário
+    if ($env:PSModulePath -notlike "*$NovoModulePath*") {
+        $env:PSModulePath = "$NovoModulePath;$env:PSModulePath"
+    }
+
+    # Cria as pastas, se não existirem
+    if (!(Test-Path -Path $NovoPerfilPath)) {
+        New-Item -ItemType Directory -Path $NovoPerfilPath | Out-Null
+    }
+
+    if (!(Test-Path -Path $NovoModulePath)) {
+        New-Item -ItemType Directory -Path $NovoModulePath | Out-Null
+    }
+}
+
+Set-PowerShellEnvironment
+
 function MZTOOLMODULE {
     # Define o nome do módulo
     $moduleName = "MZTOOL"
 
     # Define o caminho do diretório do módulo (pasta padrão para módulos do usuário)
-    $moduleDir = Join-Path -Path $env:USERPROFILE -ChildPath "Documents\WindowsPowerShell\Modules\$moduleName"
+    $moduleDir = Join-Path -Path $env:PSModulePath -ChildPath "\Modules\$moduleName"
 
     # Cria o diretório, se não existir
     if (-Not (Test-Path $moduleDir)) {
