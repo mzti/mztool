@@ -695,7 +695,9 @@ ______________________________________________________
                             $encodedCommand = [Convert]::ToBase64String(
                                 [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
                             )
-                            $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+                            # Adiciona os parâmetros -NonInteractive e -WindowStyle Hidden para evitar prompt interativo
+                            $arguments = @('-noprofile', '-NonInteractive', '-EncodedCommand', $encodedCommand)
 
                             if ($Wait) {
                                 [void](Start-Process powershell -ArgumentList $arguments -Wait)
@@ -707,7 +709,7 @@ ______________________________________________________
                             Reset-MZTOOLLayout
                         }
 
-                        # Caso Reset-MZTOOLLayout não esteja definido, defina-o (ou passe sua implementação real)
+                        # Caso Reset-MZTOOLLayout não esteja definido, defina-o (ou use sua implementação real)
                         function Reset-MZTOOLLayout {
                             # Implementação dummy (ou sua implementação real)
                             return
@@ -716,18 +718,19 @@ ______________________________________________________
                         # Captura a definição da função NEWPWSH
                         $fnDef = (Get-Command NEWPWSH).Definition
 
-                        # Job para executar WingetUpdate
+                        # Job para executar WingetUpdate, RemoveGhostDrivers e WinUpdate
                         Start-Job -Name "UPDATE" -ScriptBlock {
                             param($fnDef)
                             # Recria a função NEWPWSH no contexto do job usando dot-sourcing
                             & ([scriptblock]::Create($fnDef))
-                            # Agora a função NEWPWSH está disponível no job
+                            # Executa as funções desejadas
                             NEWPWSH -FunctionNames 'WingetUpdate'
                             NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
                         } -ArgumentList $fnDef
 
-                        # Aguarda os jobs terminarem e exibe os resultados
+                        # Aguarda o job terminar e exibe os resultados
                         Wait-Job -Name "UPDATE" | Receive-Job
+
 
                         PAUSE
                         DelTemp
