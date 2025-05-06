@@ -677,7 +677,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        # Define a função NEWPWSH na sessão principal
+                        # Suponha que a função NEWPWSH já esteja definida neste escopo
                         function NEWPWSH {
                             [CmdletBinding()]
                             param(
@@ -695,9 +695,7 @@ ______________________________________________________
                             $encodedCommand = [Convert]::ToBase64String(
                                 [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
                             )
-    
-                            # Adiciona os parâmetros -NonInteractive e -WindowStyle Hidden para evitar prompt interativo
-                            $arguments = @('-noprofile', '-NonInteractive', '-EncodedCommand', $encodedCommand)
+                            $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
 
                             if ($Wait) {
                                 [void](Start-Process powershell -ArgumentList $arguments -Wait)
@@ -709,28 +707,20 @@ ______________________________________________________
                             Reset-MZTOOLLayout
                         }
 
-                        # Caso Reset-MZTOOLLayout não esteja definido, defina-o (ou use sua implementação real)
-                        function Reset-MZTOOLLayout {
-                            # Implementação dummy (ou sua implementação real)
-                            return
-                        }
+                        # Armazena a definição da função NEWPWSH em uma variável
+                        $NewPWSHDefinition = (Get-Command NEWPWSH).Definition
 
-                        # Captura a definição da função NEWPWSH
-                        $fnDef = (Get-Command NEWPWSH).Definition
-
-                        # Job para executar WingetUpdate, RemoveGhostDrivers e WinUpdate
+                        # Cria os jobs e passa a definição da função como argumento
                         Start-Job -Name "UPDATE" -ScriptBlock {
                             param($fnDef)
-                            # Recria a função NEWPWSH no contexto do job usando dot-sourcing
-                            & ([scriptblock]::Create($fnDef))
-                            # Executa as funções desejadas
-                            NEWPWSH -FunctionNames 'WingetUpdate'
+                            # Recria a função NEWPWSH no contexto do job
+                            Invoke-Expression $fnDef
                             NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
-                        } -ArgumentList $fnDef
+                            NEWPWSH -FunctionNames 'WingetUpdate'
+                        } -ArgumentList $NewPWSHDefinition
 
                         # Aguarda o job terminar e exibe os resultados
                         Wait-Job -Name "UPDATE" | Receive-Job
-
 
                         PAUSE
                         DelTemp
