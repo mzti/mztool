@@ -705,17 +705,17 @@ ______________________________________________________
     
                             Reset-MZTOOLLayout 
                         }
-                        
-                        Start-Job -Name "Winget" -ScriptBlock { 
+
+                        Start-Job -Name "WINGET" -ScriptBlock { 
                             NEWPWSH -FunctionNames 'WingetUpdate'
                         }
 
-                        Start-Job -Name "WinUpdate" -ScriptBlock { 
+                        Start-Job -Name "WINUPDATE" -ScriptBlock { 
                             NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
                         }
 
                         # Aguarda os jobs específicos terminarem antes de continuar                        
-                        Wait-Job -Name "Winget", "WinUpdate" | Receive-Job
+                        Wait-Job -Name "WINGET", "WINUPDATE" | Receive-Job
                         
                         DelTemp
 
