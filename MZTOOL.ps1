@@ -359,6 +359,12 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
+            function Set-CursorToStart {
+                # Define o cursor na posição inicial (0,0) da janela do console.
+                $cursor = $host.UI.RawUI.CursorPosition
+                $cursor.X = 0
+                $host.UI.RawUI.CursorPosition = $cursor
+            }
             function NEWPWSH {
                 param(
                     [Parameter(Mandatory = $true)]
@@ -366,47 +372,41 @@ ______________________________________________________
                     [switch]$Wait
                 )
 
-                # Calcula o número total de etapas com base no número de funções
-                $TotalSteps = (Get-Command -Type Function | Where-Object { $FunctionNames -contains $_.Name }).Count
-                $CurrentStep = 0
+                # Combina as definições de todas as funções do grupo, preservando a ordem
+                $combinedDefinitions = foreach ($fn in $FunctionNames) {
+        (Get-Command -Type Function $fn).Definition
+                } -join "`n"
 
-                foreach ($fn in $FunctionNames) {
-                    # Incrementa o contador de etapas
-                    $CurrentStep++
+                # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
+                $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
 
-                    # Obtém a definição da função
-                    $fnDefinition = (Get-Command -Type Function $fn).Definition
+                # Prepara os argumentos sem e com -Wait conforme o caso
+                $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
 
-                    # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
-                    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($fnDefinition))
-
-                    # Prepara os argumentos sem e com -Wait conforme o caso
-                    $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
-
-                    if ($Wait) {
-                        [void](Start-Process powershell -ArgumentList $arguments -Wait)
-                    }
-                    else {
-                        [void](Start-Process powershell -ArgumentList $arguments)
-                    }
-
-                    Write-Output ("IMPLEMENTANDO {0} ({1} DE {2})" -f $fn.ToUpper(), $CurrentStep, $TotalSteps).ToUpper()
+                if ($Wait) {
+                    [void](Start-Process powershell -ArgumentList $arguments -Wait)
                 }
+                else {
+                    [void](Start-Process powershell -ArgumentList $arguments)
+                }
+               
+                Write-Output "IMPLEMENTANDO $FunctionNames" -NoNewline
+                Set-CursorToStart
+            
+                # Suprime a saída de Reset-MZTOOLLayout, assumindo que já está pré-carregada
+                #Reset-MZTOOLLayout | Out-Null
             }
-
-            function STARTNEWPWSH {
-                # Execução das funções na ordem desejada (todas as saídas serão suprimidas):
-                NEWPWSH -FunctionNames 'PerfilTheme'
-                NEWPWSH -FunctionNames 'AnyDesk'
-                NEWPWSH -FunctionNames 'WingetModule' -Wait
-                NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-                NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
-                Start-Sleep -SECONDS 5
-                NEWPWSH -FunctionNames 'Microsoft365' -Wait
-                NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
-            }
-
-            STARTNEWPWSH
+          
+            # Execução dos grupos na ordem desejada (todas as saídas serão suprimidas):
+            NEWPWSH -FunctionNames 'PerfilTheme'
+            NEWPWSH -FunctionNames 'AnyDesk'
+            NEWPWSH -FunctionNames 'WingetModule' -Wait
+            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
+            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
+            Start-Sleep -SECONDS 5
+            NEWPWSH -FunctionNames 'Microsoft365' -Wait
+            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+                      
 
                      
             Clear-Host
