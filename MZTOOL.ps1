@@ -717,7 +717,7 @@ ______________________________________________________
                         $fnDef = (Get-Command NEWPWSH).Definition
 
                         # Job para executar WingetUpdate
-                        Start-Job -Name "WINGET" -ScriptBlock {
+                        Start-Job -Name "UPDATE" -ScriptBlock {
                             param($fnDef)
                             # Recria a função NEWPWSH no contexto do job usando dot-sourcing
                             & ([scriptblock]::Create($fnDef))
@@ -727,7 +727,7 @@ ______________________________________________________
                         } -ArgumentList $fnDef
 
                         # Aguarda os jobs terminarem e exibe os resultados
-                        Wait-Job -Name "WINGET", "WINUPDATE" | Receive-Job
+                        Wait-Job -Name "UPDATE" | Receive-Job
 
                         PAUSE
                         DelTemp
