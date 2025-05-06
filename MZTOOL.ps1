@@ -366,74 +366,7 @@ ______________________________________________________
             # ----------------------------------------------------------------------
             # Função para exibir a barra de progresso in-place em uma linha fixa.
             # ----------------------------------------------------------------------
-            function Show-CustomProgress {
-                param(
-                    [Parameter(Mandatory = $true)]
-                    [int]$PercentComplete,
-                    [int]$BarWidth = 30,
-                    [string]$Message = "IMPLEMENTANDO",
-                    [int]$LinePosition = 17
-                )
-    
-                $rawUI = $Host.UI.RawUI
-                $windowSize = $rawUI.WindowSize
-
-                # Posiciona o cursor na linha fixa determinada por -LinePosition
-                $cursorPos = $rawUI.CursorPosition
-                $cursorPos.X = 0
-                $cursorPos.Y = $LinePosition
-                $rawUI.CursorPosition = $cursorPos
-
-                # Calcula o número de caracteres preenchidos e vazios
-                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
-                $empty = $BarWidth - $filled
-                $bar = ("#" * $filled) + ("-" * $empty)
-                $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
-
-                # Limpa a linha completa e escreve a barra de progresso
-                $clearLine = " " * $windowSize.Width
-                Write-Host $clearLine -NoNewline
-                $rawUI.CursorPosition = $cursorPos
-                Write-Host $progressText -NoNewline
-            }
-
-            # ----------------------------------------------------------------------
-            # Função NEWPWSH: agrupa e executa as funções via -EncodedCommand,
-            # suprimindo a saída e chamando Reset-MZTOOLLayout (já carregada no módulo).
-            # ----------------------------------------------------------------------
-            function NEWPWSH {
-                [CmdletBinding()]
-                param(
-                    [Parameter(Mandatory = $true)]
-                    [string[]]$FunctionNames,
-                    [switch]$Wait
-                )
-    
-                # Combina as definições das funções (preservando a ordem)
-                $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
-                } -join "`n"
-    
-                # Converte o conteúdo para Base64 para uso com -EncodedCommand
-                $encodedCommand = [Convert]::ToBase64String(
-                    [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
-                )
-                $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
-    
-                if ($Wait) {
-                    [void](Start-Process powershell -ArgumentList $arguments -Wait)
-                }
-                else {
-                    [void](Start-Process powershell -ArgumentList $arguments)
-                }
-    
-                Reset-MZTOOLLayout 
-            }
-
-            # ----------------------------------------------------------------------
-            # Função Invoke-AllGroups: executa grupos de funções em sequência e
-            # atualiza uma única barra de progresso que avança conforme os grupos são concluídos.
-            # ----------------------------------------------------------------------
+            
             function Invoke-AllGroups {
                 param(
                     [int]$BarWidth = 30,
@@ -677,8 +610,8 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 ' 
-                        NEWPWSH2 -FunctionNames 'WingetUpdate'
-                        NEWPWSH2 -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+                        NEWPWSH -FunctionNames 'WingetUpdate'
+                        NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
               
 
                         PAUSE
@@ -2364,7 +2297,7 @@ function Install-DeviceDrivers {
     }
 }
 
-function NEWPWSH2 {
+function NEWPWSH {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -2391,6 +2324,37 @@ function NEWPWSH2 {
     }
     
     Reset-MZTOOLLayout 
+}
+
+function Show-CustomProgress {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$PercentComplete,
+        [int]$BarWidth = 30,
+        [string]$Message = "IMPLEMENTANDO",
+        [int]$LinePosition = 17
+    )
+    
+    $rawUI = $Host.UI.RawUI
+    $windowSize = $rawUI.WindowSize
+
+    # Posiciona o cursor na linha fixa determinada por -LinePosition
+    $cursorPos = $rawUI.CursorPosition
+    $cursorPos.X = 0
+    $cursorPos.Y = $LinePosition
+    $rawUI.CursorPosition = $cursorPos
+
+    # Calcula o número de caracteres preenchidos e vazios
+    $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+    $empty = $BarWidth - $filled
+    $bar = ("#" * $filled) + ("-" * $empty)
+    $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
+
+    # Limpa a linha completa e escreve a barra de progresso
+    $clearLine = " " * $windowSize.Width
+    Write-Host $clearLine -NoNewline
+    $rawUI.CursorPosition = $cursorPos
+    Write-Host $progressText -NoNewline
 }
 
 function awin {
