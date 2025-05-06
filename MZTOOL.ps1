@@ -677,14 +677,16 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        WingetUpdate
-      
-                        Start-Process powershell <#-WindowStyle Hidden#> -Wait -args '-noprofile', '-EncodedCommand',
-                        ([Convert]::ToBase64String(
-                            [Text.Encoding]::Unicode.GetBytes(
-                              (Get-Command -Type Function RemoveGhostDrivers, WinUpdate).Definition
-                            ))
-                        )
+                        Start-Job -Name "Winget" -ScriptBlock { 
+                            NEWPWSH -FunctionNames 'WingetUpdate'
+                        }
+
+                        Start-Job -Name "WinUpdate" -ScriptBlock { 
+                            NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+                        }
+
+                        # Aguarda os jobs específicos terminarem antes de continuar                        
+                        Wait-Job -Name "Winget", "WinUpdate" | Receive-Job
                         
                         DelTemp
 
