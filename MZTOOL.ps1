@@ -363,14 +363,13 @@ ______________________________________________________
                 param(
                     [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
-                    [int]$BarWidth = 30,
-                    [string]$Message = "EXECUTANDO"
+                    [int]$BarWidth = 30
                 )
     
                 $rawUI = $Host.UI.RawUI
                 $winSize = $rawUI.WindowSize
 
-                # Posiciona o cursor na última linha da janela
+                # Posiciona o cursor na última linha
                 $cursorPos = $rawUI.CursorPosition
                 $cursorPos.X = 0
                 $cursorPos.Y = $winSize.Height - 1
@@ -379,8 +378,7 @@ ______________________________________________________
                 $filled = [math]::Round($PercentComplete * $BarWidth / 100)
                 $empty = $BarWidth - $filled
                 $bar = ("#" * $filled) + ("-" * $empty)
-                # Delimita a variável ${Message} para evitar erros de interpretação
-                $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
+                $progress = "IMPLEMENTANDO: {0,3}% [{1}]" -f $PercentComplete, $bar
 
                 $clearLine = " " * $winSize.Width
                 Write-Host $clearLine -NoNewline
@@ -436,7 +434,7 @@ ______________________________________________________
             # ----------------------------------------------------------------------
             function Invoke-AllGroups {
                 param(
-                    [int]$BarWidth = 40
+                    [int]$BarWidth = 30
                 )
                 # Define cada grupo a ser executado; cada item é um objeto com:
                 # - Functions: array de funções (ordem preservada)
@@ -455,7 +453,7 @@ ______________________________________________________
                 $completed = 0
 
                 # Inicia a barra de progresso com 0%
-                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "Progresso Geral"
+                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO"
 
                 foreach ($group in $groups) {
                     if ($group.ContainsKey("Wait") -and $group.Wait) {
@@ -466,7 +464,7 @@ ______________________________________________________
                     }
                     $completed++
                     $percent = [math]::Round(($completed * 100) / $total)
-                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Progresso Geral"
+                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO"
                 }
             }
 
