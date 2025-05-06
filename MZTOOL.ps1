@@ -710,9 +710,6 @@ ______________________________________________________
                         # Armazena a definição da função NEWPWSH em uma variável
                         $NewPWSHDefinition = (Get-Command NEWPWSH).Definition
 
-                        # Executa a função na sessão atual (se necessário)
-                        NEWPWSH -FunctionNames 'WingetUpdate'
-
                         # Cria os jobs e passa a definição da função como argumento
                         Start-Job -Name "WINGET" -ScriptBlock {
                             param($fnDef)
@@ -720,9 +717,7 @@ ______________________________________________________
                             Invoke-Expression $fnDef
                             NEWPWSH -FunctionNames 'WingetUpdate'
                         } -ArgumentList $NewPWSHDefinition
-
-                        
-
+                      
                         Start-Job -Name "WINUPDATE" -ScriptBlock {
                             param($fnDef)
                             Invoke-Expression $fnDef
@@ -730,7 +725,6 @@ ______________________________________________________
                         } -ArgumentList $NewPWSHDefinition
 
                        
-
                         # Aguarda os jobs terminarem e exibe os resultados
                         Wait-Job -Name "WINGET", "WINUPDATE" | Receive-Job
 
