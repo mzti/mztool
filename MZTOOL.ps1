@@ -723,24 +723,11 @@ ______________________________________________________
                             & ([scriptblock]::Create($fnDef))
                             # Agora a função NEWPWSH está disponível no job
                             NEWPWSH -FunctionNames 'WingetUpdate'
-                        } -ArgumentList $fnDef
-
-                        PAUSE
-
-                        # Job para executar RemoveGhostDrivers e WinUpdate
-                        Start-Job -Name "WINUPDATE" -ScriptBlock {
-                            param($fnDef)
-                            # Recria a função NEWPWSH no contexto do job
-                            & ([scriptblock]::Create($fnDef))
-                            # Chama a função com os nomes das funções desejadas
                             NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
                         } -ArgumentList $fnDef
 
-                        PAUSE
-
                         # Aguarda os jobs terminarem e exibe os resultados
                         Wait-Job -Name "WINGET", "WINUPDATE" | Receive-Job
-
 
                         PAUSE
                         DelTemp
