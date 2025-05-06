@@ -372,7 +372,7 @@ ______________________________________________________
                     [int]$PercentComplete,
                     [int]$BarWidth = 30,
                     [string]$Message = "Aguarde",
-                    [int]$LinePosition = 20
+                    [int]$LinePosition = 15
                 )
     
                 $rawUI = $Host.UI.RawUI
@@ -437,7 +437,7 @@ ______________________________________________________
             function Invoke-AllGroups {
                 param(
                     [int]$BarWidth = 30,
-                    [int]$LinePosition = 13
+                    [int]$LinePosition = 15
                 )
     
                 $groups = @(
@@ -478,7 +478,7 @@ ______________________________________________________
             # ----------------------------------------------------------------------
             # Chamada final para executar os grupos com a barra de progresso unificada.
             # ----------------------------------------------------------------------
-            Invoke-AllGroups -BarWidth 30 -LinePosition 13
+            Invoke-AllGroups -BarWidth 30 -LinePosition 15
 
 
             <#
