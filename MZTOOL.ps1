@@ -677,6 +677,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
+                        # Define a função NEWPWSH antes de utilizá-la nos jobs
                         function NEWPWSH {
                             [CmdletBinding()]
                             param(
@@ -684,39 +685,39 @@ ______________________________________________________
                                 [string[]]$FunctionNames,
                                 [switch]$Wait
                             )
-    
+
                             # Combina as definições das funções (preservando a ordem)
                             $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        
                                 (Get-Command -Type Function $fn).Definition
-        
                             } -join "`n"
-    
+
                             # Converte o conteúdo para Base64 para uso com -EncodedCommand
                             $encodedCommand = [Convert]::ToBase64String(
                                 [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
                             )
                             $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
-    
+
                             if ($Wait) {
                                 [void](Start-Process powershell -ArgumentList $arguments -Wait)
                             }
                             else {
                                 [void](Start-Process powershell -ArgumentList $arguments)
                             }
-    
-                            Reset-MZTOOLLayout 
+
+                            Reset-MZTOOLLayout
                         }
 
-                        Start-Job -Name "WINGET" -ScriptBlock { 
+                        # Cria os jobs para executar as funções
+                        Start-Job -Name "WINGET" -ScriptBlock {
                             NEWPWSH -FunctionNames 'WingetUpdate'
                         }
                         PAUSE
-                        Start-Job -Name "WINUPDATE" -ScriptBlock { 
+                        Start-Job -Name "WINUPDATE" -ScriptBlock {
                             NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
                         }
                         PAUSE
-                        # Aguarda os jobs específicos terminarem antes de continuar                        
+
+                        # Aguarda os jobs específicos terminarem antes de continuar
                         Wait-Job -Name "WINGET", "WINUPDATE" | Receive-Job
                         PAUSE
                         
