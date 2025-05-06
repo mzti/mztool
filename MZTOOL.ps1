@@ -2353,7 +2353,7 @@ function NEWPWSH {
         [void](Start-Process powershell -ArgumentList $arguments)
     }
     
-    Reset-MZTOOLLayout 
+    #Reset-MZTOOLLayout 
 }
 
 function awin {
