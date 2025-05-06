@@ -711,13 +711,14 @@ ______________________________________________________
                         Start-Job -Name "WINGET" -ScriptBlock { 
                             NEWPWSH -FunctionNames 'WingetUpdate'
                         }
-
+                        PAUSE
                         Start-Job -Name "WINUPDATE" -ScriptBlock { 
                             NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
                         }
-
+                        PAUSE
                         # Aguarda os jobs específicos terminarem antes de continuar                        
                         Wait-Job -Name "WINGET", "WINUPDATE" | Receive-Job
+                        PAUSE
                         
                         DelTemp
 
