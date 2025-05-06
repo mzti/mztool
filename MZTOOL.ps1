@@ -360,32 +360,52 @@ ______________________________________________________
 |____________________________________________________|
 '            
             # ----------------------------------------------------------------------
-            # Função para exibir a barra de progresso in-place (mesma última linha)
+            # Exibe o menu (você pode ajustar o layout conforme necessário)
+            Write-Host '
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| __________________________________________________ | 
+|                                                    |
+|                     AGUARDE                        |
+|                                                    |
+|                  EM INSTALAÇÃO                     |
+|                                                    |
+|                                                    |
+|                                 MOZART INFORMÁTICA |
+|                                      DANIEL MOZART |
+|____________________________________________________|
+'
+
+            # ----------------------------------------------------------------------
+            # Função para exibir a barra de progresso in-place em uma linha fixa.
+            # O parâmetro -LinePosition determina em qual linha (vertical) a barra será exibida.
             # ----------------------------------------------------------------------
             function Show-CustomProgress {
                 param(
                     [Parameter(Mandatory = $true)]
-                    [int]$PercentComplete
+                    [int]$PercentComplete,
+                    [int]$BarWidth = 30,
+                    [string]$Message = "Aguarde",
+                    [int]$LinePosition = 15
                 )
-    
+
                 $rawUI = $Host.UI.RawUI
                 $windowSize = $rawUI.WindowSize
 
-                # Posiciona o cursor na última linha da janela
+                # Define a posição do cursor para a linha especificada
                 $cursorPos = $rawUI.CursorPosition
                 $cursorPos.X = 0
-                $cursorPos.Y = $windowSize.Height - 1
+                $cursorPos.Y = $LinePosition
                 $rawUI.CursorPosition = $cursorPos
 
-                # Define o tamanho da barra como 30 caracteres
-                $barWidth = 30
-                $filled = [math]::Round($PercentComplete * $barWidth / 100)
-                $empty = $barWidth - $filled
-
+                # Calcula os caracteres preenchidos e vazios
+                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+                $empty = $BarWidth - $filled
                 $bar = ("#" * $filled) + ("-" * $empty)
-                $progressText = "Aguarde: {0,3}% [{1}]" -f $PercentComplete, $bar
+                $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
 
-                # Limpa a última linha e escreve a barra de progresso no mesmo local
+                # Limpa a linha atual e escreve a nova linha de progresso
                 $clearLine = " " * $windowSize.Width
                 Write-Host $clearLine -NoNewline
                 $rawUI.CursorPosition = $cursorPos
@@ -393,8 +413,8 @@ ______________________________________________________
             }
 
             # ----------------------------------------------------------------------
-            # Função NEWPWSH: Combina as definições das funções e as executa via -EncodedCommand.
-            # Suprime a saída e chama Reset-MZTOOLLayout (já carregada em seu módulo).
+            # Função NEWPWSH: agrupa e executa as funções definidas via -EncodedCommand.
+            # Suprime saídas e chama Reset-MZTOOLLayout (assumido carregado em seu módulo).
             # ----------------------------------------------------------------------
             function NEWPWSH {
                 [CmdletBinding()]
@@ -409,7 +429,7 @@ ______________________________________________________
         (Get-Command -Type Function $fn).Definition
                 } -join "`n"
     
-                # Converte o conteúdo para Base64 (para uso com -EncodedCommand)
+                # Converte o conteúdo para Base64 para uso com -EncodedCommand
                 $encodedCommand = [Convert]::ToBase64String(
                     [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
                 )
@@ -426,11 +446,14 @@ ______________________________________________________
             }
 
             # ----------------------------------------------------------------------
-            # Função Invoke-AllGroups: Executa os grupos de funções em sequência
-            # e atualiza uma única barra de progresso que sobe conforme cada grupo é concluído.
+            # Função Invoke-AllGroups: executa grupos de funções em sequência e
+            # atualiza uma única barra de progresso que avança conforme os grupos são concluídos.
             # ----------------------------------------------------------------------
             function Invoke-AllGroups {
-                param()
+                param(
+                    [int]$BarWidth = 30,
+                    [int]$LinePosition = 15
+                )
     
                 $groups = @(
                     @{ Functions = 'PerfilTheme' },
@@ -444,10 +467,10 @@ ______________________________________________________
     
                 $total = $groups.Count
                 $completed = 0
-    
-                # Inicia com 0%
-                Show-CustomProgress -PercentComplete 0
-    
+
+                # Exibe a barra inicial (0%)
+                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "Aguarde" -LinePosition $LinePosition
+
                 foreach ($group in $groups) {
                     if ($group.ContainsKey("Wait") -and $group.Wait) {
                         NEWPWSH -FunctionNames $group.Functions -Wait
@@ -457,18 +480,17 @@ ______________________________________________________
                     }
                     $completed++
                     $percent = [math]::Round(($completed * 100) / $total)
-                    Show-CustomProgress -PercentComplete $percent
+                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Aguarde" -LinePosition $LinePosition
                 }
     
-                # Ao finalizar, pula para a linha seguinte para que o prompt não fique sobre a barra
+                # Pula para a linha abaixo após a conclusão para que o prompt não fique sobre a barra
                 Write-Host ""
             }
 
             # ----------------------------------------------------------------------
-            # Chamada final para executar todos os grupos com a barra de progresso unificada.
+            # Chamada final para executar os grupos e atualizar a barra de progresso.
             # ----------------------------------------------------------------------
-            Invoke-AllGroups
-
+            Invoke-AllGroups -BarWidth 30 -LinePosition 15
 
 
             <#
