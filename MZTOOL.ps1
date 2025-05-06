@@ -341,10 +341,10 @@ ______________________________________________________
 
         1 {
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
-
-            Clear-Host
+            $Host.UI.RawUI.WindowTitle = 'MZTOOL> INSTALL'
+            Import-Module MZTOOL -Force
             
-            # Exibe o menu
+            Clear-Host
             Write-Host '
 ______________________________________________________
 |                                                    |
