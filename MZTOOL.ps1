@@ -359,6 +359,122 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '            
+            function Show-CustomProgress {
+                param(
+                    [Parameter(Mandatory = $true)]
+                    [int]$PercentComplete,
+                    [int]$BarWidth = 30,
+                    [string]$Message = "EXECUTANDO"
+                )
+    
+                $rawUI = $Host.UI.RawUI
+                $winSize = $rawUI.WindowSize
+
+                # Posiciona o cursor na última linha da janela
+                $cursorPos = $rawUI.CursorPosition
+                $cursorPos.X = 0
+                $cursorPos.Y = $winSize.Height - 1
+                $rawUI.CursorPosition = $cursorPos
+
+                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+                $empty = $BarWidth - $filled
+                $bar = ("#" * $filled) + ("-" * $empty)
+                # Delimita a variável ${Message} para evitar erros de interpretação
+                $progress = "${Message}: {0,3}% [{1}]" -f $PercentComplete, $bar
+
+                $clearLine = " " * $winSize.Width
+                Write-Host $clearLine -NoNewline
+                $rawUI.CursorPosition = $cursorPos
+                Write-Host $progress -NoNewline
+            }
+
+            # ----------------------------------------------------------------------
+            # Função dummy para Reset-MZTOOLLayout, ajuste conforme sua lógica.
+            # ----------------------------------------------------------------------
+            function Reset-MZTOOLLayout {
+                # Coloque aqui os comandos para restaurar seu layout ou mantenha vazio.
+                return
+            }
+
+            # ----------------------------------------------------------------------
+            # Função NEWPWSH para agrupar e executar funções via -EncodedCommand.
+            # Essa versão foi ajustada para não emitir saídas adicionais.
+            # ----------------------------------------------------------------------
+            function NEWPWSH {
+                [CmdletBinding()]
+                param(
+                    [Parameter(Mandatory = $true)]
+                    [string[]]$FunctionNames,
+                    [switch]$Wait,
+                    [int]$BarWidth = 30
+                )
+    
+                # Combina as definições das funções do grupo, preservando a ordem
+                $combinedDefinitions = foreach ($fn in $FunctionNames) {
+        (Get-Command -Type Function $fn).Definition
+                } -join "`n"
+    
+                # Codifica o comando para Base64
+                $encodedCommand = [Convert]::ToBase64String(
+                    [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
+                )
+                $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+                # Oculta a janela (e suprime saídas) e executa
+                if ($Wait) {
+                    Start-Process powershell -ArgumentList $arguments -Wait -WindowStyle Hidden
+                }
+                else {
+                    Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden
+                }
+    
+                Reset-MZTOOLLayout
+            }
+
+            # ----------------------------------------------------------------------
+            # Função que executa os grupos de funções em sequência, atualizando uma única barra de progresso.
+            # ----------------------------------------------------------------------
+            function Invoke-AllGroups {
+                param(
+                    [int]$BarWidth = 40
+                )
+                # Define cada grupo a ser executado; cada item é um objeto com:
+                # - Functions: array de funções (ordem preservada)
+                # - Wait: switch indicando se a execução deve aguardar
+                $groups = @(
+                    @{ Functions = 'PerfilTheme' },
+                    @{ Functions = 'AnyDesk' },
+                    @{ Functions = 'WingetModule'; Wait = $true },
+                    @{ Functions = 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp' },
+                    @{ Functions = 'WingetInstall', 'WingetUpdate' },
+                    @{ Functions = 'Microsoft365'; Wait = $true },
+                    @{ Functions = 'PinIcons', 'StartSoftwares' }
+                )
+    
+                $total = $groups.Count
+                $completed = 0
+
+                # Inicia a barra de progresso com 0%
+                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "Progresso Geral"
+
+                foreach ($group in $groups) {
+                    if ($group.ContainsKey("Wait") -and $group.Wait) {
+                        NEWPWSH -FunctionNames $group.Functions -Wait -BarWidth $BarWidth
+                    }
+                    else {
+                        NEWPWSH -FunctionNames $group.Functions -BarWidth $BarWidth
+                    }
+                    $completed++
+                    $percent = [math]::Round(($completed * 100) / $total)
+                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Progresso Geral"
+                }
+            }
+
+            # ----------------------------------------------------------------------
+            # Chamada final para executar os grupos com a barra de progresso única.
+            # ----------------------------------------------------------------------
+            Invoke-AllGroups -BarWidth 40
+            <#
             function Set-CursorToStart {
                 # Define o cursor na posição inicial (0,0) da janela do console.
                 $cursor = $host.UI.RawUI.CursorPosition
@@ -407,7 +523,7 @@ ______________________________________________________
             NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
             Start-Sleep -SECONDS 5
             NEWPWSH -FunctionNames 'Microsoft365' -Wait
-            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares'
+            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares' #>
                       
 
                      
