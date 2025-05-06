@@ -687,7 +687,9 @@ ______________________________________________________
     
                             # Combina as definições das funções (preservando a ordem)
                             $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
+        
+                                (Get-Command -Type Function $fn).Definition
+        
                             } -join "`n"
     
                             # Converte o conteúdo para Base64 para uso com -EncodedCommand
