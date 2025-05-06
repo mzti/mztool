@@ -715,8 +715,9 @@ ______________________________________________________
                             param($fnDef)
                             # Recria a função NEWPWSH no contexto do job
                             Invoke-Expression $fnDef
-                            NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'
                             NEWPWSH -FunctionNames 'WingetUpdate'
+                            NEWPWSH -FunctionNames 'WinUpdate'
                         } -ArgumentList $NewPWSHDefinition
 
                         # Aguarda o job terminar e exibe os resultados
