@@ -371,8 +371,8 @@ ______________________________________________________
                     [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
                     [int]$BarWidth = 30,
-                    [string]$Message = "Aguarde",
-                    [int]$LinePosition = 15
+                    [string]$Message = "IMPLEMENTANDO",
+                    [int]$LinePosition = 17
                 )
     
                 $rawUI = $Host.UI.RawUI
@@ -437,7 +437,7 @@ ______________________________________________________
             function Invoke-AllGroups {
                 param(
                     [int]$BarWidth = 30,
-                    [int]$LinePosition = 15
+                    [int]$LinePosition = 17
                 )
     
                 $groups = @(
@@ -454,7 +454,7 @@ ______________________________________________________
                 $completed = 0
 
                 # Exibe a barra inicial (0% concluído)
-                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "Aguarde" -LinePosition $LinePosition
+                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
 
                 foreach ($group in $groups) {
                     if ($group.ContainsKey("Wait") -and $group.Wait) {
@@ -465,7 +465,7 @@ ______________________________________________________
                     }
                     $completed++
                     $percent = [math]::Round(($completed * 100) / $total)
-                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Aguarde" -LinePosition $LinePosition
+                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
                     
                     # Aguarda 3 segundos antes de iniciar o próximo grupo
                     Start-Sleep -Seconds 3
@@ -478,60 +478,7 @@ ______________________________________________________
             # ----------------------------------------------------------------------
             # Chamada final para executar os grupos com a barra de progresso unificada.
             # ----------------------------------------------------------------------
-            Invoke-AllGroups -BarWidth 30 -LinePosition 15
-
-
-            <#
-            function Set-CursorToStart {
-                # Define o cursor na posição inicial (0,0) da janela do console.
-                $cursor = $host.UI.RawUI.CursorPosition
-                $cursor.X = 0
-                $host.UI.RawUI.CursorPosition = $cursor
-            }
-            function NEWPWSH {
-                param(
-                    [Parameter(Mandatory = $true)]
-                    [string[]]$FunctionNames,
-                    [switch]$Wait
-                )
-
-                # Combina as definições de todas as funções do grupo, preservando a ordem
-                $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
-                } -join "`n"
-
-                # Converte o conteúdo para Base64 (necessário para -EncodedCommand)
-                $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
-
-                # Prepara os argumentos sem e com -Wait conforme o caso
-                $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
-
-                if ($Wait) {
-                    [void](Start-Process powershell -ArgumentList $arguments -Wait)
-                }
-                else {
-                    [void](Start-Process powershell -ArgumentList $arguments)
-                }
-                              
-                
-                Write-Host "`rIMPLEMENTANDO $FunctionNames" -NoNewline                    
-                Set-CursorToStart
-              
-            
-                # Suprime a saída de Reset-MZTOOLLayout, assumindo que já está pré-carregada
-                #Reset-MZTOOLLayout | Out-Null
-            }
-          
-            # Execução dos grupos na ordem desejada (todas as saídas serão suprimidas):
-            NEWPWSH -FunctionNames 'PerfilTheme'
-            NEWPWSH -FunctionNames 'AnyDesk'
-            NEWPWSH -FunctionNames 'WingetModule' -Wait
-            NEWPWSH -FunctionNames 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp'
-            NEWPWSH -FunctionNames 'WingetInstall', 'WingetUpdate'
-            Start-Sleep -SECONDS 5
-            NEWPWSH -FunctionNames 'Microsoft365' -Wait
-            NEWPWSH -FunctionNames 'PinIcons', 'StartSoftwares' #>
-                      
+            Invoke-AllGroups -BarWidth 30 -LinePosition 17                      
 
                      
             Clear-Host
