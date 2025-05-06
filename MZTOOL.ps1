@@ -715,26 +715,20 @@ ______________________________________________________
                             param($fnDef)
                             # Recria a função NEWPWSH no contexto do job
                             Invoke-Expression $fnDef
-                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'
-                            NEWPWSH -FunctionNames 'WingetUpdate'
-                            NEWPWSH -FunctionNames 'WinUpdate'
+                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'                            
                         } -ArgumentList $NewPWSHDefinition
                         
                         Start-Job -Name "WINGET" -ScriptBlock {
                             param($fnDef)
                             # Recria a função NEWPWSH no contexto do job
-                            Invoke-Expression $fnDef
-                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'
-                            NEWPWSH -FunctionNames 'WingetUpdate'
-                            NEWPWSH -FunctionNames 'WinUpdate'
+                            Invoke-Expression $fnDef                           
+                            NEWPWSH -FunctionNames 'WingetUpdate'                            
                         } -ArgumentList $NewPWSHDefinition
                         
                         Start-Job -Name "WINUPDATE" -ScriptBlock {
                             param($fnDef)
                             # Recria a função NEWPWSH no contexto do job
                             Invoke-Expression $fnDef
-                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'
-                            NEWPWSH -FunctionNames 'WingetUpdate'
                             NEWPWSH -FunctionNames 'WinUpdate'
                         } -ArgumentList $NewPWSHDefinition
                         # Aguarda o job terminar e exibe os resultados
