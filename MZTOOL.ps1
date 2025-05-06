@@ -676,75 +676,13 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA                 |
 |                   DANIEL MOZART                    |
 |____________________________________________________|
-'
-                        # Define a função NEWPWSH na sessão principal
-                        function NEWPWSH {
-                            [CmdletBinding()]
-                            param(
-                                [Parameter(Mandatory = $true)]
-                                [string[]]$FunctionNames,
-                                [switch]$Wait
-                            )
-
-                            # Combina as definições das funções (preservando a ordem)
-                            $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
-                            } -join "`n"
-
-                            # Adiciona um "exit" no fim para garantir que o novo processo encerre
-                            $combinedDefinitions += "`nexit"
-
-                            # Converte o conteúdo para Base64 para uso com -EncodedCommand
-                            $encodedCommand = [Convert]::ToBase64String(
-                                [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
-                            )
-    
-                            # Monta os argumentos de forma a evitar interatividade e janelas desnecessárias
-                            $arguments = @(
-                                '-noprofile',
-                                '-NonInteractive',
-                                '-NoLogo',
-                                '-EncodedCommand',
-                                $encodedCommand
-                            )
-
-                            if ($Wait) {
-                                [void](Start-Process powershell -ArgumentList $arguments -Wait -NoNewWindow -WindowStyle Hidden)
-                            }
-                            else {
-                                [void](Start-Process powershell -ArgumentList $arguments -NoNewWindow -WindowStyle Hidden)
-                            }
-
-                            Reset-MZTOOLLayout
-                        }
-
-                        # Definição dummy para Reset-MZTOOLLayout (substitua se tiver a implementação real)
-                        function Reset-MZTOOLLayout {
-                            return
-                        }
-
-                        # Captura a definição da função NEWPWSH
-                        $fnDef = (Get-Command NEWPWSH).Definition
-
-                        # Cria um único job (que recria a função NEWPWSH no seu contexto) e executa os comandos desejados
-                        Start-Job -Name "UPDATE" -ScriptBlock {
-                            param($fnDef)
-
-                            # Recria a função NEWPWSH no contexto do job
-                            & ([scriptblock]::Create($fnDef))
-
-                            # Agora executa os comandos desejados.
-                            # Se preferir que os dois comandos sejam executados de forma separada,
-                            # considere criar jobs distintos.
-                            NEWPWSH -FunctionNames 'WingetUpdate'
-                            NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
-                        } -ArgumentList $fnDef
-
-                        # Aguarda o job terminar e exibe os resultados
-                        Wait-Job -Name "UPDATE" | Receive-Job
-
+' 
+                        NEWPWSH2 -FunctionNames 'WingetUpdate'
+                        NEWPWSH2 -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+              
 
                         PAUSE
+
                         DelTemp
 
                         Clear-Host
@@ -2424,6 +2362,35 @@ function Install-DeviceDrivers {
     if ($InstallationResult.RebootRequired) {
         Write-Host "Reinicialização necessária. Por favor, reinicie o computador."
     }
+}
+
+function NEWPWSH2 {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$FunctionNames,
+        [switch]$Wait
+    )
+    
+    # Combina as definições das funções (preservando a ordem)
+    $combinedDefinitions = foreach ($fn in $FunctionNames) {
+        (Get-Command -Type Function $fn).Definition
+    } -join "`n"
+    
+    # Converte o conteúdo para Base64 para uso com -EncodedCommand
+    $encodedCommand = [Convert]::ToBase64String(
+        [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
+    )
+    $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+    if ($Wait) {
+        [void](Start-Process powershell -ArgumentList $arguments -Wait)
+    }
+    else {
+        [void](Start-Process powershell -ArgumentList $arguments)
+    }
+    
+    Reset-MZTOOLLayout 
 }
 
 function awin {
