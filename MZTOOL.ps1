@@ -677,7 +677,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        # Suponha que a função NEWPWSH já esteja definida neste escopo
+                        # Define a função NEWPWSH na sessão principal
                         function NEWPWSH {
                             [CmdletBinding()]
                             param(
@@ -691,48 +691,58 @@ ______________________________________________________
         (Get-Command -Type Function $fn).Definition
                             } -join "`n"
 
+                            # Adiciona um "exit" no fim para garantir que o novo processo encerre
+                            $combinedDefinitions += "`nexit"
+
                             # Converte o conteúdo para Base64 para uso com -EncodedCommand
                             $encodedCommand = [Convert]::ToBase64String(
                                 [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
                             )
-                            $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+                            # Monta os argumentos de forma a evitar interatividade e janelas desnecessárias
+                            $arguments = @(
+                                '-noprofile',
+                                '-NonInteractive',
+                                '-NoLogo',
+                                '-EncodedCommand',
+                                $encodedCommand
+                            )
 
                             if ($Wait) {
-                                [void](Start-Process powershell -ArgumentList $arguments -Wait)
+                                [void](Start-Process powershell -ArgumentList $arguments -Wait -NoNewWindow -WindowStyle Hidden)
                             }
                             else {
-                                [void](Start-Process powershell -ArgumentList $arguments)
+                                [void](Start-Process powershell -ArgumentList $arguments -NoNewWindow -WindowStyle Hidden)
                             }
 
                             Reset-MZTOOLLayout
                         }
 
-                        # Armazena a definição da função NEWPWSH em uma variável
-                        $NewPWSHDefinition = (Get-Command NEWPWSH).Definition
+                        # Definição dummy para Reset-MZTOOLLayout (substitua se tiver a implementação real)
+                        function Reset-MZTOOLLayout {
+                            return
+                        }
 
-                        # Cria os jobs e passa a definição da função como argumento
-                        Start-Job -Name "REMOVEDRIVERS" -ScriptBlock {
+                        # Captura a definição da função NEWPWSH
+                        $fnDef = (Get-Command NEWPWSH).Definition
+
+                        # Cria um único job (que recria a função NEWPWSH no seu contexto) e executa os comandos desejados
+                        Start-Job -Name "UPDATE" -ScriptBlock {
                             param($fnDef)
+
                             # Recria a função NEWPWSH no contexto do job
-                            Invoke-Expression $fnDef
-                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'                            
-                        } -ArgumentList $NewPWSHDefinition
-                        
-                        Start-Job -Name "WINGET" -ScriptBlock {
-                            param($fnDef)
-                            # Recria a função NEWPWSH no contexto do job
-                            Invoke-Expression $fnDef                           
-                            NEWPWSH -FunctionNames 'WingetUpdate'                            
-                        } -ArgumentList $NewPWSHDefinition
-                        
-                        Start-Job -Name "WINUPDATE" -ScriptBlock {
-                            param($fnDef)
-                            # Recria a função NEWPWSH no contexto do job
-                            Invoke-Expression $fnDef
-                            NEWPWSH -FunctionNames 'WinUpdate'
-                        } -ArgumentList $NewPWSHDefinition
+                            & ([scriptblock]::Create($fnDef))
+
+                            # Agora executa os comandos desejados.
+                            # Se preferir que os dois comandos sejam executados de forma separada,
+                            # considere criar jobs distintos.
+                            NEWPWSH -FunctionNames 'WingetUpdate'
+                            NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+                        } -ArgumentList $fnDef
+
                         # Aguarda o job terminar e exibe os resultados
-                        Wait-Job -Name "REMOVEDRIVERS", "WINGET", "WINUPDATE" | Receive-Job
+                        Wait-Job -Name "UPDATE" | Receive-Job
+
 
                         PAUSE
                         DelTemp
