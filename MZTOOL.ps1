@@ -372,7 +372,7 @@ ______________________________________________________
                     [int]$PercentComplete,
                     [int]$BarWidth = 30,
                     [string]$Message = "Aguarde",
-                    [int]$LinePosition = 13
+                    [int]$LinePosition = 15
                 )
     
                 $rawUI = $Host.UI.RawUI
