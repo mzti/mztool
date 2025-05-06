@@ -711,7 +711,7 @@ ______________________________________________________
                         $NewPWSHDefinition = (Get-Command NEWPWSH).Definition
 
                         # Cria os jobs e passa a definição da função como argumento
-                        Start-Job -Name "UPDATE" -ScriptBlock {
+                        Start-Job -Name "REMOVEDRIVERS" -ScriptBlock {
                             param($fnDef)
                             # Recria a função NEWPWSH no contexto do job
                             Invoke-Expression $fnDef
@@ -719,9 +719,26 @@ ______________________________________________________
                             NEWPWSH -FunctionNames 'WingetUpdate'
                             NEWPWSH -FunctionNames 'WinUpdate'
                         } -ArgumentList $NewPWSHDefinition
-
+                        
+                        Start-Job -Name "WINGET" -ScriptBlock {
+                            param($fnDef)
+                            # Recria a função NEWPWSH no contexto do job
+                            Invoke-Expression $fnDef
+                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'
+                            NEWPWSH -FunctionNames 'WingetUpdate'
+                            NEWPWSH -FunctionNames 'WinUpdate'
+                        } -ArgumentList $NewPWSHDefinition
+                        
+                        Start-Job -Name "WINUPDATE" -ScriptBlock {
+                            param($fnDef)
+                            # Recria a função NEWPWSH no contexto do job
+                            Invoke-Expression $fnDef
+                            NEWPWSH -FunctionNames 'RemoveGhostDrivers'
+                            NEWPWSH -FunctionNames 'WingetUpdate'
+                            NEWPWSH -FunctionNames 'WinUpdate'
+                        } -ArgumentList $NewPWSHDefinition
                         # Aguarda o job terminar e exibe os resultados
-                        Wait-Job -Name "UPDATE" | Receive-Job
+                        Wait-Job -Name "REMOVEDRIVERS", "WINGET", "WINUPDATE" | Receive-Job
 
                         PAUSE
                         DelTemp
