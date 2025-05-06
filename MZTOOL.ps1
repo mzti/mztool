@@ -466,6 +466,9 @@ ______________________________________________________
                     $completed++
                     $percent = [math]::Round(($completed * 100) / $total)
                     Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "Aguarde" -LinePosition $LinePosition
+                    
+                    # Aguarda 3 segundos antes de iniciar o próximo grupo
+                    Start-Sleep -Seconds 3
                 }
 
                 # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
