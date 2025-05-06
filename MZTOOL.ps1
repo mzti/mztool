@@ -343,39 +343,7 @@ ______________________________________________________
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
 
             Clear-Host
-            Write-Host '
-    
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| __________________________________________________ | 
-|                                                    |
-|                     AGUARDE                        |
-|                                                    |
-|                  EM INSTALAÇÃO                     |
-|                                                    |
-|                                                    |
-|                                 MOZART INFORMÁTICA |
-|                                      DANIEL MOZART |
-|____________________________________________________|
-'            
-            # ----------------------------------------------------------------------
-            # Exibe o menu (você pode ajustar o layout conforme necessário)
-            Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| __________________________________________________ | 
-|                                                    |
-|                     AGUARDE                        |
-|                                                    |
-|                  EM INSTALAÇÃO                     |
-|                                                    |
-|                                                    |
-|                                 MOZART INFORMÁTICA |
-|                                      DANIEL MOZART |
-|____________________________________________________|
-'
+            
             # Exibe o menu
             Write-Host '
 ______________________________________________________
@@ -420,7 +388,7 @@ ______________________________________________________
                 $filled = [math]::Round($PercentComplete * $BarWidth / 100)
                 $empty = $BarWidth - $filled
                 $bar = ("#" * $filled) + ("-" * $empty)
-                $progressText = "$Message: {0,3}% [$bar]" -f $PercentComplete
+                $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
 
                 # Limpa a linha completa e escreve a barra de progresso
                 $clearLine = " " * $windowSize.Width
