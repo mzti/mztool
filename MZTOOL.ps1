@@ -376,7 +376,7 @@ ______________________________________________________
                 $bar = ("#" * $filled) + ("-" * $empty)
     
                 # Formata a mensagem com a porcentagem e a barra
-                $progress = "$Message: {0,3}% [$bar]" -f $PercentComplete
+                $progress = "${Message}: {0,3}% [$bar]" -f $PercentComplete
     
                 # Retorna o cursor para o início da linha e atualiza a mesma linha
                 Write-Host "`r$progress" -NoNewline
