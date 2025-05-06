@@ -677,6 +677,35 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
+                        function NEWPWSH {
+                            [CmdletBinding()]
+                            param(
+                                [Parameter(Mandatory = $true)]
+                                [string[]]$FunctionNames,
+                                [switch]$Wait
+                            )
+    
+                            # Combina as definições das funções (preservando a ordem)
+                            $combinedDefinitions = foreach ($fn in $FunctionNames) {
+        (Get-Command -Type Function $fn).Definition
+                            } -join "`n"
+    
+                            # Converte o conteúdo para Base64 para uso com -EncodedCommand
+                            $encodedCommand = [Convert]::ToBase64String(
+                                [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
+                            )
+                            $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+                            if ($Wait) {
+                                [void](Start-Process powershell -ArgumentList $arguments -Wait)
+                            }
+                            else {
+                                [void](Start-Process powershell -ArgumentList $arguments)
+                            }
+    
+                            Reset-MZTOOLLayout 
+                        }
+                        
                         Start-Job -Name "Winget" -ScriptBlock { 
                             NEWPWSH -FunctionNames 'WingetUpdate'
                         }
