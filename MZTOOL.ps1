@@ -390,8 +390,12 @@ ______________________________________________________
                     [void](Start-Process powershell -ArgumentList $arguments)
                 }
                
-                Write-Output "IMPLEMENTANDO $FunctionNames" -NoNewline
-                Set-CursorToStart
+                # Continuously overwrite the output
+                while ($true) {
+                    Write-Host "`rIMPLEMENTANDO $FunctionNames" -NoNewline
+                    Start-Sleep -Milliseconds 500
+                    Set-CursorToStart
+                }
             
                 # Suprime a saída de Reset-MZTOOLLayout, assumindo que já está pré-carregada
                 #Reset-MZTOOLLayout | Out-Null
