@@ -366,7 +366,37 @@ ______________________________________________________
             # ----------------------------------------------------------------------
             # Função para exibir a barra de progresso in-place em uma linha fixa.
             # ----------------------------------------------------------------------
-            
+            function Show-CustomProgress {
+                param(
+                    [Parameter(Mandatory = $true)]
+                    [int]$PercentComplete,
+                    [int]$BarWidth = 30,
+                    [string]$Message = "IMPLEMENTANDO",
+                    [int]$LinePosition = 17
+                )
+    
+                $rawUI = $Host.UI.RawUI
+                $windowSize = $rawUI.WindowSize
+
+                # Posiciona o cursor na linha fixa determinada por -LinePosition
+                $cursorPos = $rawUI.CursorPosition
+                $cursorPos.X = 0
+                $cursorPos.Y = $LinePosition
+                $rawUI.CursorPosition = $cursorPos
+
+                # Calcula o número de caracteres preenchidos e vazios
+                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+                $empty = $BarWidth - $filled
+                $bar = ("#" * $filled) + ("-" * $empty)
+                $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
+
+                # Limpa a linha completa e escreve a barra de progresso
+                $clearLine = " " * $windowSize.Width
+                Write-Host $clearLine -NoNewline
+                $rawUI.CursorPosition = $cursorPos
+                Write-Host $progressText -NoNewline
+            }
+
             function Invoke-AllGroups {
                 param(
                     [int]$BarWidth = 30,
@@ -2324,37 +2354,6 @@ function NEWPWSH {
     }
     
     Reset-MZTOOLLayout 
-}
-
-function Show-CustomProgress {
-    param(
-        [Parameter(Mandatory = $true)]
-        [int]$PercentComplete,
-        [int]$BarWidth = 30,
-        [string]$Message = "IMPLEMENTANDO",
-        [int]$LinePosition = 17
-    )
-    
-    $rawUI = $Host.UI.RawUI
-    $windowSize = $rawUI.WindowSize
-
-    # Posiciona o cursor na linha fixa determinada por -LinePosition
-    $cursorPos = $rawUI.CursorPosition
-    $cursorPos.X = 0
-    $cursorPos.Y = $LinePosition
-    $rawUI.CursorPosition = $cursorPos
-
-    # Calcula o número de caracteres preenchidos e vazios
-    $filled = [math]::Round($PercentComplete * $BarWidth / 100)
-    $empty = $BarWidth - $filled
-    $bar = ("#" * $filled) + ("-" * $empty)
-    $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
-
-    # Limpa a linha completa e escreve a barra de progresso
-    $clearLine = " " * $windowSize.Width
-    Write-Host $clearLine -NoNewline
-    $rawUI.CursorPosition = $cursorPos
-    Write-Host $progressText -NoNewline
 }
 
 function awin {
