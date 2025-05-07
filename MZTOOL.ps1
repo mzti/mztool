@@ -2256,12 +2256,15 @@ function ImgHealth {
     # Verifica a integridade da imagem do sistema.
     DISM /Online /Cleanup-Image /CheckHealth
 
+    Clear-Host    
+    
     # Repara a imagem do sistema, se necessário.
     DISM /Online /Cleanup-Image /RestoreHealth
 
+    Clear-Host
+
     # Executa o comando SFC para verificar e reparar arquivos corrompidos do sistema.
     SFC /SCANNOW
-
 
     Clear-Host
 }
