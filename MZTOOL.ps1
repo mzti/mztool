@@ -2352,13 +2352,13 @@ function NEWPWSHold {
     
     #Reset-MZTOOLLayout 
 }
-
 function NEWPWSH {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string[]]$FunctionNames,
-        [switch]$Wait
+        [switch]$Wait,
+        [switch]$ReturnProcess
     )
     
     # Combina as definições das funções (preservando a ordem)
@@ -2367,21 +2367,24 @@ function NEWPWSH {
     } -join "`n"
     
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
-    $encodedCommand = [Convert]::ToBase64String(
-        [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
-    )
+    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
     $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
     
     if ($Wait) {
-        # Se o parâmetro Wait for fornecido, espera o término do processo
+        # Caso Wait seja especificado, aguardamos o término do processo internamente.
         [void](Start-Process powershell -ArgumentList $arguments -Wait)
     }
-    else {
-        # Caso contrário, capturo e retorno o objeto do processo para uso externo
+    elseif ($ReturnProcess) {
+        # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
         $proc = Start-Process powershell -ArgumentList $arguments -PassThru
         return $proc
     }
+    else {
+        # Se nada for especificado, usamos a forma que não retorna nada – compatível com [void](...)
+        [void](Start-Process powershell -ArgumentList $arguments)
+    }
 }
+
 
 
 function awin {
