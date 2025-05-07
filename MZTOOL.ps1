@@ -2252,14 +2252,15 @@ function DelTemp {
 function ImgHealth {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> IMGHEALTH'
     Import-Module MZTOOL -Force
-    # Executa o comando SFC para verificar e reparar arquivos corrompidos do sistema.
-    SFC /SCANNOW
-
+    
     # Verifica a integridade da imagem do sistema.
     DISM /Online /Cleanup-Image /CheckHealth
 
     # Repara a imagem do sistema, se necessário.
     DISM /Online /Cleanup-Image /RestoreHealth
+
+    # Executa o comando SFC para verificar e reparar arquivos corrompidos do sistema.
+    SFC /SCANNOW
 
 
     Clear-Host
