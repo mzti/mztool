@@ -60,29 +60,16 @@ function MZTOOLMODULE {
     # Conteúdo do módulo MZTOOL.psm1
     $moduleContent = @'
 # MZTOOL.psm1
-# Módulo para customização do console e posicionamento automático das janelas.
-# 
-# Funcionalidades:
-# 1. A janela principal (primeira instância) abre centralizada se for a única.
-#    Se houver outras janelas, ela se reposiciona para o canto inferior direito.
-# 2. As janelas adicionais são posicionadas a partir do canto superior esquerdo, em um layout em grade:
-#    – abrem lado a lado até não haver mais espaço horizontal e, em seguida, iniciam uma nova linha.
-# 3. A função Reset-MZTOOLLayout (opcional) permite reiniciar o contador (para que,
-#    ao fechar todas as janelas, a janela principal volte ao centro).
-#
 #region Importações e API
 
-# Carrega o assembly para trabalhar com a área de trabalho (para obter a resolução)
 [void][System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
-$workArea = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
-$screenWidth = $workArea.Width
+$workArea     = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
+$screenWidth  = $workArea.Width
 $screenHeight = $workArea.Height
 
-# Valores aproximados para o tamanho do console em pixels (ajuste conforme necessário)
-$global:winWidth  = 464  # aproximadamente 58 colunas * 8 pixels
-$global:winHeight = 320  # aproximadamente 20 linhas * 16 pixels
+$global:winWidth  = 464
+$global:winHeight = 320
 
-# Importa as funções da API do Windows para manipulação dos estilos da janela
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
@@ -98,25 +85,22 @@ public class Win32 {
     public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
     
     [DllImport("user32.dll")]
-    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
+        int X, int Y, int cx, int cy, uint uFlags);
 }
 "@
 #endregion
 
 #region Fixar tamanho e remover redimensionamento
-# Obtém o handle da janela do console atual
 $global:hwnd = (Get-Process -Id $PID).MainWindowHandle
-
 if ($global:hwnd -ne [IntPtr]::Zero) {
     $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
-    # Remove os estilos que permitem redimensionamento via mouse: WS_SIZEBOX e WS_MAXIMIZEBOX
     $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
     [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
     
-    # Atualiza a janela para aplicar os novos estilos
-    $SWP_NOMOVE     = 0x0002
-    $SWP_NOSIZE     = 0x0001
-    $SWP_NOZORDER   = 0x0004
+    $SWP_NOMOVE       = 0x0002
+    $SWP_NOSIZE       = 0x0001
+    $SWP_NOZORDER     = 0x0004
     $SWP_FRAMECHANGED = 0x0020
     $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
     [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
@@ -125,68 +109,46 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 
 #region Layout de Janela - Contador e Posicionamento
 
-# Caminho para o arquivo que armazena o contador
 $global:counterFile = Join-Path $env:TEMP "MZTOOL_Index.txt"
 
 function Get-MZTOOLIndex {
     if (-Not (Test-Path $global:counterFile)) {
          1 | Out-File -FilePath $global:counterFile -Encoding ASCII
          return 1
-    } else {
+    }
+    else {
          try {
              $index = [int](Get-Content $global:counterFile -Raw)
-         } catch {
-             $index = 1
          }
+         catch { $index = 1 }
          $newIndex = $index + 1
          $newIndex | Out-File -FilePath $global:counterFile -Encoding ASCII
          return $index
     }
 }
 
-# Função para resetar o layout (opcional) – ao fechar todas as janelas, chame esse comando para
-# reiniciar o contador e permitir que a janela principal seja centralizada na próxima importação.
 function Reset-MZTOOLLayout {
     1 | Out-File -FilePath $global:counterFile -Encoding ASCII
-    # Reposiciona a janela atual para o centro
     $centerX = [Math]::Floor(($screenWidth - $global:winWidth) / 2)
     $centerY = [Math]::Floor(($screenHeight - $global:winHeight) / 2)
-    $SWP_NOSIZE   = 0x0001
-    $SWP_NOZORDER = 0x0004
-    $SWP_SHOWWINDOW = 0x0040
+    $SWP_NOSIZE       = 0x0001
+    $SWP_NOZORDER     = 0x0004
+    $SWP_SHOWWINDOW   = 0x0040
     $flags = $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_SHOWWINDOW
     [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, $centerX, $centerY, 0, 0, $flags)
 }
 Export-ModuleMember -Function Reset-MZTOOLLayout
 
-# Obtém o índice da instância atual
 $global:currentIndex = Get-MZTOOLIndex
 
-# Agora, define o posicionamento com base no índice:
-# Se for a janela principal (índice igual a 1):
-#   - Se nenhuma outra janela tiver sido aberta (o valor lido do arquivo for 1), centraliza-a.
-#   - Se houver outras janelas (o arquivo indica valor maior que 1), posiciona no canto inferior direito.
-# Se for uma janela adicional (índice maior que 1):
-#   - Posiciona-a em um layout em grade, a partir do canto superior esquerdo, lado a lado.
-
 if ($global:currentIndex -eq 1) {
-    # Lê o total de janelas abertas (pelo contador atual)
-    $total = [int](Get-Content $global:counterFile -Raw)
-    if ($total -eq 1) {
-        # Centraliza a janela
-        $posX = [Math]::Floor(($screenWidth - $global:winWidth) / 2)
-        $posY = [Math]::Floor(($screenHeight - $global:winHeight) / 2)
-    } else {
-        # Reposiciona a janela principal para o canto inferior direito
-        $posX = $screenWidth - $global:winWidth
-        $posY = $screenHeight - $global:winHeight
-    }
-} else {
-    # Para janelas adicionais: utiliza o índice para dispor em grade
-    
-    # Calcula quantas janelas cabem lado a lado (na área de trabalho)
+    # Mantenha a janela principal sempre centralizada
+    $posX = [Math]::Floor(($screenWidth - $global:winWidth) / 2)
+    $posY = [Math]::Floor(($screenHeight - $global:winHeight) / 2)
+}
+else {
+    # Para janelas adicionais: posiciona em layout em grade, sem reajustar as já abertas.
     $maxCols = [Math]::Floor($screenWidth / $global:winWidth)
-    # O índice para posicionamento em grade é (currentIndex - 1), pois a principal está fora da grade
     $gridIndex = $global:currentIndex - 1
     $col = ($gridIndex - 1) % $maxCols
     $row = [Math]::Floor(($gridIndex - 1) / $maxCols)
@@ -194,7 +156,6 @@ if ($global:currentIndex -eq 1) {
     $posY = $row * $global:winHeight
 }
 
-# Aplica o posicionamento calculado
 $SWP_NOSIZE     = 0x0001
 $SWP_NOZORDER   = 0x0004
 $SWP_SHOWWINDOW = 0x0040
@@ -203,7 +164,6 @@ $flags = $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_SHOWWINDOW
 #endregion
 
 #region Customização do Console
-# Define a cor de fundo e fixa o tamanho do console
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 $H = Get-Host
 $Win = $H.UI.RawUI.WindowSize
@@ -215,6 +175,7 @@ $H.UI.RawUI.Set_BufferSize($Win)
 
 Write-Output "Módulo MZTOOL carregado com sucesso!"
 '@
+
 
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $modulePath -Value $moduleContent -Force
