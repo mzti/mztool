@@ -1535,6 +1535,7 @@ function WingetInstall {
         switch ($id) {
             "Google.Chrome" {
                 Write-Output "Instalando Google Chrome via alternativa..."
+                pause
                 $downloadUrl = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"
                 $tempFile = Join-Path $env:TEMP "GoogleChrome.msi"
                 try {
@@ -1578,6 +1579,7 @@ function WingetInstall {
             if ($result -match "O hash do instalador não corresponde") {
                 Write-Output "Erro de hash detectado para $id. Iniciando método alternativo..."
                 InstallFallback $id
+                pause
             }
             else {
                 Write-Output "$id instalado com sucesso via winget."
@@ -1586,6 +1588,7 @@ function WingetInstall {
         catch {
             Write-Output "Erro ao instalar $id via winget: $_. Iniciando método alternativo..."
             InstallFallback $id
+            pause
         }
         Clear-Host
     }
