@@ -642,10 +642,11 @@ ______________________________________________________
 ' 
 
                    
-                        $proc1 = NEWPWSH -FunctionNames 'WingetUpdate'
-                        $proc2 = NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+                        $proc1 = NEWPWSH -FunctionNames 'WingetUpdate' -ReturnProcess
+                        $proc2 = NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate' -ReturnProcess
 
-                        Wait-Process -Id @($proc1.Id, $proc2.Id)
+                        $validProcesses = @($proc1, $proc2) | Where-Object { $_.Id -gt 0 }
+                        Wait-Process -Id $validProcesses.Id
               
 
                         PAUSE
