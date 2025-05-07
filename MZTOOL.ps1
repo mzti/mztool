@@ -640,8 +640,41 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 ' 
-                        NEWPWSH -FunctionNames 'WingetUpdate'
-                        NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+
+                        function NEWPWSHPROC {
+                            [CmdletBinding()]
+                            param(
+                                [Parameter(Mandatory = $true)]
+                                [string[]]$FunctionNames,
+                                [switch]$Wait
+                            )
+    
+                            # Combina as definições das funções (preservando a ordem)
+                            $combinedDefinitions = foreach ($fn in $FunctionNames) {
+        (Get-Command -Type Function $fn).Definition
+                            } -join "`n"
+    
+                            # Converte o conteúdo para Base64 para uso com -EncodedCommand
+                            $encodedCommand = [Convert]::ToBase64String(
+                                [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
+                            )
+                            $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+                            if ($Wait) {
+                                # Se o parâmetro Wait for fornecido, espera o término do processo
+                                [void](Start-Process powershell -ArgumentList $arguments -Wait)
+                            }
+                            else {
+                                # Caso contrário, capturo e retorno o objeto do processo para uso externo
+                                $proc = Start-Process powershell -ArgumentList $arguments -PassThru
+                                return $proc
+                            }
+                        }
+
+                        $proc1 = NEWPWSHPROC -FunctionNames 'WingetUpdate'
+                        $proc2 = NEWPWSHPROC -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+
+                        Wait-Process -Id @($proc1.Id, $proc2.Id)
               
 
                         PAUSE
@@ -2194,13 +2227,6 @@ function DelTemp {
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
-    # Função para definir o cursor na posição inicial.
-    function Set-CursorToStart {
-        $cursor = $host.UI.RawUI.CursorPosition
-        $cursor.X = 0
-        $host.UI.RawUI.CursorPosition = $cursor
-    }
-
     # Função para remoção de arquivos temporários.
     function Remove-Files {
         param (
@@ -2208,7 +2234,7 @@ function DelTemp {
             [string]$Description
         )
       
-        Set-CursorToStart
+        
         Write-Host "`rLimpando $Description" -NoNewline   
         Write-Host "`r                                                              " -NoNewline      
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
