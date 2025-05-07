@@ -406,7 +406,7 @@ ______________________________________________________
                     @{ Functions = 'PerfilTheme' },
                     @{ Functions = 'AnyDesk' },
                     @{ Functions = 'WingetModule'; Wait = $true },
-                    @{ Functions = 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate', 'ImgHealth', 'DelTemp' },
+                    @{ Functions = 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate' },
                     @{ Functions = 'WingetInstall', 'WingetUpdate' },
                     @{ Functions = 'Microsoft365'; Wait = $true },
                     @{ Functions = 'PinIcons', 'StartSoftwares' }
