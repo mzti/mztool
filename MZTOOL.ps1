@@ -56,6 +56,13 @@ function MZTOOLMODULE {
 
     # Define o caminho completo para o arquivo .psm1 do módulo
     $modulePath = Join-Path -Path $moduleDir -ChildPath "$moduleName.psm1"
+    
+    # Verifica se o arquivo .psm1 já existe e o deleta, se necessário
+    if (Test-Path -Path $modulePath) {
+       
+        Remove-Item -Path $modulePath -Force -ErrorAction Stop
+        
+    }
 
     # Conteúdo do módulo MZTOOL.psm1
     $moduleContent = @'
@@ -173,11 +180,6 @@ $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
 #endregion
 '@
-
-    # Verifica se o arquivo .psm1 já existe e o deleta, se necessário
-    if (Test-Path -Path $modulePath) {
-        Remove-Item -Path $modulePath -Force
-    }
 
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $modulePath -Value $moduleContent -Force
