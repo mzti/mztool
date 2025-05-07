@@ -177,6 +177,11 @@ Write-Output "Módulo MZTOOL carregado com sucesso!"
 '@
 
 
+    # Verifica se o arquivo .psm1 já existe e o deleta, se necessário
+    if (Test-Path -Path $modulePath) {
+        Remove-Item -Path $modulePath -Force
+    }
+
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $modulePath -Value $moduleContent -Force
 }
