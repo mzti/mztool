@@ -1514,40 +1514,83 @@ function WingetModule {
 }
 
 function WingetInstall {
-    
-    #WINGET - Instalação dos softwares Acrobat Reader, Google Chrome, Microsoft Powershell 7+.
-
+    # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
-    Import-Module MZTOOL -Force 
+    Import-Module MZTOOL -Force
 
-    #Verifica se o módulo Winget está instalado e atualizado.
-    if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
-        #Script Continua.
-    }
-         
-    else {
-        WingetModule               
+    # Se o comando winget não estiver disponível, invoca outra rotina (WingetModule) para disponibilizá-lo.
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+        WingetModule
     }
 
-    #Instala os softwares Google Chrome, Microsoft Powershell e Acrobat Reader 64Bit através do Winget.
+    # Lista dos IDs dos softwares a serem instalados.
     $softwareIds = @(
         "Google.Chrome",
         "Microsoft.Powershell",
         "Adobe.Acrobat.Reader.64-bit"
     )
-    
-    1..3 | ForEach-Object {
-        foreach ($id in $softwareIds) {
-            Winget Install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-            Clear-Host
+
+    # Função local para instalar via método alternativo de acordo com o software.
+    function InstallFallback ($id) {
+        switch ($id) {
+            "Google.Chrome" {
+                Write-Output "Instalando Google Chrome via alternativa..."
+                $downloadUrl = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"
+                $tempFile = Join-Path $env:TEMP "GoogleChrome.msi"
+                try {
+                    Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
+                    Start-Process "msiexec.exe" -ArgumentList "/i `"$tempFile`" /qn" -Wait
+                    Write-Output "Google Chrome instalado via alternativa."
+                }
+                catch { Write-Output "Falha na instalação alternativa do Google Chrome: $_" }
+            }
+            "Microsoft.Powershell" {
+                Write-Output "Instalando Microsoft PowerShell via alternativa..."
+                $downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.3.7/PowerShell-7.3.7-win-x64.msi"
+                $tempFile = Join-Path $env:TEMP "PowerShell.msi"
+                try {
+                    Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
+                    Start-Process "msiexec.exe" -ArgumentList "/i `"$tempFile`" /qn" -Wait
+                    Write-Output "Microsoft PowerShell instalado via alternativa."
+                }
+                catch { Write-Output "Falha na instalação alternativa do MS PowerShell: $_" }
+            }
+            "Adobe.Acrobat.Reader.64-bit" {
+                Write-Output "Instalando Adobe Acrobat Reader via alternativa..."
+                $downloadUrl = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"
+                $tempFile = Join-Path $env:TEMP "AcrobatReader.exe"
+                try {
+                    Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
+                    Start-Process -FilePath $tempFile -ArgumentList "/sAll", "/rs", "/rps", "/msi", "/norestart" -Wait
+                    Write-Output "Adobe Acrobat Reader instalado via alternativa."
+                }
+                catch { Write-Output "Falha na instalação alternativa do Acrobat Reader: $_" }
+            }
+            default { Write-Output "Nenhuma alternativa definida para $id" }
         }
-    
+    }
+
+    # Loop para instalar cada software.
+    foreach ($id in $softwareIds) {
+        Write-Output "Tentando instalar $id via winget..."
+        try {
+            $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent 2>&1
+            if ($result -match "O hash do instalador não corresponde") {
+                Write-Output "Erro de hash detectado para $id. Iniciando método alternativo..."
+                InstallFallback $id
+            }
+            else {
+                Write-Output "$id instalado com sucesso via winget."
+            }
+        }
+        catch {
+            Write-Output "Erro ao instalar $id via winget: $_. Iniciando método alternativo..."
+            InstallFallback $id
+        }
         Clear-Host
-            
-    }            
-        
-          
+    }
 }
+
 
 function WingetUpdate { 
 
