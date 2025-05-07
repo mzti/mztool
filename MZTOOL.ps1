@@ -2201,9 +2201,19 @@ function DelTemp {
             [string]$Path,
             [string]$Description
         )
-      
-        Write-Host "`r                                                              " -NoNewline 
-        
+        $rawUI = $Host.UI.RawUI
+        $windowSize = $rawUI.WindowSize
+
+        # Posiciona o cursor na última linha da janela
+        $cursorPos = $rawUI.CursorPosition
+        $cursorPos.X = 0
+        $cursorPos.Y = $windowSize.Height - 1
+        $rawUI.CursorPosition = $cursorPos
+        # Limpa a última linha e escreve a barra de progresso
+        $clearLine = " " * $windowSize.Width
+        Write-Host $clearLine -NoNewline
+          
+        $rawUI.CursorPosition = $cursorPos
         Write-Host "`rLimpando $Description" -NoNewline   
         
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
@@ -2245,8 +2255,10 @@ function DelTemp {
 
     # Remove miniaturas.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
-    
-    Start-Sleep 1
+   
+    Write-Host "`n`nFINALIZANDO"
+
+    Start-Sleep -Seconds 2
 }
 
 function ImgHealth {
@@ -2326,34 +2338,6 @@ function Install-DeviceDrivers {
     }
 }
 
-function NEWPWSHold {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$FunctionNames,
-        [switch]$Wait
-    )
-    
-    # Combina as definições das funções (preservando a ordem)
-    $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
-    } -join "`n"
-    
-    # Converte o conteúdo para Base64 para uso com -EncodedCommand
-    $encodedCommand = [Convert]::ToBase64String(
-        [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
-    )
-    $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
-    
-    if ($Wait) {
-        [void](Start-Process powershell -ArgumentList $arguments -Wait)
-    }
-    else {
-        [void](Start-Process powershell -ArgumentList $arguments)
-    }
-    
-   
-}
 function NEWPWSH {
     [CmdletBinding()]
     param(
