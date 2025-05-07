@@ -647,9 +647,6 @@ ______________________________________________________
 
                         $validProcesses = @($proc1, $proc2) | Where-Object { $_.Id -gt 0 }
                         Wait-Process -Id $validProcesses.Id
-              
-
-                        PAUSE
 
                         DelTemp
 
