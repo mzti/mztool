@@ -189,7 +189,7 @@ $H.UI.RawUI.Set_BufferSize($Win)
 MZTOOLMODULE
    
 #Importa o módulo MZTOOL para a sessão atual.
-Import-Module MZTOOL -Force
+Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -207,7 +207,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
     
     #Importa o módulo MZTOOL para a sessão atual.
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
 } 
     
@@ -278,8 +278,8 @@ OpSys
 function DisplayMenu {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL BETA'
-    Import-Module MZTOOL -Force 
-    Reset-MZTOOLLayout 
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
+    Reset-MZTOOLLayout  
     
     
     Clear-Host
@@ -306,7 +306,7 @@ ______________________________________________________
         1 {
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
             $Host.UI.RawUI.WindowTitle = 'MZTOOL> INSTALL'
-            Import-Module MZTOOL -Force
+            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
             
             Clear-Host
             Write-Host '
@@ -436,7 +436,7 @@ ______________________________________________________
             #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
  
             $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
-            Import-Module MZTOOL -Force
+            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
             Reset-MZTOOLLayout
             
                
@@ -480,7 +480,7 @@ ______________________________________________________
             function MENUFERRAMENTAS {
                 
                 $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
-                Import-Module MZTOOL -Force
+                Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
                  
 
                 Clear-Host
@@ -776,7 +776,7 @@ ______________________________________________________
             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
             $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
-            Import-Module MZTOOL -Force
+            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
             Clear-Host
             Write-Host '
@@ -906,7 +906,7 @@ ______________________________________________________
 function ClockDate {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLOCK|DATE'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Define um novo servidor e sincroniza o relógio e a data do sistema.    
     Start-Process PowerShell -WindowStyle Hidden {
@@ -921,7 +921,7 @@ function ClockDate {
 function MachineEnvTool {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> MACHINE ENVTOOL'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     #Adiciona variáveis de ambiente.
     Start-Process PowerShell -WindowStyle Hidden {        
@@ -939,7 +939,7 @@ function MachineEnvTool {
 function ToolDir {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Criação do diretório C:\TOOL.
 
@@ -962,7 +962,7 @@ function DownloadMztool {
     #Download do arquivo MZTOOL.zip
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADMZTOOL'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Add-Type -AssemblyName "System.Net.Http"
      
@@ -1152,7 +1152,7 @@ ______________________________________________________
                                 #OPÇÃO 0 - ENCERRAR MZTOOL.
 
                                 $Host.UI.RawUI.WindowTitle = 'MZTOOL> EXIT'
-                                Import-Module MZTOOL -Force
+                                Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
                                 Clear-Host
                                 Write-Host '
@@ -1441,7 +1441,7 @@ function WinUpdateModule {
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATEMODULE'
-    Import-Module MZTOOL -Force  
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
@@ -1458,7 +1458,7 @@ function WinUpdateModule {
 function WingetModule {
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETMODULE'
-    Import-Module MZTOOL -Force  
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue  
    
     #Módulo WINGET.
 
@@ -1518,7 +1518,6 @@ function WingetInstall {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGET'
     Import-Module MZTOOL -Force
 
-    # Se o comando winget não estiver disponível, invoca outra rotina (WingetModule) para disponibilizá-lo.
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         WingetModule
     }
@@ -1530,40 +1529,39 @@ function WingetInstall {
         "Adobe.Acrobat.Reader.64-bit"
     )
 
-    # Função local para instalar via método alternativo de acordo com o software.
+    # Função local para instalação alternativa dos softwares
     function InstallFallback ($id) {
         switch ($id) {
             "Google.Chrome" {
-                Write-Output "Instalando Google Chrome via alternativa..."
-                pause
+                Write-Output "Instalando Google Chrome via método alternativo..."
                 $downloadUrl = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"
                 $tempFile = Join-Path $env:TEMP "GoogleChrome.msi"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process "msiexec.exe" -ArgumentList "/i `"$tempFile`" /qn" -Wait
-                    Write-Output "Google Chrome instalado via alternativa."
+                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Wait -Verb RunAs
+                    Write-Output "Google Chrome instalado via método alternativo."
                 }
                 catch { Write-Output "Falha na instalação alternativa do Google Chrome: $_" }
             }
             "Microsoft.Powershell" {
-                Write-Output "Instalando Microsoft PowerShell via alternativa..."
+                Write-Output "Instalando Microsoft PowerShell via método alternativo..."
                 $downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.3.7/PowerShell-7.3.7-win-x64.msi"
                 $tempFile = Join-Path $env:TEMP "PowerShell.msi"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process "msiexec.exe" -ArgumentList "/i `"$tempFile`" /qn" -Wait
-                    Write-Output "Microsoft PowerShell instalado via alternativa."
+                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Wait -Verb RunAs
+                    Write-Output "Microsoft PowerShell instalado via método alternativo."
                 }
-                catch { Write-Output "Falha na instalação alternativa do MS PowerShell: $_" }
+                catch { Write-Output "Falha na instalação alternativa do Microsoft PowerShell: $_" }
             }
             "Adobe.Acrobat.Reader.64-bit" {
-                Write-Output "Instalando Adobe Acrobat Reader via alternativa..."
+                Write-Output "Instalando Adobe Acrobat Reader via método alternativo..."
                 $downloadUrl = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"
                 $tempFile = Join-Path $env:TEMP "AcrobatReader.exe"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process -FilePath $tempFile -ArgumentList "/sAll", "/rs", "/rps", "/msi", "/norestart" -Wait
-                    Write-Output "Adobe Acrobat Reader instalado via alternativa."
+                    Start-Process -FilePath $tempFile -ArgumentList "/sAll", "/rs", "/rps", "/msi", "/norestart" -Wait -Verb RunAs
+                    Write-Output "Adobe Acrobat Reader instalado via método alternativo."
                 }
                 catch { Write-Output "Falha na instalação alternativa do Acrobat Reader: $_" }
             }
@@ -1571,24 +1569,26 @@ function WingetInstall {
         }
     }
 
-    # Loop para instalar cada software.
     foreach ($id in $softwareIds) {
         Write-Output "Tentando instalar $id via winget..."
-        try {
-            $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent 2>&1
-            if ($result -match "O hash do instalador não corresponde") {
+        $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent 2>&1
+        # Se o winget retornar erro (código diferente de zero)...
+        if ($LASTEXITCODE -ne 0) {
+            # Se a mensagem indicar que o software já está instalado, não inicia o fallback.
+            if ($result -match "já instalado" -or $result -match "installed") {
+                Write-Output "$id já está instalado com a versão atual, pulando instalação alternativa."
+            }
+            elseif ($result -match "hash do instalador não corresponde") {
                 Write-Output "Erro de hash detectado para $id. Iniciando método alternativo..."
                 InstallFallback $id
-                pause
             }
             else {
-                Write-Output "$id instalado com sucesso via winget."
+                Write-Output "Erro durante a instalação de $id (ExitCode: $LASTEXITCODE). Iniciando método alternativo..."
+                InstallFallback $id
             }
         }
-        catch {
-            Write-Output "Erro ao instalar $id via winget: $_. Iniciando método alternativo..."
-            InstallFallback $id
-            pause
+        else {
+            Write-Output "$id instalado com sucesso via winget."
         }
         Clear-Host
     }
@@ -1601,7 +1601,7 @@ function WingetUpdate {
     #Start-Process PowerShell <#-WindowStyle Hidden#> {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINGETUPDATE'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     1..3 | ForEach-Object {
             
@@ -1617,7 +1617,7 @@ function WinUpdate {
     #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINUPDATE'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Import-Module PSWindowsUpdate -Force 
 
@@ -1630,7 +1630,7 @@ function WinUpdate {
 function RemoveGhostDrivers {
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> REMOVEGHOSTDEVICES'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
    
@@ -1649,7 +1649,7 @@ function RemoveGhostDrivers {
 function AnyDesk {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> ANYDESK'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Download do software Standalone AnyDesk-CM para a área de trabalho pública.           
 
@@ -1663,7 +1663,7 @@ function AnyDesk {
 function Microsoft365 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> MICROSOFT365'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
     [xml]$XML = @'
@@ -1726,7 +1726,7 @@ function DownloadOffice2007 {
     #Download do arquivo de instalação do Microsoft Office 2007.
         
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> DOWNLOADOFFICE2007'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     $wc = New-Object System.Net.WebClient
     $wc.DownloadFile('https://bit.ly/Office2007', "$env:TOOL\OFFICE\2007\Setup.exe")
@@ -1736,7 +1736,7 @@ function DownloadOffice2007 {
 function Office2007 {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> OFFICE2007'
-    Import-Module MZTOOL -Force 
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
     Start-Process "$env:TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
@@ -1752,7 +1752,7 @@ function NetFx3 {
     Start-Job -Name NetFx3 -ScriptBlock { 
 
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> .NETFRAMEWORK3.5'
-        Import-Module MZTOOL -Force
+        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
         Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum            
         
@@ -1767,7 +1767,7 @@ function DriverBooster {
     Start-Process PowerShell <#-WindowStyle Hidden#> {
     
         $Host.UI.RawUI.WindowTitle = 'MZTOOL> DRIVER_BOOSTER'
-        Import-Module MZTOOL -Force
+        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
         
         Expand-Archive -LiteralPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER"
 
@@ -1821,7 +1821,7 @@ function DriverBooster {
 function PerfilTheme {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
@@ -1929,7 +1929,7 @@ function PerfilTheme {
 function PinIcons {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > PINICONS'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
@@ -2101,14 +2101,14 @@ function PinIcons {
 function DefaultSoftwares {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> PERFILTHEME > DEFAULTSOFTWARES'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
 }
 
 function StartSoftwares {
 
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> STARTSOFTWARES'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Start-Process CHROME
     Start-Process ACROBAT
@@ -2202,7 +2202,7 @@ function StartSoftwares {
 
 function DelTemp {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> CLEANTEMP'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
@@ -2272,7 +2272,7 @@ function DelTemp {
 
 function ImgHealth {
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> IMGHEALTH'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     # Verifica a integridade da imagem do sistema.
     DISM /Online /Cleanup-Image /CheckHealth
@@ -2294,7 +2294,7 @@ function Pro {
 
     
     $Host.UI.RawUI.WindowTitle = 'MZTOOL> WINDOWSPRO'
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Converte a versão do Windows para PRO. (Não ativa o sistema, para a ativação é necessário haver uma Licença Digital HWID).
 
