@@ -641,38 +641,9 @@ ______________________________________________________
 |____________________________________________________|
 ' 
 
-                        function NEWPWSHPROC {
-                            [CmdletBinding()]
-                            param(
-                                [Parameter(Mandatory = $true)]
-                                [string[]]$FunctionNames,
-                                [switch]$Wait
-                            )
-    
-                            # Combina as definições das funções (preservando a ordem)
-                            $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
-                            } -join "`n"
-    
-                            # Converte o conteúdo para Base64 para uso com -EncodedCommand
-                            $encodedCommand = [Convert]::ToBase64String(
-                                [Text.Encoding]::Unicode.GetBytes($combinedDefinitions)
-                            )
-                            $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
-    
-                            if ($Wait) {
-                                # Se o parâmetro Wait for fornecido, espera o término do processo
-                                [void](Start-Process powershell -ArgumentList $arguments -Wait)
-                            }
-                            else {
-                                # Caso contrário, capturo e retorno o objeto do processo para uso externo
-                                $proc = Start-Process powershell -ArgumentList $arguments -PassThru
-                                return $proc
-                            }
-                        }
-
-                        $proc1 = NEWPWSHPROC -FunctionNames 'WingetUpdate'
-                        $proc2 = NEWPWSHPROC -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
+                   
+                        $proc1 = NEWPWSH -FunctionNames 'WingetUpdate'
+                        $proc2 = NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate'
 
                         Wait-Process -Id @($proc1.Id, $proc2.Id)
               
@@ -2353,7 +2324,7 @@ function Install-DeviceDrivers {
     }
 }
 
-function NEWPWSH {
+function NEWPWSHold {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -2380,6 +2351,39 @@ function NEWPWSH {
     }
     
     #Reset-MZTOOLLayout 
+}
+
+function NEWPWSH {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$FunctionNames,
+        [switch]$Wait,
+        [switch]$ReturnProcess
+    )
+    
+    # Combina as definições das funções (preservando a ordem)
+    $combinedDefinitions = foreach ($fn in $FunctionNames) {
+        (Get-Command -Type Function $fn).Definition
+    } -join "`n"
+    
+    # Converte o conteúdo para Base64 para uso com -EncodedCommand
+    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+    $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    
+    if ($Wait) {
+        # Caso Wait seja especificado, aguardamos o término do processo internamente.
+        [void](Start-Process powershell -ArgumentList $arguments -Wait)
+    }
+    elseif ($ReturnProcess) {
+        # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
+        $proc = Start-Process powershell -ArgumentList $arguments -PassThru
+        return $proc
+    }
+    else {
+        # Se nada for especificado, usamos a forma que não retorna nada – compatível com [void](...)
+        [void](Start-Process powershell -ArgumentList $arguments)
+    }
 }
 
 function awin {
