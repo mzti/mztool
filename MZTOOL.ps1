@@ -226,7 +226,6 @@ MZTOOLMODULE
 #Importa o módulo MZTOOL para a sessão atual.
 Import-Module MZTOOL -Force
 
-
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 $myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID)
@@ -517,7 +516,7 @@ ______________________________________________________
                 
                 $Host.UI.RawUI.WindowTitle = 'MZTOOL> TOOL'
                 Import-Module MZTOOL -Force
-                Reset-MZTOOLLayout 
+                 
 
                 Clear-Host
                 Write-Host '
@@ -2203,9 +2202,10 @@ function DelTemp {
             [string]$Description
         )
       
+        Write-Host "`r                                                              " -NoNewline 
         
         Write-Host "`rLimpando $Description" -NoNewline   
-        Write-Host "`r                                                              " -NoNewline      
+        
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
     }
 
@@ -2348,7 +2348,7 @@ function NEWPWSHold {
         [void](Start-Process powershell -ArgumentList $arguments)
     }
     
-    #Reset-MZTOOLLayout 
+   
 }
 function NEWPWSH {
     [CmdletBinding()]
