@@ -172,10 +172,7 @@ $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
 #endregion
-
-Write-Output "Módulo MZTOOL carregado com sucesso!"
 '@
-
 
     # Verifica se o arquivo .psm1 já existe e o deleta, se necessário
     if (Test-Path -Path $modulePath) {
