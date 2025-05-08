@@ -1520,7 +1520,7 @@ function WingetInstall {
 
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
     $Host.UI.RawUI.WindowTitle = "$TITLE> WINGET"
-    Import-Module MZTOOL -Force
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         WingetModule
@@ -1542,11 +1542,11 @@ function WingetInstall {
                 $tempFile = Join-Path $env:TEMP "GoogleChrome.msi"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Wait -Verb RunAs
-                    #Write-Output "Google Chrome instalado via método alternativo."
+                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Verb RunAs
+                    Write-Output "Google Chrome instalado via método alternativo."
                 }
                 catch {
-                    #Write-Output "Falha na instalação alternativa do Google Chrome: $_" 
+                    Write-Output "Falha na instalação alternativa do Google Chrome: $_" 
                 }
             }
             "Microsoft.Powershell" {
@@ -1555,11 +1555,11 @@ function WingetInstall {
                 $tempFile = Join-Path $env:TEMP "PowerShell.msi"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Wait -Verb RunAs
-                    #Write-Output "Microsoft PowerShell instalado via método alternativo."
+                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Verb RunAs
+                    Write-Output "Microsoft PowerShell instalado via método alternativo."
                 }
                 catch {
-                    #Write-Output "Falha na instalação alternativa do Microsoft PowerShell: $_" 
+                    Write-Output "Falha na instalação alternativa do Microsoft PowerShell: $_" 
                 }
             }
             "Adobe.Acrobat.Reader.64-bit" {
@@ -1568,44 +1568,43 @@ function WingetInstall {
                 $tempFile = Join-Path $env:TEMP "AcrobatReader.exe"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process -FilePath $tempFile -ArgumentList "/sAll", "/rs", "/rps", "/msi", "/norestart" -Wait -Verb RunAs
-                    #Write-Output "Adobe Acrobat Reader instalado via método alternativo."
+                    Start-Process -FilePath $tempFile -ArgumentList "/sAll", "/rs", "/rps", "/msi", "/norestart" -Verb RunAs
+                    Write-Output "Adobe Acrobat Reader instalado via método alternativo."
                 }
                 catch {
-                    #Write-Output "Falha na instalação alternativa do Acrobat Reader: $_" 
+                    Write-Output "Falha na instalação alternativa do Acrobat Reader: $_" 
                 }
             }
             default {
-                #Write-Output "Nenhuma alternativa definida para $id" 
+                Write-Output "Nenhuma alternativa definida para $id" 
             }
         }
     }
 
     foreach ($id in $softwareIds) {
-        #Write-Output "Tentando instalar $id via winget..."
+        Write-Output "Tentando instalar $id via winget..."
         $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent 2>&1
         # Se o winget retornar erro (código diferente de zero)...
         if ($LASTEXITCODE -ne 0) {
             # Se a mensagem indicar que o software já está instalado, não inicia o fallback.
             if ($result -match "já instalado" -or $result -match "installed") {
-                #Write-Output "$id já está instalado com a versão atual, pulando instalação alternativa."
+                Write-Output "$id já está instalado com a versão atual, pulando instalação alternativa."
             }
             elseif ($result -match "hash do instalador não corresponde") {
-                # Write-Output "Erro de hash detectado para $id. Iniciando método alternativo..."
+                Write-Output "Erro de hash detectado para $id. Iniciando método alternativo..."
                 InstallFallback $id
             }
             else {
-                #Write-Output "Erro durante a instalação de $id (ExitCode: $LASTEXITCODE). Iniciando método alternativo..."
+                Write-Output "Erro durante a instalação de $id (ExitCode: $LASTEXITCODE). Iniciando método alternativo..."
                 InstallFallback $id
             }
         }
         else {
-            #Write-Output "$id instalado com sucesso via winget."
+            Write-Output "$id instalado com sucesso via winget."
         }
         Clear-Host
     }
 }
-
 
 function WingetUpdate { 
 
@@ -1735,7 +1734,8 @@ function Microsoft365 {
     
     Clear-Host
 
-}    
+}   
+
 function DownloadOffice2007 {
     
     #Download do arquivo de instalação do Microsoft Office 2007.
