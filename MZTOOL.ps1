@@ -1551,7 +1551,7 @@ function WingetInstall {
             }
             "Microsoft.Powershell" {
                 Write-Output "Instalando Microsoft PowerShell via método alternativo..."
-                $downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.3.7/PowerShell-7.3.7-win-x64.msi"
+                $downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"
                 $tempFile = Join-Path $env:TEMP "PowerShell.msi"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
@@ -1583,7 +1583,7 @@ function WingetInstall {
 
     foreach ($id in $softwareIds) {
         Write-Output "Tentando instalar $id via winget..."
-        $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements --Silent 2>&1
+        $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements 2>&1
         # Se o winget retornar erro (código diferente de zero)...
         if ($LASTEXITCODE -ne 0) {
             # Se a mensagem indicar que o software já está instalado, não inicia o fallback.
@@ -1604,6 +1604,8 @@ function WingetInstall {
         }
         Clear-Host
     }
+
+    Clear-Host
 }
 
 function WingetUpdate { 
