@@ -689,29 +689,6 @@ ______________________________________________________
 |____________________________________________________|
  '
                                
-                        function 2007Folder {
-
-                            $2007Folder = 'C:\TOOL\OFFICE\2007' 
-            
-                            if (Test-Path -Path $2007Folder -ErrorAction SilentlyContinue) {
-
-                                #Script continua.
-
-                            }
-
-                            else {
-                
-                                ToolDir
-                   
-                                DownloadOffice2007
-                            }
-    
-                        }
-                                         
-                        2007Folder
-
-                        NetFx3
-
                         Office2007
 
                         Start-Sleep 1
@@ -1738,13 +1715,15 @@ function Microsoft365 {
 
 }   
 
-function DownloadOffice2007 {
-    
-    #Download do arquivo de instalação do Microsoft Office 2007.
-        
-    $Host.UI.RawUI.WindowTitle = "$TITLE> DOWNLOADOFFICE2007"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
+function Office2007 {
+
+    #Implementação do Microsoft Office 2007.
+
+    $Host.UI.RawUI.WindowTitle = "$TITLE> OFFICE2007"
+    
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+    
     Add-Type -AssemblyName "System.Net.Http"
     # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
@@ -1756,66 +1735,78 @@ function DownloadOffice2007 {
     $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
 
     $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
-    
-    # Exibe o status dos links
-    if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
-    }
-    else {
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
-    }
 
-    if (Test-LinkOnline -Url $OFFICE2007GOOGLEDRIVE) {
-        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
-    }
-    else {
-        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
-    }
+    function DownloadOffice2007 {         
+          
+    
+        #Verifica se a pasta OFFICE2007 já existe. Caso não exista, cria a pasta e baixa o arquivo ZIP do Microsoft Office 2007.
+
+        if (!Test-Path -Path $OFFICE2007FOLDER -ErrorAction SilentlyContinue) {
+
+            ToolDir
+
+            New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
+
+        }
+    
+    
+        # Exibe o status dos links
+        if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
+        }
+        else {
+            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
+        }
+
+        if (Test-LinkOnline -Url $OFFICE2007GOOGLEDRIVE) {
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
+        }
+        else {
+            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
+        }
    
     
-    Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
+        Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
-    PAUSE
+        PAUSE
             
-    if (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue ) { 
+        if (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue ) { 
      
     
-        Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
+            Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
+        }
+
+        PAUSE
+
+        Clear-Host
     }
+    function NetFx3 {
 
-    PAUSE
+        #Implementa o recurso .NetFramework 3.5 no sistema.
+    
+        Start-Job -Name NetFx3 -ScriptBlock { 
+    
+            $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
+            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+    
+            Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum            
+            
+        }
+        
+    }
+   
+    DownloadOffice2007
 
-    Clear-Host
-}
-function Office2007 {
-
-    #Implementação do Microsoft Office 2007.
-
-    $Host.UI.RawUI.WindowTitle = "$TITLE> OFFICE2007"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+    NetFx3
     
     #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
-    Start-Process "$env:TOOL\OFFICE\2007\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
+    Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
     Wait-Job -Name NetFx3  
     Start-Process 'winword.exe'
    
 }
 
-function NetFx3 {
-
-    #Implementa o recurso .NetFramework 3.5 no sistema.
-
-    Start-Job -Name NetFx3 -ScriptBlock { 
-
-        $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
-        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-
-        Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum            
-        
-    }
-    
-}
 
 function DriverBooster {
     
