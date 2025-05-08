@@ -332,7 +332,7 @@ ______________________________________________________
             # ----------------------------------------------------------------------
             # Função para exibir a barra de progresso in-place em uma linha fixa.
             # ----------------------------------------------------------------------
-            function Show-CustomProgress {
+            function DEPLOY-CustomProgress {
                 param(
                     [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
@@ -383,7 +383,7 @@ ______________________________________________________
                 $completed = 0
 
                 # Exibe a barra inicial (0% concluído)
-                Show-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
+                DEPLOY-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
 
                 foreach ($group in $groups) {
                     if ($group.ContainsKey("Wait") -and $group.Wait) {
@@ -394,7 +394,7 @@ ______________________________________________________
                     }
                     $completed++
                     $percent = [math]::Round(($completed * 100) / $total)
-                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
+                    DEPLOY-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
                     
                     # Aguarda 3 segundos antes de iniciar o próximo grupo
                     Start-Sleep -Seconds 3
@@ -1014,7 +1014,7 @@ function DownloadMztool {
     }
 
     # Função para exibir uma barra de progresso customizada na última linha do console
-    function Show-CustomProgress {
+    function DOWNLOADCustomProgress {
         param(
             [Parameter(Mandatory = $true)]
             [int]$PercentComplete,
@@ -1085,7 +1085,7 @@ function DownloadMztool {
             if ($totalBytes -gt 0) {
                 $percent = [math]::Round(($totalRead / $totalBytes) * 100)
                 if ($percent -ne $lastPercent) {
-                    Show-CustomProgress -PercentComplete $percent -BarWidth $BarWidth
+                    DOWNLOADCustomProgress -PercentComplete $percent -BarWidth $BarWidth
                     $lastPercent = $percent
                 }
             }
@@ -1209,7 +1209,7 @@ ______________________________________________________
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
         # Função para exibir a barra de progresso customizada na última linha
-        function Show-CustomProgress {
+        function EXPANDCustomProgress {
             param(
                 [Parameter(Mandatory = $true)]
                 [int]$PercentComplete
@@ -1304,7 +1304,7 @@ ______________________________________________________
                 $currentEntry++
                 $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
                 # Atualiza a barra de progresso customizada na última linha
-                Show-CustomProgress -PercentComplete $percentComplete
+                EXPANDCustomProgress -PercentComplete $percentComplete
 
                 # Define o caminho completo de destino para a entrada
                 $destPath = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
@@ -2437,6 +2437,358 @@ function NEWPWSH {
         [void](Start-Process powershell -ArgumentList $arguments)
     }
 }
+
+function DOWNLOADCustomProgress {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$PercentComplete,
+        [int]$BarWidth = 30
+    )
+
+    $rawUI = $Host.UI.RawUI
+    $winSize = $rawUI.WindowSize
+
+    # Posiciona o cursor na última linha
+    $cursorPos = $rawUI.CursorPosition
+    $cursorPos.X = 0
+    $cursorPos.Y = $winSize.Height - 1
+    $rawUI.CursorPosition = $cursorPos
+
+    $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+    $empty = $BarWidth - $filled
+    $bar = ("#" * $filled) + ("-" * $empty)
+    $progress = "BAIXANDO: {0,3}% [{1}]" -f $PercentComplete, $bar
+
+    $clearLine = " " * $winSize.Width
+    Write-Host $clearLine -NoNewline
+    $rawUI.CursorPosition = $cursorPos
+    Write-Host $progress -NoNewline
+}
+
+# Função para efetuar o download via HttpWebRequest e atualizar a barra de progresso
+function Invoke-DownloadFileWithProgress {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Url,
+        [Parameter(Mandatory = $true)]
+        [string]$Destination,
+        [int]$BarWidth = 30
+    )
+
+    try {
+        $req = [System.Net.HttpWebRequest]::Create($Url)
+        $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        $req.AllowAutoRedirect = $true
+        $resp = $req.GetResponse()
+    }
+    catch {
+        return
+    }
+
+    $totalBytes = $resp.ContentLength
+    if ($totalBytes -eq -1) {
+        return
+    }
+
+    $inputStream = $resp.GetResponseStream()
+
+    try {
+        $fileStream = [System.IO.File]::Create($Destination)
+    }
+    catch {
+        return
+    }
+
+    $buffer = New-Object byte[] 8192
+    $totalRead = 0
+    $lastPercent = 0
+
+    while (($read = $inputStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+        $fileStream.Write($buffer, 0, $read)
+        $totalRead += $read
+        if ($totalBytes -gt 0) {
+            $percent = [math]::Round(($totalRead / $totalBytes) * 100)
+            if ($percent -ne $lastPercent) {
+                DOWNLOADCustomProgress -PercentComplete $percent -BarWidth $BarWidth
+                $lastPercent = $percent
+            }
+        }
+    }
+
+    $fileStream.Dispose()
+    $inputStream.Dispose()
+    $resp.Dispose()
+}
+
+# Função que tenta baixar de uma lista de URLs (ordem de prioridade)
+function Invoke-DownloadFileWithRedundancy {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Urls,
+        [Parameter(Mandatory = $true)]
+        [string]$Destination,
+        [int]$BarWidth = 30
+    )
+
+    foreach ($url in $Urls) {
+        if (Test-LinkOnline -Url $url) {
+            Invoke-DownloadFileWithProgress -Url $url -Destination $Destination -BarWidth $BarWidth
+            return
+        }
+
+        else {
+            do {
+            
+                #Caso as duas nuvens estejam fora do ar oferece um menu de opções.
+                                              
+                Start-Sleep -Seconds 1
+                function DisplayMenuDownloadError {           
+                    Clear-Host
+                    Write-Host '
+______________________________________________________
+|                                                    |
+|                       MZTOOL                       |
+| __________________________________________________ | 
+|            FERRAMENTAS DE DIAGNÓSTICOS             | 
+|                                                    |'
+                    Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
+                    Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
+                    Write-Host '|                                                    |
+|                                                    |
+| |1| TENTAR NOVAMENTE                               |
+| |2| VOLTAR AO MENU PRINCIPAL                       |
+| |0| ENCERRAR MZTOOL                                |
+|                                                    |
+|                 MOZART INFORMÁTICA | DANIEL MOZART |
+|____________________________________________________|'
+           
+                    $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+                    
+                    switch ($choice) {
+                        '1' {                        
+                            DownloadMztool
+                            break
+                        }
+                        '2' {
+                            DisplayMenu
+                            break
+                        }
+                        '0' {
+                    
+                            #OPÇÃO 0 - ENCERRAR MZTOOL.
+
+                            $Host.UI.RawUI.WindowTitle = "$TITLE> EXIT"
+                            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+
+                            Clear-Host
+                            Write-Host '
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| _________________________________________________  | 
+|                                                    |
+|                                                    |
+|                                                    |
+|                 ENCERRANDO MZTOOL                  |
+|                                                    |
+|                                                    |
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|
+'
+        
+                            DelTemp
+
+                            if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+
+                                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+                            }
+
+                            Start-Sleep -Seconds 2
+                            Exit
+                            Exit-PSHostProcess
+                            Exit-PSSession
+                        }
+                        default {
+                            Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
+                            Start-Sleep -Seconds 2
+                            DisplayMenuDownloadError
+                        }
+                    }
+                }
+        
+                DisplayMenuDownloadError
+    
+            } while ($true)<# Action when all if and elseif conditions are false #>
+        }
+    }
+}
+
+function EXPANDCustomProgress {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$PercentComplete
+    )
+
+    $rawUI = $Host.UI.RawUI
+    $windowSize = $rawUI.WindowSize
+
+    # Posiciona o cursor na última linha da janela
+    $cursorPos = $rawUI.CursorPosition
+    $cursorPos.X = 0
+    $cursorPos.Y = $windowSize.Height - 1
+    $rawUI.CursorPosition = $cursorPos
+
+    # Define o tamanho da barra (por exemplo, 50 caracteres)
+    $barWidth = 30
+    $filled = [math]::Round($PercentComplete * $barWidth / 100)
+    $empty = $barWidth - $filled
+
+    $bar = ("#" * $filled) + ("-" * $empty)
+    $progressText = "EXTRAINDO: {0,3}% [{1}]" -f $PercentComplete, $bar
+
+    # Limpa a última linha e escreve a barra de progresso
+    $clearLine = " " * $windowSize.Width
+    Write-Host $clearLine -NoNewline
+    $rawUI.CursorPosition = $cursorPos
+    Write-Host $progressText -NoNewline
+}
+
+# Função auxiliar para extrair uma entrada via streams (caso ExtractToFile não esteja disponível)
+function Expand-ArchiveEntryStream {
+    param (
+        [Parameter(Mandatory = $true)]
+        $Entry,
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationPath,
+        [switch]$Quiet
+    )
+
+    try {
+        $fileStream = [System.IO.File]::Create($DestinationPath)
+    }
+    catch {
+        if (-not $Quiet) {
+            Write-Host "Falha ao criar '$DestinationPath': $_" -ForegroundColor Red
+        }
+        return
+    }
+
+    if (-not $fileStream) {
+        if (-not $Quiet) {
+            Write-Host "fileStream nulo para '$DestinationPath'." -ForegroundColor Red
+        }
+        return
+    }
+
+    $stream = $Entry.Open()
+    $buffer = New-Object byte[] 8192
+    while (($bytesRead = $stream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+        $fileStream.Write($buffer, 0, $bytesRead)
+    }
+    $fileStream.Dispose()
+    $stream.Dispose()
+}
+
+# Função principal para extrair o ZIP com a barra de progresso customizada na parte inferior
+function Expand-Archive-WithCustomProgress {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationPath,
+        [switch]$Force,
+        [switch]$Quiet
+    )
+
+    # Cria o diretório de destino, se não existir
+    if (-not (Test-Path $DestinationPath)) {
+        New-Item -Path $DestinationPath -ItemType Directory | Out-Null
+    }
+
+    # Carrega a assembly para manipulação de arquivos ZIP
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+    # Abre o arquivo ZIP para leitura
+    $zipArchive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+    $totalEntries = $zipArchive.Entries.Count
+    $currentEntry = 0
+
+    foreach ($entry in $zipArchive.Entries) {
+        $currentEntry++
+        $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
+        # Atualiza a barra de progresso customizada na última linha
+        EXPANDCustomProgress -PercentComplete $percentComplete
+
+        # Define o caminho completo de destino para a entrada
+        $destPath = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
+
+        if ([string]::IsNullOrEmpty($entry.Name) -or $entry.FullName.EndsWith("/")) {
+            # Trata diretórios
+            if (-not (Test-Path $destPath)) {
+                New-Item -Path $destPath -ItemType Directory | Out-Null
+            }
+        }
+        else {
+            # Garante que o diretório pai exista
+            $directory = Split-Path -Path $destPath -Parent
+            if (-not (Test-Path $directory)) {
+                New-Item -ItemType Directory -Path $directory -Force | Out-Null
+            }
+        
+            # Se necessário, remove o arquivo existente (utilizando -Force)
+            if ((Test-Path $destPath) -and $Force.IsPresent) {
+                try {
+                    Remove-Item $destPath -Force -ErrorAction Stop
+                }
+                catch {
+                    if (-not $Quiet) {
+                        Write-Host "Não foi possível remover '$destPath'. Pulando essa entrada." -ForegroundColor Red
+                    }
+                    continue
+                }
+            }
+        
+            # Tenta usar o método ExtractToFile, se disponível
+            $methInfo = $entry.GetType().GetMethod("ExtractToFile")
+            if ($methInfo) {
+                try {
+                    $entry.ExtractToFile($destPath, $Force.IsPresent)
+                }
+                catch {
+                    if (-not $Quiet) {
+                        Write-Host "Erro em ExtractToFile para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
+                    }
+                    Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+                }
+            }
+            else {
+                if (-not $Quiet) {
+                    Write-Host "Método ExtractToFile indisponível para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
+                }
+                Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+            }
+        }
+    }
+
+    # Fecha o arquivo ZIP
+    $zipArchive.Dispose()
+
+    # Limpa a última linha da janela após a conclusão
+    $rawUI = $Host.UI.RawUI
+    $windowSize = $rawUI.WindowSize
+    $cursorPos = $rawUI.CursorPosition
+    $cursorPos.X = 0
+    $cursorPos.Y = $windowSize.Height - 1
+    $rawUI.CursorPosition = $cursorPos
+    Write-Host (" " * $windowSize.Width)
+
+    if (-not $Quiet) {
+        Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
+    }
+} 
+
 
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
