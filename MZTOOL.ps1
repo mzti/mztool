@@ -1716,7 +1716,8 @@ function Microsoft365 {
 
         #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
         
-        $365URL = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
+        #$365URL = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
+        $365URL = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
         $365EXE = "$env:TEMP\MICROSOFT365.exe"
 
         $wc = New-Object System.Net.WebClient
