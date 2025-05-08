@@ -1755,6 +1755,7 @@ function DownloadOffice2007 {
     $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
     $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
 
+    $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
     
     # Exibe o status dos links
     if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
@@ -1771,8 +1772,8 @@ function DownloadOffice2007 {
         Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
     }
    
-    $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
-    Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
+    
+    Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
     PAUSE
             
