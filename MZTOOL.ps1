@@ -2437,6 +2437,24 @@ function NEWPWSH {
         [void](Start-Process powershell -ArgumentList $arguments)
     }
 }
+function Test-LinkOnline {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Url
+    )
+    try {
+        $req = [System.Net.HttpWebRequest]::Create($Url)
+        $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"  # Simula um navegador
+        $req.AllowAutoRedirect = $true  # Permite seguir redirecionamentos automaticamente
+        $req.Method = "GET"  # Usa GET ao invés de HEAD para capturar corretamente a URI final
+        $resp = $req.GetResponse()
+        $resp.Close()
+        return $true
+    }
+    catch {
+        return $false
+    }
+}
 
 function DOWNLOADCustomProgress {
     param(
@@ -2566,7 +2584,7 @@ ______________________________________________________
                     
                     switch ($choice) {
                         '1' {                        
-                            DownloadMztool
+                            return
                             break
                         }
                         '2' {
