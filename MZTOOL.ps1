@@ -1916,6 +1916,7 @@ function PerfilTheme {
         }
     }
 
+    #Define o nível de efeitos visuais para "Ajustar para melhor desempenho".
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
         
     #Remove Widgets.    
