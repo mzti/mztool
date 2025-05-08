@@ -1744,10 +1744,47 @@ function DownloadOffice2007 {
         
     $Host.UI.RawUI.WindowTitle = "$TITLE> DOWNLOADOFFICE2007"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+
+    Add-Type -AssemblyName "System.Net.Http"
+    # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
     
-    $wc = New-Object System.Net.WebClient
-    $wc.DownloadFile('https://bit.ly/Office2007', "$env:TOOL\OFFICE\2007\Setup.exe")
+    $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21APNtATD%5F8SnPaKI'
+    $OFFICE2007GOOGLEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21APNtATD%5F8SnPaKI'
+
+    $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
+    $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
+
     
+    # Exibe o status dos links
+    if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
+    }
+    else {
+        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
+    }
+
+    if (Test-LinkOnline -Url $OFFICE2007GOOGLEDRIVE) {
+        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
+    }
+    else {
+        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
+    }
+   
+    $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
+    Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
+
+    PAUSE
+            
+    if (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue ) { 
+     
+    
+        Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
+
+    }
+
+    PAUSE
+
     Clear-Host
 }
 function Office2007 {
