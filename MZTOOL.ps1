@@ -832,7 +832,7 @@ ______________________________________________________
 
         w {
             
-            WingetInstall 
+            NEWPWSH -FunctionNames 'WingetInstall' -Wait
             DisplayMenu
 
         }
