@@ -1741,7 +1741,7 @@ function Office2007 {
     
         #Verifica se a pasta OFFICE2007 já existe. Caso não exista, cria a pasta e baixa o arquivo ZIP do Microsoft Office 2007.
 
-        if (!Test-Path -Path $OFFICE2007FOLDER -ErrorAction SilentlyContinue) {
+        if (-not (Test-Path -Path $OFFICE2007FOLDER -ErrorAction SilentlyContinue)) {
 
             ToolDir
 
