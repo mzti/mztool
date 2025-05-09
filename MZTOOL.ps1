@@ -515,9 +515,10 @@ ______________________________________________________
 '                                    
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 function CLOSEAPPS { 
-                    $APPS = DIAGNOSTICS | ForEach-Object {
-                        if (Get-Process $APPS.Name -ErrorAction SilentlyContinue) {                 
-                            Stop-Process -Name $APPS.Name -Force -ErrorAction SilentlyContinue
+                    $APPS = DIAGNOSTICS
+                    foreach ($APP in $APPS) {
+                        if (Get-Process -Name $APP.Name -ErrorAction SilentlyContinue) {                 
+                            Stop-Process -Name $APP.Name -Force -ErrorAction SilentlyContinue
                         }
                     }        
                 }
