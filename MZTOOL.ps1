@@ -253,35 +253,30 @@ else {
         }
           
         # Adiciona ou atualiza as variáveis de ambiente no perfil do PowerShell.
-        function vari {
+        $variaveis = @{
+            '$TOOL'    = "C:\TOOL"
+            '$DESKTOP' = "C:\Users\Public\DESKTOP"
+            '$WINVER'  = "$WINVER"
+        }      
 
-            $variaveis = @{
-                '$TOOL'    = "C:\TOOL"
-                '$DESKTOP' = "C:\Users\Public\DESKTOP"
-                '$WINVER'  = "$WINVER"
-            }
-            # Se o arquivo de perfil não existir, cria-o.
-            if (-not (Test-Path $PROFILE)) {
-                New-Item -Path $PROFILE -ItemType File -Force | Out-Null
-            }
-
-            foreach ($nome in $variaveis.Keys) {
-                # Cria um padrão de busca para encontrar linhas que definam a variável.
-                # A expressão procura linhas que, no início (ignora espaços opcionais) contenham "$nome ="  
+        foreach ($nome in $variaveis.Keys) {
+            # Cria um padrão de busca para encontrar linhas que definam a variável.
+            # A expressão procura linhas que, no início (ignora espaços opcionais) contenham "$nome ="  
               
             
-                # Usa Select-String para procurar o padrão no arquivo de perfil.
-                if (Select-String -Path $PROFILE -Pattern $nome -Quiet) {
-                    Write-Host "A variável '$nome' já está presente no arquivo de perfil."
-                }
-                else {
-                    # Cria a linha de definição da variável (com o símbolo $ escapado).
-                    $linhaParaAdicionar = "$($nome) = '$($variaveis[$nome])'"
-                    Add-Content -Path $PROFILE -Value $linhaParaAdicionar
-                    Write-Host "A variável '$nome' foi adicionada ao arquivo de perfil permanentemente."
-                }
+            # Usa Select-String para procurar o padrão no arquivo de perfil.
+            if (Select-String -Path $PROFILE -Pattern $nome -Quiet) {
+                Write-Host "A variável '$nome' já está presente no arquivo de perfil."
+            }
+            else {
+                # Cria a linha de definição da variável (com o símbolo $ escapado).
+                $linhaParaAdicionar = "$($nome) = '$($variaveis[$nome])'"
+                Add-Content -Path $PROFILE -Value $linhaParaAdicionar
+                Write-Host "A variável '$nome' foi adicionada ao arquivo de perfil permanentemente."
             }
         }
+
+
         # Atualiza o perfil do PowerShell com as variáveis de ambiente.
         <#Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
