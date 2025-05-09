@@ -249,7 +249,7 @@ else {
            
         }
           
-        <# # Adiciona ou atualiza as variáveis de ambiente no perfil do PowerShell.
+        # Adiciona ou atualiza as variáveis de ambiente no perfil do PowerShell.
         $variaveis = @{
             '$TOOL'    = "C:\TOOL"
             '$DESKTOP' = "C:\Users\Public\DESKTOP"
@@ -270,7 +270,7 @@ else {
 
             }
         }
-#>
+
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
