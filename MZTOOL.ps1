@@ -264,7 +264,7 @@ else {
             }
             else {
                 # Cria a linha de definição da variável (com o símbolo $ escapado).
-                $linhaParaAdicionar = "$($nome) = '$($variaveis[$nome])´n"
+                $linhaParaAdicionar = "`n$($nome) = '$($variaveis[$nome])"
                 Add-Content -Path $PROFILE -Value $linhaParaAdicionar
                 Write-Host "A variável '$nome' foi adicionada ao arquivo de perfil permanentemente."
 
