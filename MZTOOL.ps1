@@ -257,7 +257,7 @@ else {
         # Adiciona as variáveis de ambiente ao perfil do PowerShell.
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WinVer', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         # Define as variáveis de ambiente para o ambiente de usuário.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')
         [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')
@@ -1037,14 +1037,12 @@ function WingetModule {
    
     #Módulo WINGET.
 
-    #Obtém a versão do Windows.
-    $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
+    #Obtém a versão do Windows.   
     $ErrorActionPreference = 'SilentlyContinue'
      
     #Verifica se a versão do Windows é a 11.
-    if ( $WinVer -Match 'Windows 11') {
-        Write-Host "$WinVer" |  Clear-Host
-                
+    if ($Env:WINVER -Match 'Windows 11') {
+                     
         #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
         Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
         Add-AppPackage -Path "$env:TEMP\source.msix" |  Clear-Host
@@ -1057,9 +1055,8 @@ function WingetModule {
     }
 
     #Verifica se a versão do Windows é a 10.
-    elseif ($WinVer -Match 'Windows 10') {
-        Write-Host "$WinVer"
-                
+    elseif ($Env:WINVER -Match 'Windows 10') {
+                     
         #Instala o pacote NuGet.
         Install-PackageProvider -Name NuGet -Force |  Clear-Host
         
@@ -1463,16 +1460,14 @@ function PerfilTheme {
         Stop-Process -Name explorer        
     }
 
-    $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
-
     #Adiciona o Tema Escuro ao Windows.
-    if ( $WinVer -Match 'Windows 11') {
-        Write-Host "$WinVer"
+    if ($Env:WINVER -Match 'Windows 11') {
+        
         Start-Process -FilePath 'C:\Windows\Resources\Themes\dark.theme'
     }
 
-    elseif ($WinVer -Match 'Windows 10') {
-        Write-Host "$WinVer"
+    elseif ($Env:WINVER -Match 'Windows 10') {
+        
         Start-Process -FilePath 'C:\Windows\Resources\Themes\aero.theme'
     }
 
