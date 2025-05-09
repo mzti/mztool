@@ -46,29 +46,22 @@ $Host.UI.RawUI.WindowTitle = "$TITLE"
 
 $WINVER = (Get-WmiObject Win32_OperatingSystem).Caption
 
-function OpSys {
+function OPSYS {
 
     #Verifica se o sistema operacional é suportado.
 
-    if ($WINVER -match 'Windows 10|Windows 11') {
+    if (-not ($WINVER -match 'Windows 10|Windows 11')) {
       
-        #Script continua.
-
-    }
-
-    else {
-
         Write-Host 'SISTEMA OPERACIONAL NÃO SUPORTADO.'
 
         Start-Sleep 5
 
         EXIT
-                
+
     }
 }
 
-OpSys
-    
+OPSYS 
 
 function MZTOOLMODULE {
     # Define o nome do módulo
