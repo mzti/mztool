@@ -458,27 +458,10 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '                               
-            ToolDir 
-
-            Start-Sleep -Seconds 1
-
             DownloadMztool            
           
             Start-Sleep -Seconds 1
-
-            function StartFerramentas {
-                $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
-                                                
-                if ($OSARCHITECTURE -eq '64 bits') {
-                    Diagnostics64
-                }
-
-                elseif ($OSARCHITECTURE -eq '32 bits') {
-                    Diagnostics32
-                }
-            }
-            
-            StartFerramentas
+            Diagnostics
             function MENUFERRAMENTAS {
                 
                 $Host.UI.RawUI.WindowTitle = "$TITLE> TOOL"
@@ -505,7 +488,7 @@ ______________________________________________________
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 Switch ($CHOICE) {
                     1 {
-                        StartFerramentas
+                        Diagnostics
 
                         Start-Sleep -Seconds 1
                             
@@ -517,7 +500,7 @@ ______________________________________________________
                         foreach ($tool in $tools) {
                             Stop-Process -Name $tool -Force -ErrorAction SilentlyContinue
                         }
-                        Write-Host "Todas as ferramentas foram fechadas." -ForegroundColor Green
+                       
                         Start-Sleep -Seconds 2
 
                         MENUFERRAMENTAS
@@ -526,7 +509,7 @@ ______________________________________________________
                         DisplayMenu
                     }
                     Default {
-                        Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA." -ForegroundColor Red
+                        Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
                         Start-Sleep -Seconds 2
                         MENUFERRAMENTAS
                     }
@@ -775,12 +758,7 @@ ______________________________________________________
 '
             
             DelTemp
-
-            if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
-
-                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
-            }
-
+         
             Start-Sleep -Seconds 2
             Exit
             Exit-PSHostProcess
@@ -792,7 +770,7 @@ ______________________________________________________
         #Testa a função AnyDesk.
         any {
 
-            AnyDesk 
+            NEWPWSH -FunctionNames 'AnyDesk' 
             DisplayMenu
 
         }
@@ -817,8 +795,7 @@ ______________________________________________________
         #Testa a função WinUpdate.
         u {
 
-            WinUpdateModule
-            WinUpdate 
+            NEWPWSH -FunctionNames 'WinUpdateModule', 'WinUpdate' -Wait
             DisplayMenu
 
         }
@@ -826,7 +803,7 @@ ______________________________________________________
         #Testa a função ClockDate.
         h {
 
-            ClockDate 
+            NEWPWSH -FunctionNames 'ClockDate'
             DisplayMenu
 
         }
@@ -834,7 +811,7 @@ ______________________________________________________
         #Testa a função Pro.
         p {
 
-            Pro 
+            NEWPWSH -FunctionNames 'Pro' 
             DisplayMenu
 
         }
@@ -842,7 +819,7 @@ ______________________________________________________
         #Testa a função ImgHealth.
         sfc {
 
-            ImgHealth 
+            NEWPWSH -FunctionNames 'ImgHealth', 'DelTemp'             
             DisplayMenu
 
         }
@@ -850,9 +827,8 @@ ______________________________________________________
         #Testa a função DriverBooster.
         db {
 
-            ToolDir
             DownloadMztool
-            DriverBooster 
+            NEWPWSH -FunctionNames 'DriverBooster'
             DisplayMenu
 
         }
@@ -887,32 +863,26 @@ function ClockDate {
     $Host.UI.RawUI.WindowTitle = "$TITLE> CLOCK|DATE"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
-    #Define um novo servidor e sincroniza o relógio e a data do sistema.    
-    Start-Process PowerShell -WindowStyle Hidden {
-
-        w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
-        net start w32time 
-        w32tm /resync /force
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.  
+  
+    w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
+    net start w32time 
+    w32tm /resync /force
    
-    }
-}
+}  
 
 function MachineEnvTool {
 
     $Host.UI.RawUI.WindowTitle = "$TITLE> MACHINE ENVTOOL"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
-    #Adiciona variáveis de ambiente.
-    Start-Process PowerShell -WindowStyle Hidden {        
+    #Define as variáveis de ambiente para o ambiente de máquina.
+    [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
+    [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
+    [Environment]::SetEnvironmentVariable('MZBETA', 'PowerShell irm https://bit.ly/MZBETA | iex', 'Machine')
+    #Define a variável na biblioteca Powershell do ambiente Machine.
+    Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
 
-        #Define as variáveis de ambiente para o ambiente de máquina.
-        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
-        [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
-        [Environment]::SetEnvironmentVariable('MZBETA', 'PowerShell irm https://bit.ly/MZBETA | iex', 'Machine')
-        #Define a variável na biblioteca Powershell do ambiente Machine.
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
-
-    }
 }
 
 function ToolDir {
@@ -943,19 +913,13 @@ function DownloadMztool {
     $Host.UI.RawUI.WindowTitle = "$TITLE> DOWNLOADMZTOOL"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
-    Add-Type -AssemblyName "System.Net.Http"
-     
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
     $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
        
-    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'    
     
-    # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-
-  
     # Exibe o status dos links
     if (Test-LinkOnline -Url $ONEDRIVELINK) {
         Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
@@ -971,11 +935,12 @@ function DownloadMztool {
         Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
     }
 
+    ToolDir
+    
     # Lista de URLs para teste (OneDrive + Google Drive como fallback)
     $DRIVEURLS = @($ONEDRIVELINK, $GOOGLEDRIVELINK)
     Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
-    
-            
+              
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
@@ -994,53 +959,53 @@ function DownloadMztool {
     Clear-Host
 }
 
-function Diagnostics64 {
+function Diagnostics {
     
-    #Inicializa Softwares de diagnósticos de hardware x64.
+    # Inicializa Softwares de diagnósticos de hardware x64.
 
     $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
 
-    $APPS = @(
-        "AIDA_64\aida64.exe",
-        "BLUE_SCREEN_VIEW\BlueScreenView.exe",
-        "CORE_TEMP\Core_Temp_64.exe",
-        "CPU_Z\cpuz_x64.exe",        
-        "HDSENTINEL\HDSentinel.exe",
-        "HWINFO\HWiNFO64.exe",
-        "GPU_Z.exe"
-    )
+    $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+                                        
+    if ($OSARCHITECTURE -eq '64 bits') {
+        $APPS = @(
+            @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
+            @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
+            @{ Name = "Core_Temp_64"; Path = "CORE_TEMP\Core_Temp_64.exe" },
+            @{ Name = "cpuz_x64"; Path = "CPU_Z\cpuz_x64.exe" },
+            @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
+            @{ Name = "HWiNFO64"; Path = "HWINFO\HWiNFO64.exe" },
+            @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
+        )
+    }
+
+    elseif ($OSARCHITECTURE -eq '32 bits') {
+        $APPS = @(
+            @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
+            @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
+            @{ Name = "Core_Temp_32"; Path = "CORE_TEMP\Core_Temp_32.exe" },
+            @{ Name = "cpuz_x32"; Path = "CPU_Z\cpuz_x32.exe" },
+            @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
+            @{ Name = "HWiNFO32"; Path = "HWINFO\HWiNFO32.exe" },
+            @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
+        )
+    }
+    else {
+        Write-Host "ARQUITETURA DO SISTEMA NÃO SUPORTADA."
+        return
+    }
 
     foreach ($APP in $APPS) {
-
-        Start-Process "$MZTOOLFOLDER\$APP"        
+        # Verifica se o software já está em execução
+        if (-not (Get-Process -Name $APP.Name -ErrorAction SilentlyContinue)) {
+            Start-Process "$MZTOOLFOLDER\$($APP.Path)"
+        }
+        else {
+            #Script continua.
+        }
     }
 
     Clear-Host
-}
-
-function Diagnostics32 {
-    
-    #Inicializa Softwares de diagnósticos de hardware x32.
-
-    $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
-
-    $APPS = @(
-        "AIDA_64\aida64.exe",
-        "BLUE_SCREEN_VIEW\BlueScreenView.exe",
-        "CORE_TEMP\Core_Temp_32.exe",
-        "CPU_Z\cpuz_x32.exe",
-        "HDSENTINEL\HDSentinel.exe",
-        "HWINFO\HWiNFO32.exe",
-        "GPU_Z.exe"
-    )
-
-    foreach ($APP in $APPS) {
-
-        Start-Process "$MZTOOLFOLDER\$APP"
-    }    
-
-    Clear-Host
-        
 }
 
 function WinUpdateModule {
@@ -1351,11 +1316,7 @@ function Office2007 {
     $Host.UI.RawUI.WindowTitle = "$TITLE> OFFICE2007"
     
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-    
-    Add-Type -AssemblyName "System.Net.Http"
-    # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-    
+       
     $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
     $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
 
@@ -1937,6 +1898,11 @@ function DelTemp {
 
     # Remove miniaturas.
     Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
+
+    if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+
+        Remove-Files -Path $env:TOOL -Description "pasta TOOL."
+    }
    
     Start-Sleep -Seconds 2
 }
@@ -2025,7 +1991,8 @@ function NEWPWSH {
         [Parameter(Mandatory = $true)]
         [string[]]$FunctionNames,
         [switch]$Wait,
-        [switch]$ReturnProcess
+        [switch]$ReturnProcess,
+        [switch]$Hidden
     )
     
     # Combina as definições das funções (preservando a ordem)
@@ -2040,6 +2007,12 @@ function NEWPWSH {
     if ($Wait) {
         # Caso Wait seja especificado, aguardamos o término do processo internamente.
         [void](Start-Process powershell -ArgumentList $arguments -Wait)
+    }
+
+      
+    if ($Hidden) {
+        # Caso Wait seja especificado, aguardamos o término do processo internamente.
+        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
     }
     elseif ($ReturnProcess) {
         # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
@@ -2106,6 +2079,11 @@ function Invoke-DownloadFileWithProgress {
         [string]$Destination,
         [int]$BarWidth = 30
     )
+
+    Add-Type -AssemblyName "System.Net.Http"
+
+    # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
     try {
         $req = [System.Net.HttpWebRequest]::Create($Url)
@@ -2426,9 +2404,9 @@ function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
 
-ClockDate
+NEWPWSH -FunctionNames 'ClockDate' -Hidden
 
-MachineEnvTool
+NEWPWSH -FunctionNames 'MachineEnvTool' -Hidden 
 
 DisplayMenu 
 
