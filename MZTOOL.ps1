@@ -45,9 +45,9 @@ $TITLE = 'MZTOOL BETA'
 $Host.UI.RawUI.WindowTitle = "$TITLE"
 
 $ENVIROMENTVARS = @{
-    'TOOL'    = "C:\TOOL"
+    'TOOL'    = "C:\MZTOOL"
     'DESKTOP' = "C:\Users\Public\DESKTOP"
-    'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption
+    'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
     
 }.GetEnumerator() | ForEach-Object {
     if ($_.Key -and $_.Value) { 
@@ -469,7 +469,7 @@ ______________________________________________________
             DownloadMztool            
           
             Start-Sleep -Seconds 1
-            Diagnostics
+            DIAGNOSTICS
             function MENUFERRAMENTAS {
                 
                 $Host.UI.RawUI.WindowTitle = "$TITLE> TOOL"
@@ -487,7 +487,7 @@ ______________________________________________________
 |                                                    |
 | |1| INICIAR FERRAMENTAS DE DIAGNÓSTICO             |
 | |2| FECHAR TODAS AS FERRAMENTAS                    |
-| |3| VOLTAR AO MENU PRINCIPAL                       |
+| |3| FECHAR FERRAMENTAS E VOLTAR AO MENU            |
 |                                                    |
 |                 MOZART INFORMÁTICA                 |
 |                   DANIEL MOZART                    |
@@ -496,7 +496,7 @@ ______________________________________________________
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 Switch ($CHOICE) {
                     1 {
-                        Diagnostics
+                        DIAGNOSTICS
 
                         Start-Sleep -Seconds 1
                             
@@ -504,21 +504,21 @@ ______________________________________________________
                     }
                     2 {
                         # Fecha todas as ferramentas de diagnóstico se estiverem abertas
-                        $tools = @("aida64", "BlueScreenView", "Core_Temp_64", "Core_Temp_32", "cpuz_x64", "cpuz_x32", "HDSentinel", "HWiNFO64", "HWiNFO32", "GPU_Z")
-                        foreach ($tool in $tools) {
-                            Stop-Process -Name $tool -Force -ErrorAction SilentlyContinue
-                        }
+                        
+                        CLOSEAPPS
                        
-                        Start-Sleep -Seconds 2
+                        Start-Sleep -Seconds 1
 
                         MENUFERRAMENTAS
                     }
                     3 {
+                        CLOSEAPPS
+
                         DisplayMenu
                     }
                     Default {
                         Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                        Start-Sleep -Seconds 2
+                        Start-Sleep -Seconds 1
                         MENUFERRAMENTAS
                     }
                 }
@@ -898,16 +898,16 @@ function ToolDir {
     $Host.UI.RawUI.WindowTitle = "$TITLE> TOOL"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
-    #Criação do diretório C:\TOOL.
 
     $ErrorActionPreference = 'silentlycontinue'
      
-    #Se o diretório C:\TOOL já existir, é deletado.
+    #Se o diretório C:\MZTOOL já existir, é deletado.
     if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
         Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
     }
 
+    #Criação do diretório C:\MZTOOL.
     [System.IO.Directory]::CreateDirectory($env:TOOL) | Out-Null
     $TOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
     $TOOLFOLDER.Attributes = 'Hidden' 
@@ -967,37 +967,35 @@ function DownloadMztool {
     Clear-Host
 }
 
-function Diagnostics {
+function DIAGNOSTICS {
     
     # Inicializa Softwares de diagnósticos de hardware x64.
 
-    $MZTOOLFOLDER = "$env:TOOL\MZTOOL"
+    $TOOLFOLDER = "$env:TOOL\TOOL"
+                                
+    $APPS = @(
+        @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
+        @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
+        @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
+        @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
+    )
 
-    $OSARCHITECTURE = (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
-                                        
-    if ($OSARCHITECTURE -eq '64 bits') {
-        $APPS = @(
-            @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
-            @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
+    if ($Env:WINVER -match '64 bits') {
+        $APPS += @(
             @{ Name = "Core_Temp_64"; Path = "CORE_TEMP\Core_Temp_64.exe" },
             @{ Name = "cpuz_x64"; Path = "CPU_Z\cpuz_x64.exe" },
-            @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
-            @{ Name = "HWiNFO64"; Path = "HWINFO\HWiNFO64.exe" },
-            @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
+            @{ Name = "HWiNFO64"; Path = "HWINFO\HWiNFO64.exe" }
         )
     }
 
-    elseif ($OSARCHITECTURE -eq '32 bits') {
-        $APPS = @(
-            @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
-            @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
+    elseif ($Env:WINVER -match '32 bits') {
+        $APPS += @(
             @{ Name = "Core_Temp_32"; Path = "CORE_TEMP\Core_Temp_32.exe" },
             @{ Name = "cpuz_x32"; Path = "CPU_Z\cpuz_x32.exe" },
-            @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
-            @{ Name = "HWiNFO32"; Path = "HWINFO\HWiNFO32.exe" },
-            @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
+            @{ Name = "HWiNFO32"; Path = "HWINFO\HWiNFO32.exe" }
         )
     }
+
     else {
         Write-Host "ARQUITETURA DO SISTEMA NÃO SUPORTADA."
         return
@@ -1006,16 +1004,18 @@ function Diagnostics {
     foreach ($APP in $APPS) {
         # Verifica se o software já está em execução
         if (-not (Get-Process -Name $APP.Name -ErrorAction SilentlyContinue)) {
-            Start-Process "$MZTOOLFOLDER\$($APP.Path)"
-        }
-        else {
-            #Script continua.
+            Start-Process "$TOOLFOLDER\$($APP.Path)"
         }
     }
 
-    Clear-Host
+    function CLOSEAPPS { 
+        foreach ($APP in $APPS) {
+            if (Get-Process $APP.Name -ErrorAction SilentlyContinue) {                 
+                Stop-Process -Name $APP.Name -Force -ErrorAction SilentlyContinue
+            }
+        }        
+    }
 }
-
 function WinUpdateModule {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
