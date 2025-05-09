@@ -1356,7 +1356,7 @@ function Office2007 {
     
             Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
-            Remove-Item $OFFICE2007ZIP Force -ErrorAction SilentlyContinue
+            Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
 
         }
       
