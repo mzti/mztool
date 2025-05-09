@@ -44,15 +44,22 @@ $TITLE = 'MZTOOL BETA'
 
 $Host.UI.RawUI.WindowTitle = "$TITLE"
 
+if ($global:ProfileLoaded -eq $true) {
+    Write-Host "O perfil de usuário foi carregado." -ForegroundColor Green
+}
+else {
+    Write-Host "O perfil de usuário NÃO foi carregado." -ForegroundColor Red
+}
+
+
 $ENVIROMENTVARS = @{
     'TOOL'    = "C:\MZTOOL"
     'DESKTOP' = "C:\Users\Public\DESKTOP"
     'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture           
     'MZTOOL'  = "PowerShell irm https://bit.ly/MZT00L | iex"
-    'MZBETA'  = "PowerShell irm https://bit.ly/MZBETA | iex"
-    
-}.GetEnumerator() | Where-Object { $_.Key -notin @('MZTOOL', 'MZBETA') } | ForEach-Object {
-    if ($_.Key -and $_.Value) { 
+    'MZBETA'  = "PowerShell irm https://bit.ly/MZBETA | iex"        
+}.GetEnumerator() | ForEach-Object {
+    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
 
         # Define o escopo apropriado para cada variável de ambiente.    
         # Se a variável já existir, ela será atualizada.
@@ -60,7 +67,7 @@ $ENVIROMENTVARS = @{
             [Environment]::SetEnvironmentVariable($ENTRY.Key, $ENTRY.Value, $SCOPE)
         }
      
-        # Cria o arquivo de perfil se não existir.
+        # Cria o arquivo de perfil do PowerShell se não existir.
         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
                               
         # Cria a linha de definição da variável (com o símbolo $ escapado).
@@ -73,9 +80,11 @@ $ENVIROMENTVARS = @{
             Add-Content -Path $PROFILE -Value $SETENVPROFILE                
 
         }  
-        
+       
     }
+    $_
 }
+
 
 
 function OPSYS {
@@ -94,6 +103,8 @@ function OPSYS {
 }
 
 OPSYS 
+
+
 
 function MZTOOLMODULE {
     # Define o nome do módulo
@@ -243,11 +254,15 @@ $H.UI.RawUI.Set_BufferSize($Win)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
 
-# Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
-MZTOOLMODULE
-   
-# Importa o módulo MZTOOL para a sessão atual.
-Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+# Verifica se o módulo MZTOOL já está carregado.
+do {
+    
+    # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
+    MZTOOLMODULE
+    # Importa o módulo MZTOOL para a sessão atual.
+    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+
+} while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -269,7 +284,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     # Define as variáveis de ambiente para o ambiente de máquina.
-    $ENVIROMENTVARS.GetEnumerator() | ForEach-Object { [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') }
+    $ENVIROMENTVARS | ForEach-Object { [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') }
 
 } 
 
