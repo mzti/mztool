@@ -231,7 +231,8 @@ else {
         # Adiciona as variáveis de ambiente ao perfil do PowerShell.
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-
+        $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WinVer', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         # Define as variáveis de ambiente para o ambiente de usuário.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')
         [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')
@@ -255,11 +256,10 @@ else {
 function OpSys {
 
     #Verifica se o sistema operacional é suportado.
-    $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
+    #$WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
 
-    if ($WinVer -Match 'Microsoft Windows 10' -or $WinVer -Match 'Microsoft Windows 11') {
-        
-        #Script Continua.
+    if ($Env:WINVER -match 'Windows 10|Windows 11') {
+        # Script continua.
     }
 
     else {
@@ -1080,7 +1080,7 @@ function WingetModule {
     }
 
     else {
-        Write-Host 'Versão do Windows não compatível com Winget.'
+        Write-Host 'VERSÃO DO WINDOWS NÃO COMPATÍVEL COM WINGET.'
         Start-Sleep -Seconds 5
     }  
 
@@ -1107,70 +1107,70 @@ function WingetInstall {
     function InstallFallback ($id) {
         switch ($id) {
             "Google.Chrome" {
-                Write-Output "Instalando Google Chrome via método alternativo..."
+                
                 $downloadUrl = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"
                 $tempFile = Join-Path $env:TEMP "GoogleChrome.msi"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
                     Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Verb RunAs
-                    Write-Output "Google Chrome instalado via método alternativo."
+                
                 }
                 catch {
-                    Write-Output "Falha na instalação alternativa do Google Chrome: $_" 
+                    Write-Output "FALHA NA INSTALAÇÃO DO $ID : $_" 
                 }
             }
             "Microsoft.Powershell" {
-                Write-Output "Instalando Microsoft PowerShell via método alternativo..."
+                
                 $downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"
                 $tempFile = Join-Path $env:TEMP "PowerShell.msi"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
                     Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Verb RunAs
-                    Write-Output "Microsoft PowerShell instalado via método alternativo."
+                    
                 }
                 catch {
-                    Write-Output "Falha na instalação alternativa do Microsoft PowerShell: $_" 
+                    Write-Output "FALHA NA INSTALAÇÃO DO $ID : $_"  
                 }
             }
             "Adobe.Acrobat.Reader.64-bit" {
-                Write-Output "Instalando Adobe Acrobat Reader via método alternativo..."
+               
                 $downloadUrl = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"
                 $tempFile = Join-Path $env:TEMP "AcrobatReader.exe"
                 try {
                     Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
                     Start-Process -FilePath $tempFile -ArgumentList "/sAll", "/rs", "/rps", "/msi", "/norestart" -Verb RunAs
-                    Write-Output "Adobe Acrobat Reader instalado via método alternativo."
+                    
                 }
                 catch {
-                    Write-Output "Falha na instalação alternativa do Acrobat Reader: $_" 
+                    Write-Output "FALHA NA INSTALAÇÃO DO $ID : $_"  
                 }
             }
             default {
-                Write-Output "Nenhuma alternativa definida para $id" 
+                Return
             }
         }
     }
 
     foreach ($id in $softwareIds) {
-        Write-Output "Tentando instalar $id via winget..."
+        
         $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements 2>&1
         # Se o winget retornar erro (código diferente de zero)...
         if ($LASTEXITCODE -ne 0) {
             # Se a mensagem indicar que o software já está instalado, não inicia o fallback.
             if ($result -match "já instalado" -or $result -match "installed") {
-                Write-Output "$id já está instalado com a versão atual, pulando instalação alternativa."
+                
             }
             elseif ($result -match "hash do instalador não corresponde") {
-                Write-Output "Erro de hash detectado para $id. Iniciando método alternativo..."
+               
                 InstallFallback $id
             }
             else {
-                Write-Output "Erro durante a instalação de $id (ExitCode: $LASTEXITCODE). Iniciando método alternativo..."
+                
                 InstallFallback $id
             }
         }
         else {
-            Write-Output "$id instalado com sucesso via winget."
+            #Script continua.
         }
         Clear-Host
     }
