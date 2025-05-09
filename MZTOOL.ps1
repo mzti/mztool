@@ -1786,13 +1786,10 @@ function Office2007 {
         #Implementa o recurso .NetFramework 3.5 no sistema.
     
         Start-Job -Name NetFx3 -ScriptBlock { 
-    
             $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
             Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-    
-            Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum            
-            
-        }
+            Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
+        } | Out-Null
         
     }
    
@@ -1802,7 +1799,7 @@ function Office2007 {
     
     #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
     Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
-    Wait-Job -Name NetFx3  
+    Wait-Job -Name NetFx3 | Out-Null
     Start-Process 'winword.exe'
    
 }
