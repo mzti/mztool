@@ -1728,8 +1728,8 @@ function Office2007 {
     # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
     
-    $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21APNtATD%5F8SnPaKI'
-    $OFFICE2007GOOGLEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21APNtATD%5F8SnPaKI'
+    $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
+    $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
 
     $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
     $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
