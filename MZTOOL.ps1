@@ -44,6 +44,32 @@ $TITLE = 'MZTOOL BETA'
 
 $Host.UI.RawUI.WindowTitle = "$TITLE"
 
+$WINVER = (Get-WmiObject Win32_OperatingSystem).Caption
+
+function OpSys {
+
+    #Verifica se o sistema operacional é suportado.
+
+    if ($WINVER -match 'Windows 10|Windows 11') {
+      
+        #Script continua.
+
+    }
+
+    else {
+
+        Write-Host 'SISTEMA OPERACIONAL NÃO SUPORTADO.'
+
+        Start-Sleep 5
+
+        EXIT
+                
+    }
+}
+
+OpSys
+    
+
 function MZTOOLMODULE {
     # Define o nome do módulo
     $moduleName = "MZTOOL"
@@ -231,7 +257,6 @@ else {
         # Adiciona as variáveis de ambiente ao perfil do PowerShell.
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        $WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WinVer', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         # Define as variáveis de ambiente para o ambiente de usuário.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')
@@ -253,28 +278,6 @@ else {
 
 
 
-function OpSys {
-
-    #Verifica se o sistema operacional é suportado.
-    #$WinVer = (Get-WmiObject Win32_OperatingSystem).Caption
-
-    if ($Env:WINVER -match 'Windows 10|Windows 11') {
-        # Script continua.
-    }
-
-    else {
-
-        Write-Host 'SISTEMA OPERACIONAL NÃO SUPORTADO.'
-
-        Start-Sleep 5
-
-        EXIT
-                
-    }
-}
-
-OpSys
-    
 #MENU MZTOOL -----------------------------------------------------
 
 function DisplayMenu {
