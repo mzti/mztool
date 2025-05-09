@@ -44,13 +44,13 @@ $TITLE = 'MZTOOL BETA'
 
 $Host.UI.RawUI.WindowTitle = "$TITLE"
 
-$WINVER = (Get-WmiObject Win32_OperatingSystem).Caption
+$Env:WINVER = (Get-WmiObject Win32_OperatingSystem).Caption
 
 function OPSYS {
 
     #Verifica se o sistema operacional é suportado.
 
-    if (-not ($WINVER -match 'Windows 10|Windows 11')) {
+    if (-not ($Env:WINVER -match 'Windows 10|Windows 11')) {
       
         Write-Host 'SISTEMA OPERACIONAL NÃO SUPORTADO.'
 
@@ -264,7 +264,7 @@ else {
             }
             else {
                 # Cria a linha de definição da variável (com o símbolo $ escapado).
-                $linhaParaAdicionar = "`n$($nome) = '$($variaveis[$nome])'"
+                $linhaParaAdicionar = "`n`$($nome) = `"$($variaveis[$nome])`""
                 Add-Content -Path $PROFILE -Value $linhaParaAdicionar
                 Write-Host "A variável '$nome' foi adicionada ao arquivo de perfil permanentemente."
 
