@@ -47,9 +47,11 @@ $Host.UI.RawUI.WindowTitle = "$TITLE"
 $ENVIROMENTVARS = @{
     'TOOL'    = "C:\MZTOOL"
     'DESKTOP' = "C:\Users\Public\DESKTOP"
-    'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+    'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture           
+    'MZTOOL'  = "PowerShell irm https://bit.ly/MZT00L | iex"
+    'MZBETA'  = "PowerShell irm https://bit.ly/MZBETA | iex"
     
-}.GetEnumerator() | ForEach-Object {
+}.GetEnumerator() | Where-Object { $_.Key -notin @('MZTOOL', 'MZBETA') } | ForEach-Object {
     if ($_.Key -and $_.Value) { 
 
         # Define o escopo apropriado para cada variável de ambiente.    
