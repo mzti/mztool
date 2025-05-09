@@ -64,9 +64,9 @@ $ENVIROMENTVARS = @{
         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
                               
         # Cria a linha de definição da variável (com o símbolo $ escapado).
-        $SETENVPROFILE = "`n[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`""
+        $SETENVPROFILE = "[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`"`n`n"
                
-        # Usa Select-String para procurar o padrão no arquivo de perfil.
+        # Verifica se a variável já existe no arquivo de perfil.
         if (-Not (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet)) {
             
             # Se a variável não estiver presente, adiciona ao arquivo de perfil na biblioteca Powershell do ambiente User.
