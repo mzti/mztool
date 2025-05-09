@@ -44,12 +44,7 @@ $TITLE = 'MZTOOL BETA'
 
 $Host.UI.RawUI.WindowTitle = "$TITLE"
 
-if ($global:ProfileLoaded -eq $true) {
-    Write-Host "O perfil de usuário foi carregado." -ForegroundColor Green
-}
-else {
-    Write-Host "O perfil de usuário NÃO foi carregado." -ForegroundColor Red
-}
+
 
 
 $ENVIROMENTVARS = @{
@@ -326,8 +321,16 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-    
     $MENU = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+   
+    if ($global:ProfileLoaded -eq $true) {
+        Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
+    }
+    else {
+        Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
+    }
+    
+    
     Switch ($MENU) {
 
         1 {
