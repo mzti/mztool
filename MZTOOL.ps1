@@ -240,19 +240,16 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
 else {
     # Não está executando como administrador.
     function PwshEnvTool {
-        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-            Start-Process Powershell -WindowStyle Hidden -Wait {
-                
-                # Verifica e cria o perfil do PowerShell se não existir.
-                if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {
-                    New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-                }
-            
-            }
-                          
+       
+        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {                     
+              
+            New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+
+            Start-Sleep -Seconds 1
+           
         }
           
-        # Adiciona ou atualiza as variáveis de ambiente no perfil do PowerShell.
+        <# # Adiciona ou atualiza as variáveis de ambiente no perfil do PowerShell.
         $variaveis = @{
             '$TOOL'    = "C:\TOOL"
             '$DESKTOP' = "C:\Users\Public\DESKTOP"
@@ -260,21 +257,24 @@ else {
         }      
 
         foreach ($nome in $variaveis.Keys) {
-            # Cria um padrão de busca para encontrar linhas que definam a variável.
-            # A expressão procura linhas que, no início (ignora espaços opcionais) contenham "$nome ="  
-              
-            
+                 
             # Usa Select-String para procurar o padrão no arquivo de perfil.
             if (Select-String -Path $PROFILE -Pattern $nome -Quiet) {
                 Write-Host "A variável '$nome' já está presente no arquivo de perfil."
             }
             else {
                 # Cria a linha de definição da variável (com o símbolo $ escapado).
-                $linhaParaAdicionar = "$($nome) = '$($variaveis[$nome])'"
+                $linhaParaAdicionar = "$($nome) = '$($variaveis[$nome])´n"
                 Add-Content -Path $PROFILE -Value $linhaParaAdicionar
                 Write-Host "A variável '$nome' foi adicionada ao arquivo de perfil permanentemente."
+
             }
         }
+#>
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        
 
 
         # Atualiza o perfil do PowerShell com as variáveis de ambiente.
