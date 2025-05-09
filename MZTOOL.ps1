@@ -515,9 +515,9 @@ ______________________________________________________
 '                                    
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 function CLOSEAPPS { 
-                    foreach ($APP in $Env:APPS) {
-                        if (Get-Process $APP.Name -ErrorAction SilentlyContinue) {                 
-                            Stop-Process -Name $APP.Name -Force -ErrorAction SilentlyContinue
+                    $APPS = DIAGNOSTICS | ForEach-Object {
+                        if (Get-Process $APPS.Name -ErrorAction SilentlyContinue) {                 
+                            Stop-Process -Name $APPS.Name -Force -ErrorAction SilentlyContinue
                         }
                     }        
                 }
@@ -1001,7 +1001,7 @@ function DIAGNOSTICS {
 
     $TOOLFOLDER = "$env:TOOL\TOOL"
                                 
-    $Env:APPS = @(
+    $APPS = @(
         @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
         @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
         @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
@@ -1009,7 +1009,7 @@ function DIAGNOSTICS {
     )
 
     if ($Env:WINVER -match '64 bits') {
-        $Env:APPS += @(
+        $APPS += @(
             @{ Name = "Core_Temp_64"; Path = "CORE_TEMP\Core_Temp_64.exe" },
             @{ Name = "cpuz_x64"; Path = "CPU_Z\cpuz_x64.exe" },
             @{ Name = "HWiNFO64"; Path = "HWINFO\HWiNFO64.exe" }
@@ -1017,7 +1017,7 @@ function DIAGNOSTICS {
     }
 
     elseif ($Env:WINVER -match '32 bits') {
-        $Env:APPS += @(
+        $APPS += @(
             @{ Name = "Core_Temp_32"; Path = "CORE_TEMP\Core_Temp_32.exe" },
             @{ Name = "cpuz_x32"; Path = "CPU_Z\cpuz_x32.exe" },
             @{ Name = "HWiNFO32"; Path = "HWINFO\HWiNFO32.exe" }
@@ -1029,13 +1029,14 @@ function DIAGNOSTICS {
         return
     }
 
-    foreach ($APP in $Env:APPS) {
+    foreach ($APP in $APPS) {
         # Verifica se o software já está em execução
         if (-not (Get-Process -Name $APP.Name -ErrorAction SilentlyContinue)) {
             Start-Process "$TOOLFOLDER\$($APP.Path)"
         }
     }
-    
+
+    return $APPS
 }
 function WinUpdateModule {
     
