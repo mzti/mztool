@@ -44,7 +44,41 @@ $TITLE = 'MZTOOL BETA'
 
 $Host.UI.RawUI.WindowTitle = "$TITLE"
 
-$Env:WINVER = (Get-WmiObject Win32_OperatingSystem).Caption
+$null = @{
+    'TOOL'    = "C:\TOOL"
+    'DESKTOP' = "C:\Users\Public\DESKTOP"
+    'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption
+}.GetEnumerator() | ForEach-Object {
+    if ($_.Key -and $_.Value) { 
+
+        [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Process') # Define na sessão atual
+        [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'User')
+        
+        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {                     
+              
+            New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+
+            Start-Sleep -Seconds 1
+           
+        }             
+                       
+        $SETENVPROFILE = "`n[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`""
+                    
+        Write-Host "$SETENVPROFILE" -ForegroundColor Green
+                       
+        # Usa Select-String para procurar o padrão no arquivo de perfil.
+        if (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet) {
+            Write-Host "A variável '$($_.Key)' já está presente no arquivo de perfil."
+        }
+        else {
+            # Adiciona a definição da variável ao perfil.
+            Add-Content -Path $PROFILE -Value $SETENVPROFILE                
+            Write-Host "A variável '$($_.Key)' foi adicionada ao arquivo de perfil permanentemente."
+        }  
+        
+    }
+}
+
 
 function OPSYS {
 
@@ -239,7 +273,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole)) {
     
 else {
     # Não está executando como administrador.
-    function PwshEnvTool {
+    <#function PwshEnvTool {
        
         if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {                     
               
@@ -248,47 +282,29 @@ else {
             Start-Sleep -Seconds 1
            
         }
-          
-        # Adiciona ou atualiza as variáveis de ambiente no perfil do PowerShell.
-        $variaveis = @{
-            '$TOOL'    = "C:\TOOL"
-            '$DESKTOP' = "C:\Users\Public\DESKTOP"
-            '$WINVER'  = "$Env:WINVER"
-        }      
-
-        foreach ($nome in $variaveis.Keys) {
-                 
+             
+        foreach ($NAME in $Env:ENVIROMENTVARS.Keys) {
+                
+            $SETENVPROFILE = "`n[Environment]::SetEnvironmentVariable('$NAME', '$($Env:ENVIROMENTVARS[$NAME])', 'User')`n$NAME  = `"$($Env:ENVIROMENTVARS[$NAME])`"" 
+            
+            Write-Host "$SETENVPROFILE" -ForegroundColor Green
+                       
             # Usa Select-String para procurar o padrão no arquivo de perfil.
-            if (Select-String -Path $PROFILE -Pattern $nome -Quiet) {
-                Write-Host "A variável '$nome' já está presente no arquivo de perfil."
+            if (Select-String -Path $PROFILE -Pattern $NAME  -Quiet) {
+                Write-Host "A variável '$NAME ' já está presente no arquivo de perfil."
             }
             else {
                 # Cria a linha de definição da variável (com o símbolo $ escapado).
-                $linhaParaAdicionar = "`n$nome = `"$($variaveis[$nome])`""
-                Add-Content -Path $PROFILE -Value $linhaParaAdicionar
-                Write-Host "A variável '$nome' foi adicionada ao arquivo de perfil permanentemente."
+                Add-Content -Path $PROFILE -Value $SETENVPROFILE                
+                Write-Host "A variável '$NAME' foi adicionada ao arquivo de perfil permanentemente."
 
             }
         }
-
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$Env:WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        
-
-
-        # Atualiza o perfil do PowerShell com as variáveis de ambiente.
-        <#Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')
-        [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')
-#>
              
     }
 
     #Chama a função PwshEnvTool para definir as variáveis de ambiente.
-    PwshEnvTool
+    PwshEnvTool#>
 
     # Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
