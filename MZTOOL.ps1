@@ -44,36 +44,32 @@ $TITLE = 'MZTOOL BETA'
 
 $Host.UI.RawUI.WindowTitle = "$TITLE"
 
-$null = @{
+$ENVIROMENTVARS = @{
     'TOOL'    = "C:\TOOL"
     'DESKTOP' = "C:\Users\Public\DESKTOP"
     'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption
+    
 }.GetEnumerator() | ForEach-Object {
     if ($_.Key -and $_.Value) { 
 
-        [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Process') # Define na sessão atual
-        [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'User')
-        
-        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {                     
-              
-            New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-
-            Start-Sleep -Seconds 1
-           
-        }             
-                       
-        $SETENVPROFILE = "`n[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`""
-                    
-        Write-Host "$SETENVPROFILE" -ForegroundColor Green
-                       
-        # Usa Select-String para procurar o padrão no arquivo de perfil.
-        if (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet) {
-            Write-Host "A variável '$($_.Key)' já está presente no arquivo de perfil."
+        # Define o escopo apropriado para cada variável de ambiente.    
+        # Se a variável já existir, ela será atualizada.
+        $ENTRY = $_; foreach ($SCOPE in @('Process', 'User')) {
+            [Environment]::SetEnvironmentVariable($ENTRY.Key, $ENTRY.Value, $SCOPE)
         }
-        else {
-            # Adiciona a definição da variável ao perfil.
+     
+        # Cria o arquivo de perfil se não existir.
+        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
+                              
+        # Cria a linha de definição da variável (com o símbolo $ escapado).
+        $SETENVPROFILE = "`n[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`""
+               
+        # Usa Select-String para procurar o padrão no arquivo de perfil.
+        if (-Not (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet)) {
+            
+            # Se a variável não estiver presente, adiciona ao arquivo de perfil na biblioteca Powershell do ambiente User.
             Add-Content -Path $PROFILE -Value $SETENVPROFILE                
-            Write-Host "A variável '$($_.Key)' foi adicionada ao arquivo de perfil permanentemente."
+
         }  
         
     }
@@ -245,10 +241,10 @@ $H.UI.RawUI.Set_BufferSize($Win)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
 
-#Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
+# Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
 MZTOOLMODULE
    
-#Importa o módulo MZTOOL para a sessão atual.
+# Importa o módulo MZTOOL para a sessão atual.
 Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
@@ -260,53 +256,24 @@ $adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
 
 # Verifica se o script está sendo executado como administrador.
 if ($myWindowsPrincipal.IsInRole($adminRole)) {
+    
     # Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
     # Executando como administrador. Formatação e estilo aplicadas.
     $Host.UI.RawUI.WindowTitle = "$TITLE"
     
-    #Importa o módulo MZTOOL para a sessão atual.
+    # Importa o módulo MZTOOL para a sessão atual.
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+    
+    # Define as variáveis de ambiente para o ambiente de máquina.
+    $ENVIROMENTVARS.GetEnumerator() | ForEach-Object { [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') }
 
 } 
-    
+
+# Não está executando como administrador. Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
 else {
-    # Não está executando como administrador.
-    <#function PwshEnvTool {
-       
-        if (-not (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue)) {                     
-              
-            New-Item -Path $PROFILE -Type File -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 
-            Start-Sleep -Seconds 1
-           
-        }
-             
-        foreach ($NAME in $Env:ENVIROMENTVARS.Keys) {
-                
-            $SETENVPROFILE = "`n[Environment]::SetEnvironmentVariable('$NAME', '$($Env:ENVIROMENTVARS[$NAME])', 'User')`n$NAME  = `"$($Env:ENVIROMENTVARS[$NAME])`"" 
-            
-            Write-Host "$SETENVPROFILE" -ForegroundColor Green
-                       
-            # Usa Select-String para procurar o padrão no arquivo de perfil.
-            if (Select-String -Path $PROFILE -Pattern $NAME  -Quiet) {
-                Write-Host "A variável '$NAME ' já está presente no arquivo de perfil."
-            }
-            else {
-                # Cria a linha de definição da variável (com o símbolo $ escapado).
-                Add-Content -Path $PROFILE -Value $SETENVPROFILE                
-                Write-Host "A variável '$NAME' foi adicionada ao arquivo de perfil permanentemente."
-
-            }
-        }
-             
-    }
-
-    #Chama a função PwshEnvTool para definir as variáveis de ambiente.
-    PwshEnvTool#>
-
-    # Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
