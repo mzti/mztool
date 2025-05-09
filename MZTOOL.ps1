@@ -65,28 +65,33 @@ OPSYS
 
 function MZTOOLMODULE {
     # Define o nome do módulo
-    $moduleName = "MZTOOL"
+    $MODULENAME = "MZTOOL"
 
     # Define o caminho do diretório do módulo (pasta padrão para módulos do usuário)
-    $moduleDir = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath "Modules\$moduleName"
+    $MODULEDIR = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath "Modules\$MODULENAME"
 
-    # Cria o diretório, se não existir
-    if (-Not (Test-Path $moduleDir)) {
-        New-Item -Path $moduleDir -ItemType Directory -Force | Out-Null
+    # Deleta o diretório, se existir.
+    if (Test-Path $MODULEDIR) {
+        
+        Remove-Item  -Path $MODULEDIR -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+ 
     }
 
+    # Cria o diretório do módulo.
+    New-Item -Path $MODULEDIR -ItemType Directory -Force | Out-Null
+
     # Define o caminho completo para o arquivo .psm1 do módulo
-    $modulePath = Join-Path -Path $moduleDir -ChildPath "$moduleName.psm1"
+    $MODULEPATH = Join-Path -Path $MODULEDIR -ChildPath "$MODULENAME.psm1"
     
     # Verifica se o arquivo .psm1 já existe e o deleta, se necessário
-    if (Test-Path -Path $modulePath) {
+    if (Test-Path -Path $MODULEPATH) {
        
-        Remove-Item -Path $modulePath -Force -ErrorAction Stop
+        Remove-Item -Path $MODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
         
     }
 
     # Conteúdo do módulo MZTOOL.psm1
-    $moduleContent = @'
+    $MODULECONTENT = @'
 # MZTOOL.psm1
 #region Importações e API
 
@@ -203,7 +208,7 @@ $H.UI.RawUI.Set_BufferSize($Win)
 '@
 
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
-    Set-Content -Path $modulePath -Value $moduleContent -Force
+    Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
 
 #Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
@@ -247,14 +252,43 @@ else {
                           
         }
           
-        # Adiciona as variáveis de ambiente ao perfil do PowerShell.
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        # Adiciona ou atualiza as variáveis de ambiente no perfil do PowerShell.
+        function vari {
+
+            $variaveis = @{
+                '$TOOL'    = "C:\TOOL"
+                '$DESKTOP' = "C:\Users\Public\DESKTOP"
+                '$WINVER'  = "$WINVER"
+            }
+            # Se o arquivo de perfil não existir, cria-o.
+            if (-not (Test-Path $PROFILE)) {
+                New-Item -Path $PROFILE -ItemType File -Force | Out-Null
+            }
+
+            foreach ($nome in $variaveis.Keys) {
+                # Cria um padrão de busca para encontrar linhas que definam a variável.
+                # A expressão procura linhas que, no início (ignora espaços opcionais) contenham "$nome ="  
+              
+            
+                # Usa Select-String para procurar o padrão no arquivo de perfil.
+                if (Select-String -Path $PROFILE -Pattern $nome -Quiet) {
+                    Write-Host "A variável '$nome' já está presente no arquivo de perfil."
+                }
+                else {
+                    # Cria a linha de definição da variável (com o símbolo $ escapado).
+                    $linhaParaAdicionar = "$($nome) = '$($variaveis[$nome])'"
+                    Add-Content -Path $PROFILE -Value $linhaParaAdicionar
+                    Write-Host "A variável '$nome' foi adicionada ao arquivo de perfil permanentemente."
+                }
+            }
+        }
+        # Atualiza o perfil do PowerShell com as variáveis de ambiente.
+        <#Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        # Define as variáveis de ambiente para o ambiente de usuário.
         [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')
         [Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')
-
+#>
              
     }
 
@@ -2397,7 +2431,7 @@ function awin {
 
 NEWPWSH -FunctionNames 'ClockDate' -Hidden
 
-NEWPWSH -FunctionNames 'MachineEnvTool' -Hidden 
+#NEWPWSH -FunctionNames 'MachineEnvTool' -Hidden 
 
 DisplayMenu 
 
