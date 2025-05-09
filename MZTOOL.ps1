@@ -253,7 +253,7 @@ else {
         $variaveis = @{
             '$TOOL'    = "C:\TOOL"
             '$DESKTOP' = "C:\Users\Public\DESKTOP"
-            '$WINVER'  = "$WINVER"
+            '$WINVER'  = "$Env:WINVER"
         }      
 
         foreach ($nome in $variaveis.Keys) {
@@ -273,7 +273,7 @@ else {
 
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('DESKTOP', 'C:\Users\Public\DESKTOP', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('WINVER', '$Env:WINVER', 'User')" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         
 
 
