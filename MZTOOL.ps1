@@ -194,6 +194,14 @@ do {
     # Importa o módulo MZTOOL para a sessão atual.
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
+    # Verifica se o módulo foi carregado com sucesso.
+    if (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue) {
+        Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
+    }
+    else {
+        Write-Host "Falha ao carregar o módulo MZTOOL." -ForegroundColor Red
+    }
+
     PAUSE
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
