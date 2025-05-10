@@ -39,7 +39,8 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 #Define a política de execução para permitir scripts assinados.
 #Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
 $TITLE = 'MZTOOL BETA'
 
@@ -95,8 +96,6 @@ function OPSYS {
 }
 
 OPSYS 
-
-
 
 function MZTOOLMODULE {
     # Define o nome do módulo
@@ -198,7 +197,7 @@ $H.UI.RawUI.Set_BufferSize($Win)
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
-function GET-MODULE {
+function GETMZTOOLMODULE {
 
     
     if (-not(Get-Module -Name MZTOOL -ErrorAction SilentlyContinue)) {
@@ -211,7 +210,7 @@ do {
     # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
     MZTOOLMODULE
     # Importa o módulo MZTOOL para a sessão atual.
-    GET-MODULE
+    GETMZTOOLMODULE
 
     # Verifica se o módulo foi carregado com sucesso.
     if (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue) {
@@ -219,9 +218,8 @@ do {
     }
     else {
         Write-Host "Falha ao carregar o módulo MZTOOL." -ForegroundColor Red
+        Start-Sleep -Seconds 5
     }
-
-    PAUSE
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
 
@@ -256,7 +254,7 @@ else {
 
 # Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
 #Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-Set-ExecutionPolicy -ExecutionPolicy AllSigned -Scope Process
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
 $ENVIROMENTVARS | ForEach-Object { 
     [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
