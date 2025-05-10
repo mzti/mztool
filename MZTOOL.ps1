@@ -121,7 +121,7 @@ function MZTOOLMODULE {
     }
 
     # Conteúdo do módulo MZTOOL.psm1
-    $MODULECONTENT = @'
+    <#$MODULECONTENT = @'
 # MZTOOL.psm1
 #region Importações e API
 
@@ -180,6 +180,18 @@ $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
 #endregion
+'@ #>
+    $MODULECONTENT = @'
+# MZTOOL.psm1
+    #region Customização do Console
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $H = Get-Host
+    $Win = $H.UI.RawUI.WindowSize
+    $Win.Height = 20
+    $Win.Width = 58
+    $H.UI.RawUI.Set_WindowSize($Win)
+    $H.UI.RawUI.Set_BufferSize($Win)
+    #endregion
 '@
     
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
