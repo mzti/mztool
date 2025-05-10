@@ -1321,7 +1321,7 @@ function Office2007 {
         else {
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
         }
-   
+        PAUSE
         do {
             Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
@@ -1352,17 +1352,17 @@ function Office2007 {
             } | Out-Null
         
         }
-   
-        DownloadOffice2007
+    }  
+    DownloadOffice2007
 
-        NetFx3
+    NetFx3
     
-        #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
-        Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
-        Wait-Job -Name NetFx3 | Out-Null
-        Start-Process 'winword.exe'
+    #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
+    Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
+    Wait-Job -Name NetFx3 | Out-Null
+    Start-Process 'winword.exe'
    
-    }
+   
 }
 
 
