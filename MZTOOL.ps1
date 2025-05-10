@@ -38,7 +38,8 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 
 #Define a política de execução para permitir scripts assinados.
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+#Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
 $TITLE = 'MZTOOL BETA'
 
@@ -197,14 +198,20 @@ $H.UI.RawUI.Set_BufferSize($Win)
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
+function GET-MODULE {
 
+    
+    if (-not(Get-Module -Name MZTOOL -ErrorAction SilentlyContinue)) {
+        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
+    }
+}
 # Verifica se o módulo MZTOOL já está carregado.
 do {
     
     # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
     MZTOOLMODULE
     # Importa o módulo MZTOOL para a sessão atual.
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+    GET-MODULE
 
     # Verifica se o módulo foi carregado com sucesso.
     if (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue) {
@@ -218,7 +225,7 @@ do {
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
 
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -267,9 +274,8 @@ Pause
 function DisplayMenu {
 
     $Host.UI.RawUI.WindowTitle = "$TITLE"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
-    Reset-MZTOOLLayout  
     
+    GET-MODULE    
     
     Clear-Host
     Write-Host '
@@ -293,6 +299,12 @@ ______________________________________________________
     }
     else {
         Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
+        . $PROFILE
+        Start-Sleep -Seconds 3
+        if ($global:ProfileLoaded -eq $true) {
+            Write-Host "`nO perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
+        }
+        else { Write-Host "`nFALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
     }
 
     # Adiciona uma linha em branco abaixo do menu
@@ -437,7 +449,7 @@ ______________________________________________________
  
             $Host.UI.RawUI.WindowTitle = "$TITLE> TOOL"
             Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-            Reset-MZTOOLLayout
+          
             
                
             Clear-Host
@@ -2408,7 +2420,7 @@ function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
 
-NEWPWSH -FunctionNames 'ClockDate' -Hidden
+#NEWPWSH -FunctionNames 'ClockDate' -Hidden
 
 #NEWPWSH -FunctionNames 'MachineEnvTool' -Hidden 
 
