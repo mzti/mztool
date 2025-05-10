@@ -1289,6 +1289,7 @@ function Office2007 {
 
     $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
     $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
+    $OFFICE2007HASH = "43543423A3EF750BFCA1E1A35696741A"
 
     $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
 
@@ -1321,41 +1322,43 @@ function Office2007 {
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
         }
    
-    
-        Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
+        do {
+            Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
-            
-        if (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue ) { 
-     
-    
-            Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
+            $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm MD5
 
-            Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
+        }While (!(Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue) && !($NEWOFFICE2007HASH.Hash -eq $OFFICE2007HASH))
 
-        }
-      
-    }
-    function NetFx3 {
+        Write-Host "HASH DO ARQUIVO ORIGINAL = " -NoNewline; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
+        Write-Host "HASH DO ARQUIVO BAIXADO  = " -NoNewline; Write-Host "$NEWOFFICE2007HASH" -ForegroundColor Green
 
-        #Implementa o recurso .NetFramework 3.5 no sistema.
-    
-        Start-Job -Name NetFx3 -ScriptBlock { 
-            $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
-            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-            Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
-        } | Out-Null
+        PAUSE
         
-    }
-   
-    DownloadOffice2007
+        Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
-    NetFx3
+        Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
+        function NetFx3 {
+
+            #Implementa o recurso .NetFramework 3.5 no sistema.
     
-    #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
-    Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
-    Wait-Job -Name NetFx3 | Out-Null
-    Start-Process 'winword.exe'
+            Start-Job -Name NetFx3 -ScriptBlock { 
+                $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
+                Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+                Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
+            } | Out-Null
+        
+        }
    
+        DownloadOffice2007
+
+        NetFx3
+    
+        #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
+        Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
+        Wait-Job -Name NetFx3 | Out-Null
+        Start-Process 'winword.exe'
+   
+    }
 }
 
 
