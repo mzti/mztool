@@ -194,6 +194,10 @@ do {
     # Importa o módulo MZTOOL para a sessão atual.
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
+    PAUSE
+
+    RESTART
+
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
@@ -203,28 +207,26 @@ $myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myW
 # Obtém o Objeto de Segurança do usuário Administrador.
 $adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
 
-# Se não está executando como administrador. Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
-if (-not ($myWindowsPrincipal.IsInRole($adminRole))) {
-
+function RESTART {
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
     [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+}
+
+# Se não está executando como administrador. Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
+if (-not ($myWindowsPrincipal.IsInRole($adminRole))) {
+
+    RESTART
     exit
 
-
 } 
-    
+
+# Executando como administrador. Formatação e estilo aplicadas. 
+
 # Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
-# Executando como administrador. Formatação e estilo aplicadas.
-#$Host.UI.RawUI.WindowTitle = "$TITLE"
-    
-# Importa o módulo MZTOOL para a sessão atual.
-# Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-    
-# Define as variáveis de ambiente para o ambiente de máquina.
 $ENVIROMENTVARS | ForEach-Object { [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') }
 
 
