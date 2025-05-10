@@ -129,121 +129,66 @@ function MZTOOLMODULE {
 
     # Conteúdo do módulo MZTOOL.psm1
     $MODULECONTENT = @'
-# MZTOOL.psm1
-#region Importações e API
-
-[void][System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
-$workArea     = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
-$screenWidth  = $workArea.Width
-$screenHeight = $workArea.Height
-
-$global:winWidth  = 464
-$global:winHeight = 320
-
-Add-Type @"
-using System;
-using System.Runtime.InteropServices;
-public class Win32 {
-    public const int GWL_STYLE = -16;
-    public const int WS_SIZEBOX = 0x00040000;
-    public const int WS_MAXIMIZEBOX = 0x00010000;
+    # MZTOOL.psm1
+    #region Importações e API
     
-    [DllImport("user32.dll", SetLastError=true)]
-    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    [void][System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
+    $workArea     = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
+    $screenWidth  = $workArea.Width
+    $screenHeight = $workArea.Height
     
-    [DllImport("user32.dll")]
-    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+    $global:winWidth  = 464
+    $global:winHeight = 320
     
-    [DllImport("user32.dll")]
-    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
-        int X, int Y, int cx, int cy, uint uFlags);
-}
-"@
-#endregion
-
-#region Fixar tamanho e remover redimensionamento
-$global:hwnd = (Get-Process -Id $PID).MainWindowHandle
-if ($global:hwnd -ne [IntPtr]::Zero) {
-    $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
-    $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
-    [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
-    
-    $SWP_NOMOVE       = 0x0002
-    $SWP_NOSIZE       = 0x0001
-    $SWP_NOZORDER     = 0x0004
-    $SWP_FRAMECHANGED = 0x0020
-    $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
-    [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
-}
-#endregion
-
-#region Layout de Janela - Contador e Posicionamento
-
-$global:counterFile = Join-Path $env:TEMP "MZTOOL_Index.txt"
-
-function Get-MZTOOLIndex {
-    if (-Not (Test-Path $global:counterFile)) {
-         1 | Out-File -FilePath $global:counterFile -Encoding ASCII
-         return 1
+    Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+    public class Win32 {
+        public const int GWL_STYLE = -16;
+        public const int WS_SIZEBOX = 0x00040000;
+        public const int WS_MAXIMIZEBOX = 0x00010000;
+        
+        [DllImport("user32.dll", SetLastError=true)]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        
+        [DllImport("user32.dll")]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
+            int X, int Y, int cx, int cy, uint uFlags);
     }
-    else {
-         try {
-             $index = [int](Get-Content $global:counterFile -Raw)
-         }
-         catch { $index = 1 }
-         $newIndex = $index + 1
-         $newIndex | Out-File -FilePath $global:counterFile -Encoding ASCII
-         return $index
+    "@
+    #endregion
+    
+    #region Fixar tamanho e remover redimensionamento
+    $global:hwnd = (Get-Process -Id $PID).MainWindowHandle
+    if ($global:hwnd -ne [IntPtr]::Zero) {
+        $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
+        $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
+        [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
+        
+        # Permite bloquear a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
+        $SWP_NOMOVE       = 0x0002
+        $SWP_NOSIZE       = 0x0001
+        $SWP_NOZORDER     = 0x0004
+        $SWP_FRAMECHANGED = 0x0020
+        $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
+        [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
     }
-}
-
-function Reset-MZTOOLLayout {
-    1 | Out-File -FilePath $global:counterFile -Encoding ASCII
-    $centerX = [Math]::Floor(($screenWidth - $global:winWidth) / 2)
-    $centerY = [Math]::Floor(($screenHeight - $global:winHeight) / 2)
-    $SWP_NOSIZE       = 0x0001
-    $SWP_NOZORDER     = 0x0004
-    $SWP_SHOWWINDOW   = 0x0040
-    $flags = $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_SHOWWINDOW
-    [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, $centerX, $centerY, 0, 0, $flags)
-}
-Export-ModuleMember -Function Reset-MZTOOLLayout
-
-$global:currentIndex = Get-MZTOOLIndex
-
-if ($global:currentIndex -eq 1) {
-    # Mantenha a janela principal sempre centralizada
-    $posX = [Math]::Floor(($screenWidth - $global:winWidth) / 2)
-    $posY = [Math]::Floor(($screenHeight - $global:winHeight) / 2)
-}
-else {
-    # Para janelas adicionais: posiciona em layout em grade, sem reajustar as já abertas.
-    $maxCols = [Math]::Floor($screenWidth / $global:winWidth)
-    $gridIndex = $global:currentIndex - 1
-    $col = ($gridIndex - 1) % $maxCols
-    $row = [Math]::Floor(($gridIndex - 1) / $maxCols)
-    $posX = $col * $global:winWidth
-    $posY = $row * $global:winHeight
-}
-
-$SWP_NOSIZE     = 0x0001
-$SWP_NOZORDER   = 0x0004
-$SWP_SHOWWINDOW = 0x0040
-$flags = $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_SHOWWINDOW
-[Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, $posX, $posY, 0, 0, $flags)
-#endregion
-
-#region Customização do Console
-$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-$H = Get-Host
-$Win = $H.UI.RawUI.WindowSize
-$Win.Height = 20
-$Win.Width = 58
-$H.UI.RawUI.Set_WindowSize($Win)
-$H.UI.RawUI.Set_BufferSize($Win)
-#endregion
+    #endregion
+    
+    #region Customização do Console
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $H = Get-Host
+    $Win = $H.UI.RawUI.WindowSize
+    $Win.Height = 20
+    $Win.Width = 58
+    $H.UI.RawUI.Set_WindowSize($Win)
+    $H.UI.RawUI.Set_BufferSize($Win)
+    #endregion
 '@
-
+    
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
