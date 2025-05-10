@@ -238,7 +238,16 @@ else {
 # Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
-$ENVIROMENTVARS | ForEach-Object { [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') }
+$ENVIROMENTVARS | ForEach-Object { 
+    [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
+    $loadedValue = [Environment]::GetEnvironmentVariable($_.Key, 'Machine')
+    if ($loadedValue -eq $_.Value) {
+        Write-Host "Variável $_.Key carregada com sucesso em Machine." -ForegroundColor Green
+    }
+    else {
+        Write-Host "Falha ao carregar a variável $_.Key em Machine." -ForegroundColor Red
+    }
+}
 
 Pause
 #MENU MZTOOL -----------------------------------------------------
