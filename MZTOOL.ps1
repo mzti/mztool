@@ -1326,8 +1326,12 @@ function Office2007 {
             Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
             $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm MD5
-
-        }While (!(Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue) && !($NEWOFFICE2007HASH.Hash -eq $OFFICE2007HASH))
+            
+        } while (
+            (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
+            ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
+        )
+        
 
         Write-Host "HASH DO ARQUIVO ORIGINAL = " -NoNewline; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
         Write-Host "HASH DO ARQUIVO BAIXADO  = " -NoNewline; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
