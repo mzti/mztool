@@ -274,7 +274,7 @@ function DisplayMenu {
 
     $Host.UI.RawUI.WindowTitle = "$TITLE"
     
-    GET-MODULE    
+    GETMZTOOLMODULE    
     
     Clear-Host
     Write-Host '
