@@ -233,7 +233,6 @@ else {
 
 }
 
-
 # Executando como administrador. Formatação e estilo aplicadas. 
 
 # Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
@@ -241,7 +240,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
 $ENVIROMENTVARS | ForEach-Object { [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') }
 
-
+Pause
 #MENU MZTOOL -----------------------------------------------------
 
 function DisplayMenu {
@@ -268,16 +267,19 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-    $MENU = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-   
     if ($global:ProfileLoaded -eq $true) {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
     }
     else {
         Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
     }
-    
-    
+
+    # Adiciona uma linha em branco abaixo do menu
+    Write-Host ""
+
+    # Solicita ao usuário que insira o número correspondente à opção desejada
+    $MENU = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+   
     Switch ($MENU) {
 
         1 {
