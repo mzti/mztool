@@ -216,7 +216,7 @@ $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 # Verifica se a sessão está sendo executada como administrador.
 if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
 
-    Write-Host = "ADMINISTRATOR"
+    Write-Host "ADMINISTRATOR"
     pause
 
 }
