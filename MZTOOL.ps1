@@ -1350,18 +1350,20 @@ function Office2007 {
         Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
         Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
-        function NetFx3 {
 
-            #Implementa o recurso .NetFramework 3.5 no sistema.
+    } 
+    function NetFx3 {
+
+        #Implementa o recurso .NetFramework 3.5 no sistema.
     
-            Start-Job -Name NetFx3 -ScriptBlock { 
-                $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
-                Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-                Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
-            } | Out-Null
+        Start-Job -Name NetFx3 -ScriptBlock { 
+            $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
+            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+            Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
+        } | Out-Null
         
-        }
-    }  
+    }
+     
     DownloadOffice2007
 
     NetFx3
