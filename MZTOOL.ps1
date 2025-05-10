@@ -255,7 +255,8 @@ else {
 # Executando como administrador. Formatação e estilo aplicadas. 
 
 # Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+Set-ExecutionPolicy -ExecutionPolicy AllSigned -Scope Process
 
 $ENVIROMENTVARS | ForEach-Object { 
     [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
@@ -1336,8 +1337,7 @@ function Office2007 {
 
     $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
 
-    function DownloadOffice2007 {         
-          
+    function DownloadOffice2007 {                
     
         #Verifica se a pasta OFFICE2007 já existe. Caso não exista, cria a pasta e baixa o arquivo ZIP do Microsoft Office 2007.
 
@@ -1347,8 +1347,7 @@ function Office2007 {
 
             New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
 
-        }
-    
+        }    
     
         # Exibe o status dos links
         if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
