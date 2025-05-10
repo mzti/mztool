@@ -186,6 +186,15 @@ $H.UI.RawUI.Set_BufferSize($Win)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
 
+# Define a função para reiniciar o PowerShell com privilégios elevados.
+function RESTART {
+    $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+    $newProcess.Arguments = $myInvocation.MyCommand.Definition
+    $newProcess.Verb = 'runas'
+    [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+    EXIT
+}
+
 # Verifica se o módulo MZTOOL já está carregado.
 do {
     
@@ -200,27 +209,35 @@ do {
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
 
-# Obtém o ID e o Objeto de Segurança do usuário atual.
-$myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-$myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID)
+function uac {
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
-# Obtém o Objeto de Segurança do usuário Administrador.
-$adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
+    # Obtém o ID e o Objeto de Segurança do usuário atual.
+    $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID)
+    $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
-function RESTART {
-    $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-    $newProcess.Arguments = $myInvocation.MyCommand.Definition
-    $newProcess.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+    # Verifica se a sessão está sendo executada como administrador.
+    if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
+
+        Write-Host = "ADMINISTRATOR"
+        pause
+
+    }
+
+    else {
+
+        Write-host "Executando como USUÁRIO." -ForegroundColor Green
+        PAUSE
+        $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+        $newProcess.Arguments = $myInvocation.MyCommand.Definition
+        $newProcess.Verb = 'runas'
+        [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+        EXIT
+
+    }
 }
-
-# Se não está executando como administrador. Fecha o processo atual e inicia um novo com o script como administrador solicitando UAC.
-if (-not ($myWindowsPrincipal.IsInRole($adminRole))) {
-
-    RESTART
-    exit
-
-} 
+uac
 
 # Executando como administrador. Formatação e estilo aplicadas. 
 
