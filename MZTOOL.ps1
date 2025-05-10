@@ -1330,7 +1330,7 @@ function Office2007 {
         }While (!(Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue) && !($NEWOFFICE2007HASH.Hash -eq $OFFICE2007HASH))
 
         Write-Host "HASH DO ARQUIVO ORIGINAL = " -NoNewline; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
-        Write-Host "HASH DO ARQUIVO BAIXADO  = " -NoNewline; Write-Host "$NEWOFFICE2007HASH" -ForegroundColor Green
+        Write-Host "HASH DO ARQUIVO BAIXADO  = " -NoNewline; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
 
         PAUSE
         
