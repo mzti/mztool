@@ -55,9 +55,8 @@ $ENVIROMENTVARS = @{
     'MZBETA'  = "PowerShell irm https://bit.ly/MZBETA | iex"        
 }.GetEnumerator() | ForEach-Object {
     if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
-
-        # Define o escopo apropriado para cada variável de ambiente.    
-        # Se a variável já existir, ela será atualizada.
+         
+        # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
         $ENTRY = $_; foreach ($SCOPE in @('Process', 'User')) {
             [Environment]::SetEnvironmentVariable($ENTRY.Key, $ENTRY.Value, $SCOPE)
         }
