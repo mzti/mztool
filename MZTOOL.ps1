@@ -1331,7 +1331,7 @@ function Office2007 {
         else {
             Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
         }
-        PAUSE
+       
         do {
             Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
@@ -1342,11 +1342,10 @@ function Office2007 {
             ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
         )
         
+        Write-Host "HASH ORIGINAL = " -NoNewline; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
+        Write-Host "HASH BAIXADO  = " -NoNewline; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
 
-        Write-Host "HASH DO ARQUIVO ORIGINAL = " -NoNewline; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
-        Write-Host "HASH DO ARQUIVO BAIXADO  = " -NoNewline; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
-
-        PAUSE
+        Start-Sleep -Seconds 10
         
         Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
