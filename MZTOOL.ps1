@@ -37,14 +37,21 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
 
 
-#Define a política de execução para permitir scripts assinados.
-#Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+#MZTOOL - BETA
 
-$TITLE = 'MZTOOL BETA'
+$Global:ExecutionPolicy = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('Process', 'CurrentUser') } | Select-Object -ExpandProperty ExecutionPolicy
 
-$Host.UI.RawUI.WindowTitle = "$TITLE"
+if ($Global:ExecutionPolicy.Key -notin "Bypass") {
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+}   
+
+Get-ExecutionPolicy -List
+
+Pause
+
+$Global:TITLE = 'MZTOOL BETA'
+
+$Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
 $ENVIROMENTVARS = @{
     'TOOL'    = "C:\MZTOOL"
@@ -77,8 +84,6 @@ $ENVIROMENTVARS = @{
     }
     $_
 }
-
-
 
 function OPSYS {
 
@@ -198,7 +203,6 @@ $H.UI.RawUI.Set_BufferSize($Win)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
 function GETMZTOOLMODULE {
-
     
     if (-not(Get-Module -Name MZTOOL -ErrorAction SilentlyContinue)) {
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
@@ -222,8 +226,23 @@ do {
     }
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
+function GETPROFILE {  
+    if ($global:ProfileLoaded -eq $true) {
+        Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
+    }
+    else {
+        Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
+        . $PROFILE
+        Start-Sleep -Seconds 2
+        if ($global:ProfileLoaded -eq $true) {
+            Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
+        }
+        else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
+        Start-Sleep -Seconds 2
+    }
+}
 
-
+GETPROFILE
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -250,11 +269,6 @@ else {
 
 }
 
-# Executando como administrador. Formatação e estilo aplicadas. 
-
-# Define a política de execução para Bypass apenas para a sessão atual suprimindo restrições ou avisos.
-#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
 $ENVIROMENTVARS | ForEach-Object { 
     [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
@@ -272,7 +286,7 @@ Pause
 
 function DisplayMenu {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
     
     GETMZTOOLMODULE    
     
@@ -293,30 +307,14 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-    if ($global:ProfileLoaded -eq $true) {
-        Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
-    }
-    else {
-        Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
-        . $PROFILE
-        Start-Sleep -Seconds 3
-        if ($global:ProfileLoaded -eq $true) {
-            Write-Host "`nO perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
-        }
-        else { Write-Host "`nFALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
-    }
-
-    # Adiciona uma linha em branco abaixo do menu
-    Write-Host ""
-
     # Solicita ao usuário que insira o número correspondente à opção desejada
-    $MENU = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    $MENU = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
    
     Switch ($MENU) {
 
         1 {
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
-            $Host.UI.RawUI.WindowTitle = "$TITLE> INSTALL"
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
             Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
             
             Clear-Host
@@ -446,7 +444,7 @@ ______________________________________________________
     
             #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
  
-            $Host.UI.RawUI.WindowTitle = "$TITLE> TOOL"
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
             Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
           
             
@@ -473,7 +471,7 @@ ______________________________________________________
             DIAGNOSTICS
             function MENUFERRAMENTAS {
                 
-                $Host.UI.RawUI.WindowTitle = "$TITLE> TOOL"
+                $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
                 Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
                  
 
@@ -755,7 +753,7 @@ ______________________________________________________
         0 {
             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
-            $Host.UI.RawUI.WindowTitle = "$TITLE> EXIT"
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
             Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
             Clear-Host
@@ -878,7 +876,7 @@ ______________________________________________________
 
 function ClockDate {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> CLOCK|DATE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Define um novo servidor e sincroniza o relógio e a data do sistema.  
@@ -889,23 +887,9 @@ function ClockDate {
    
 }  
 
-function MachineEnvTool {
-
-    $Host.UI.RawUI.WindowTitle = "$TITLE> MACHINE ENVTOOL"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-    
-    #Define as variáveis de ambiente para o ambiente de máquina.
-    [Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')        
-    [Environment]::SetEnvironmentVariable('MZTOOL', 'PowerShell irm https://bit.ly/MZT00L | iex', 'Machine')
-    [Environment]::SetEnvironmentVariable('MZBETA', 'PowerShell irm https://bit.ly/MZBETA | iex', 'Machine')
-    #Define a variável na biblioteca Powershell do ambiente Machine.
-    Add-Content -Path $PROFILE -Value "`n[Environment]::SetEnvironmentVariable('TOOL', 'C:\TOOL', 'Machine')"
-
-}
-
 function ToolDir {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> TOOL"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
 
@@ -928,7 +912,7 @@ function DownloadMztool {
      
     #Download do arquivo MZTOOL.zip
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> DOWNLOADMZTOOL"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DOWNLOADMZTOOL"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
@@ -1024,7 +1008,7 @@ function WinUpdateModule {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
     
-    $Host.UI.RawUI.WindowTitle = "$TITLE> WINUPDATEMODULE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     #Pacote NuGet.
@@ -1041,7 +1025,7 @@ function WinUpdateModule {
 
 function WingetModule {
     
-    $Host.UI.RawUI.WindowTitle = "$TITLE> WINGETMODULE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETMODULE"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue  
    
     #Módulo WINGET.
@@ -1098,7 +1082,7 @@ function WingetModule {
 function WingetInstall {
 
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
-    $Host.UI.RawUI.WindowTitle = "$TITLE> WINGET"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
@@ -1191,7 +1175,7 @@ function WingetUpdate {
 
     #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
     
-    $Host.UI.RawUI.WindowTitle = "$TITLE> WINGETUPDATE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETUPDATE"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     1..3 | ForEach-Object {
@@ -1207,7 +1191,7 @@ function WinUpdate {
 
     #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> WINUPDATE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATE"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Import-Module PSWindowsUpdate -Force 
@@ -1222,7 +1206,7 @@ function RemoveGhostDrivers {
     
     #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
     
-    $Host.UI.RawUI.WindowTitle = "$TITLE> REMOVEGHOSTDEVICES"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> REMOVEGHOSTDEVICES"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue    
    
     #Obtem a lista de drivers de Dispositivos Ocultos.
@@ -1241,7 +1225,7 @@ function AnyDesk {
     
     #Download do software Standalone AnyDesk-CM para a área de trabalho pública.  
     
-    $Host.UI.RawUI.WindowTitle = "$TITLE> ANYDESK"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> ANYDESK"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue            
 
     $wc = New-Object System.Net.WebClient
@@ -1253,7 +1237,7 @@ function AnyDesk {
 
 function Microsoft365 {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> MICROSOFT365"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
@@ -1322,7 +1306,7 @@ function Office2007 {
 
     #Implementação do Microsoft Office 2007.
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> OFFICE2007"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> OFFICE2007"
     
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
        
@@ -1387,7 +1371,7 @@ function Office2007 {
         #Implementa o recurso .NetFramework 3.5 no sistema.
     
         Start-Job -Name NetFx3 -ScriptBlock { 
-            $Host.UI.RawUI.WindowTitle = "$TITLE> .NETFRAMEWORK3.5"
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> .NETFRAMEWORK3.5"
             Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
             Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
         } | Out-Null
@@ -1411,7 +1395,7 @@ function DriverBooster {
     
     #Extrai e inicializa o software Driver Booster.   
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> DRIVER_BOOSTER"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DRIVER_BOOSTER"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
         
     Expand-Archive -LiteralPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER"
@@ -1465,7 +1449,7 @@ function DriverBooster {
 
 function PerfilTheme {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> PERFILTHEME"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
@@ -1572,7 +1556,7 @@ function PerfilTheme {
 
 function PinIcons {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> PERFILTHEME > PINICONS"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > PINICONS"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
@@ -1744,14 +1728,14 @@ function PinIcons {
 
 function DefaultSoftwares {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> PERFILTHEME > DEFAULTSOFTWARES"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > DEFAULTSOFTWARES"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
 }
 
 function StartSoftwares {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> STARTSOFTWARES"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> STARTSOFTWARES"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Start-Process CHROME
@@ -1846,7 +1830,7 @@ function StartSoftwares {
 }
 
 function DelTemp {
-    $Host.UI.RawUI.WindowTitle = "$TITLE> CLEANTEMP"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
@@ -1922,7 +1906,7 @@ function DelTemp {
 
 function ImgHealth {
 
-    $Host.UI.RawUI.WindowTitle = "$TITLE> IMGHEALTH"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> IMGHEALTH"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
     
     # Verifica a integridade da imagem do sistema.
@@ -1944,7 +1928,7 @@ function ImgHealth {
 function Pro {
 
     
-    $Host.UI.RawUI.WindowTitle = "$TITLE> WINDOWSPRO"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINDOWSPRO"
     Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Converte a versão do Windows para PRO. (Não ativa o sistema, para a ativação é necessário já haver uma Licença Digital HWID).
@@ -2200,7 +2184,7 @@ ______________________________________________________
                     
                             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
-                            $Host.UI.RawUI.WindowTitle = "$TITLE> EXIT"
+                            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
                             Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
                             Clear-Host
@@ -2417,9 +2401,7 @@ function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
 
-#NEWPWSH -FunctionNames 'ClockDate' -Hidden
-
-#NEWPWSH -FunctionNames 'MachineEnvTool' -Hidden 
+NEWPWSH -FunctionNames 'ClockDate' -Hidden
 
 DisplayMenu 
 
