@@ -39,9 +39,9 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 #MZTOOL - BETA
 
-$Global:ExecutionPolicy = Get-ExecutionPolicy -List | Select-Object -ExpandProperty ExecutionPolicy
+$Global:ExecutionPolicy = Get-ExecutionPolicy -List
 
-if ($Global:ExecutionPolicy.Key -in @('Process', 'CurrentUser') -notin "Bypass") {
+if ($Global:ExecutionPolicy.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 }   
 
@@ -257,9 +257,9 @@ if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
     Write-Host "ADMINISTRATOR"
     pause
 
-    ForEach-Object ($Global:ExecutionPolicy.Key -in @('Machine', 'CurrentUser')) {
-        if ($_.Key -notin "RemoteSigned") {
-            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_ -Force
+    $Global:ExecutionPolicy = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+        if ($_.ExecutionPolicy -ne "RemoteSigned") {
+            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force | Out-Null 2>&1
         } 
     } 
     Get-ExecutionPolicy -List
