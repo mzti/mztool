@@ -39,9 +39,9 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 #MZTOOL - BETA
 
-$Global:ExecutionPolicy = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('Process', 'CurrentUser') } | Select-Object -ExpandProperty ExecutionPolicy
+$Global:ExecutionPolicy = Get-ExecutionPolicy -List | Select-Object -ExpandProperty ExecutionPolicy
 
-if ($Global:ExecutionPolicy.Key -notin "Bypass") {
+if ($Global:ExecutionPolicy.Key -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 }   
 
@@ -252,6 +252,13 @@ $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 # Verifica se a sessão está sendo executada como administrador.
 if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
 
+    ForEach-Object ($Global:ExecutionPolicy.Key -in @('Machine', 'CurrentUser')) {
+        if ($_.Key -notin "RemoteSigned") {
+            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_ -Force
+        } 
+    } 
+    Get-ExecutionPolicy -List
+    pause
     Write-Host "ADMINISTRATOR"
     pause
 
