@@ -231,18 +231,20 @@ function GETPROFILE {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
     }
     else {
-        Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
-        . $PROFILE
-        Start-Sleep -Seconds 2
-        if ($global:ProfileLoaded -eq $true) {
-            Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
+        if ($Global:ExecutionPolicy.Key -in @('Machine', 'CurrentUser') -notin @('Restricted', 'AllSigned')) {
+            Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
+            . $PROFILE
+            Start-Sleep -Seconds 2        
+            if ($global:ProfileLoaded -eq $true) {
+                Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
+            }
+            else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
+            Start-Sleep -Seconds 2
         }
-        else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
-        Start-Sleep -Seconds 2
     }
-}
-
+}       
 GETPROFILE
+pause
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -252,6 +254,9 @@ $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 # Verifica se a sessão está sendo executada como administrador.
 if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
 
+    Write-Host "ADMINISTRATOR"
+    pause
+
     ForEach-Object ($Global:ExecutionPolicy.Key -in @('Machine', 'CurrentUser')) {
         if ($_.Key -notin "RemoteSigned") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_ -Force
@@ -259,8 +264,8 @@ if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
     } 
     Get-ExecutionPolicy -List
     pause
-    Write-Host "ADMINISTRATOR"
-    pause
+
+    GETPROFILE
 
 }
 
