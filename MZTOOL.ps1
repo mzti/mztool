@@ -133,6 +133,7 @@ function MZTOOLMODULE {
     $MODULECONTENT = @'
 # MZTOOL.psm1
 #region Customização do Console
+$Global:TITLE = "MZTOOL BETA"
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 $H = Get-Host
 $Win = $H.UI.RawUI.WindowSize
