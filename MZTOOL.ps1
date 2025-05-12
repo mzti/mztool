@@ -171,7 +171,7 @@ do {
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
 function GETPROFILE {  
-    if ($global:ProfileLoaded -eq $true) {
+    if ($Global:PROFILELOADED -eq $true) {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
     }
     else {
@@ -179,7 +179,7 @@ function GETPROFILE {
         Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
         . $PROFILE
         Start-Sleep -Seconds 2        
-        if ($global:ProfileLoaded -eq $true) {
+        if ($Global:PROFILELOADED -eq $true) {
             Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
         }
         else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
