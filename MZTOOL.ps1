@@ -85,17 +85,15 @@ $Global:ENVIROMENTVARS = @{
         }
      
         # Cria o arquivo de perfil do PowerShell se não existir.
-        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force  = $true | Add-Content -Value '$Global:PROFILELOADED = $true' | Out-Null > $null 2>&1 }
+        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Add-Content -Value "`$Global:PROFILELOADED = `$true" | Out-Null > $null 2>&1 }
                               
         # Cria a linha de definição da variável (com o símbolo $ escapado).
         $SETENVPROFILE = "[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`"`n`n"
         
-        if (-not (Select-String -Path $PROFILE -Pattern $Global:PROFILELOADED -Quiet)) {
-            
-            # Se a variável não estiver presente, adiciona ao arquivo de perfil na biblioteca Powershell do ambiente User.
-            Add-Content -Path $PROFILE -Value $Global:PROFILELOADED
-
-        }
+        if (-not (Select-String -Path $PROFILE -Pattern '^\s*\$Global:PROFILELOADED\s*=\s*\$true\s*$' -Quiet)) {
+            # Se a variável não estiver presente, adiciona ao arquivo de perfil
+            Add-Content -Path $PROFILE -Value "`$Global:PROFILELOADED = `$true`n`n"
+        }               
 
         # Verifica se a variável já existe no arquivo de perfil.
         if (-Not (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet)) {
