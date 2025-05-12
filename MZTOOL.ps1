@@ -200,11 +200,11 @@ if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
     Write-Host "ADMINISTRATOR"
     pause
 
-    $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+    <# $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -ne "RemoteSigned") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
         } 
-    } 
+    }#> 
     Get-ExecutionPolicy -List
     pause
 
