@@ -38,10 +38,30 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 
 #MZTOOL - BETA
+$Global:TITLE = 'MZTOOL BETA'
+$Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
+$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
 
-$Global:ExecutionPolicy = Get-ExecutionPolicy -List
+$Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
-if ($Global:ExecutionPolicy.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
+function OPSYS {
+
+    #Verifica se o sistema operacional é suportado.
+
+    if (-not ($Global:WINVER -match 'Windows 10|Windows 11')) {
+      
+        Write-Host "SISTEMA OPERACIONAL NÃO SUPORTADO.`n`nENCERRANDO MZTOOL - `n`nMOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
+
+        Start-Sleep 5
+
+        EXIT
+
+    }
+}
+
+OPSYS 
+
+if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 }   
 
@@ -49,16 +69,13 @@ Get-ExecutionPolicy -List
 
 Pause
 
-$Global:TITLE = 'MZTOOL BETA'
-
-$Host.UI.RawUI.WindowTitle = "$Global:TITLE"
-
-$ENVIROMENTVARS = @{
+$Global:ENVIROMENTVARS = @{
     'TOOL'    = "C:\MZTOOL"
     'DESKTOP' = "C:\Users\Public\DESKTOP"
-    'WINVER'  = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture           
+    'WINVER'  = $Global:WINVER           
     'MZTOOL'  = "PowerShell irm https://bit.ly/MZT00L | iex"
-    'MZBETA'  = "PowerShell irm https://bit.ly/MZBETA | iex"        
+    'MZBETA'  = "PowerShell irm https://bit.ly/MZBETA | iex"
+       
 }.GetEnumerator() | ForEach-Object {
     if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
          
@@ -68,11 +85,18 @@ $ENVIROMENTVARS = @{
         }
      
         # Cria o arquivo de perfil do PowerShell se não existir.
-        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
+        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force  = $true | Add-Content -Value '$Global:PROFILELOADED = $true' | Out-Null > $null 2>&1 }
                               
         # Cria a linha de definição da variável (com o símbolo $ escapado).
         $SETENVPROFILE = "[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`"`n`n"
-               
+        
+        if (-not (Select-String -Path $PROFILE -Pattern $Global:PROFILELOADED -Quiet)) {
+            
+            # Se a variável não estiver presente, adiciona ao arquivo de perfil na biblioteca Powershell do ambiente User.
+            Add-Content -Path $PROFILE -Value $Global:PROFILELOADED
+
+        }
+
         # Verifica se a variável já existe no arquivo de perfil.
         if (-Not (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet)) {
             
@@ -84,23 +108,6 @@ $ENVIROMENTVARS = @{
     }
     $_
 }
-
-function OPSYS {
-
-    #Verifica se o sistema operacional é suportado.
-
-    if (-not ($Env:WINVER -match 'Windows 10|Windows 11')) {
-      
-        Write-Host 'SISTEMA OPERACIONAL NÃO SUPORTADO.'
-
-        Start-Sleep 5
-
-        EXIT
-
-    }
-}
-
-OPSYS 
 
 function MZTOOLMODULE {
     # Define o nome do módulo
@@ -125,57 +132,8 @@ function MZTOOLMODULE {
         Remove-Item -Path $MODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
 
-    # Conteúdo do módulo MZTOOL.psm1
-    <#$MODULECONTENT = @'
+    $MODULECONTENT = @'
 # MZTOOL.psm1
-#region Importações e API
-
-[void][System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
-$workArea     = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
-$screenWidth  = $workArea.Width
-$screenHeight = $workArea.Height
-
-$global:winWidth  = 464
-$global:winHeight = 320
-
-Add-Type @"
-using System;
-using System.Runtime.InteropServices;
-public class Win32 {
-    public const int GWL_STYLE = -16;
-    public const int WS_SIZEBOX = 0x00040000;
-    public const int WS_MAXIMIZEBOX = 0x00010000;
-    
-    [DllImport("user32.dll", SetLastError=true)]
-    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-    
-    [DllImport("user32.dll")]
-    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-    
-    [DllImport("user32.dll")]
-    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
-        int X, int Y, int cx, int cy, uint uFlags);
-}
-"@
-#endregion
-
-#region Fixar tamanho e remover redimensionamento
-$global:hwnd = (Get-Process -Id $PID).MainWindowHandle
-if ($global:hwnd -ne [IntPtr]::Zero) {
-    $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
-    $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
-    [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
-    
-    # Permite bloquear a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
-    $SWP_NOMOVE       = 0x0002
-    $SWP_NOSIZE       = 0x0001
-    $SWP_NOZORDER     = 0x0004
-    $SWP_FRAMECHANGED = 0x0020
-    $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
-    [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
-}
-#endregion
-
 #region Customização do Console
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
 $H = Get-Host
@@ -185,18 +143,6 @@ $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
 #endregion
-'@ #>
-    $MODULECONTENT = @'
-# MZTOOL.psm1
-    #region Customização do Console
-    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-    $H = Get-Host
-    $Win = $H.UI.RawUI.WindowSize
-    $Win.Height = 20
-    $Win.Width = 58
-    $H.UI.RawUI.Set_WindowSize($Win)
-    $H.UI.RawUI.Set_BufferSize($Win)
-    #endregion
 '@
     
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
@@ -231,19 +177,19 @@ function GETPROFILE {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
     }
     else {
-        if ($Global:ExecutionPolicy.Key -in @('Machine', 'CurrentUser') -notin @('Restricted', 'AllSigned')) {
-            Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
-            . $PROFILE
-            Start-Sleep -Seconds 2        
-            if ($global:ProfileLoaded -eq $true) {
-                Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
-            }
-            else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
-            Start-Sleep -Seconds 2
+        
+        Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
+        . $PROFILE
+        Start-Sleep -Seconds 2        
+        if ($global:ProfileLoaded -eq $true) {
+            Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
         }
+        else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
+        Start-Sleep -Seconds 2
     }
-}       
-#GETPROFILE
+}
+       
+GETPROFILE
 pause
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
@@ -257,7 +203,7 @@ if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
     Write-Host "ADMINISTRATOR"
     pause
 
-    $Global:ExecutionPolicy = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+    $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -ne "RemoteSigned") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
         } 
@@ -282,7 +228,7 @@ else {
 }
 
 
-$ENVIROMENTVARS | ForEach-Object { 
+$Global:ENVIROMENTVARS | ForEach-Object { 
     [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
     $loadedValue = [Environment]::GetEnvironmentVariable($_.Key, 'Machine')
     if ($loadedValue -eq $_.Value) {
