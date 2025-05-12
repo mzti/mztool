@@ -243,7 +243,7 @@ function GETPROFILE {
         }
     }
 }       
-GETPROFILE
+#GETPROFILE
 pause
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
@@ -265,7 +265,7 @@ if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
     Get-ExecutionPolicy -List
     pause
 
-    GETPROFILE
+    #GETPROFILE
 
 }
 
