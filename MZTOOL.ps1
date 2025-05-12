@@ -176,8 +176,6 @@ function GETPROFILE {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
     }
     else {
-        
-        Write-Host "`nO perfil de usuário NÃO foi carregado." -ForegroundColor Red
         . $PROFILE
         Start-Sleep -Seconds 2        
         if ($Global:PROFILELOADED -eq $true) {
