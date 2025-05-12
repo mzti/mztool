@@ -259,7 +259,7 @@ if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
 
     $Global:ExecutionPolicy = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -ne "RemoteSigned") {
-            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force | Out-Null 2>&1
+            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
         } 
     } 
     Get-ExecutionPolicy -List
@@ -586,12 +586,12 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        WingetModule
+                        $proc1 = NEWPWSH -FunctionNames 'WingetModule' -ReturnProcess
+                        $proc2 = NEWPWSH -FunctionNames 'WinUpdateModule' -ReturnProcess
 
-                        WinUpdateModule
-
-                        Start-Sleep -Seconds 1
-
+                        $validProcesses = @($proc1, $proc2) | Where-Object { $_.Id -gt 0 }
+                        Wait-Process -Id $validProcesses.Id          
+         
                         DelTemp
 
                         Clear-Host
@@ -729,9 +729,10 @@ ______________________________________________________
 |____________________________________________________|
 '    
                         
-                        WingetModule
-
-                        Microsoft365 
+                    
+                        NEWPWSH -FunctionNames 'WingetModule' -Wait
+                      
+                        NEWPWSH -FunctionNames 'Microsoft365' -Wait 
 
                         Start-Sleep -1
 
@@ -1304,8 +1305,7 @@ function Microsoft365 {
     
     #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-    $APPS = @("Word.lnk", "Excel.lnk", "PowerPoint.lnk")
-    $APPS | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" }
+    @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" }
     
     Stop-Process -Name OfficeC2RClient -Force
     
