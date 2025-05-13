@@ -186,12 +186,12 @@ GETPROFILE
 pause
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
-$myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-$myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID)
+$MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
 $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
 # Verifica se a sessão está sendo executada como administrador.
-if ($myWindowsPrincipal.IsInRole($ADMINROLE)) {
+if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 
     Write-Host "ADMINISTRATOR"
     pause
@@ -926,7 +926,7 @@ function DIAGNOSTICS {
         @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
     )
 
-    if ($Env:WINVER -match '64 bits') {
+    if ($Global:WINVER -match '64 bits') {
         $APPS += @(
             @{ Name = "Core_Temp_64"; Path = "CORE_TEMP\Core_Temp_64.exe" },
             @{ Name = "cpuz_x64"; Path = "CPU_Z\cpuz_x64.exe" },
@@ -934,7 +934,7 @@ function DIAGNOSTICS {
         )
     }
 
-    elseif ($Env:WINVER -match '32 bits') {
+    elseif ($Global:WINVER -match '32 bits') {
         $APPS += @(
             @{ Name = "Core_Temp_32"; Path = "CORE_TEMP\Core_Temp_32.exe" },
             @{ Name = "cpuz_x32"; Path = "CPU_Z\cpuz_x32.exe" },
@@ -986,7 +986,7 @@ function WingetModule {
     $ErrorActionPreference = 'SilentlyContinue'
      
     #Verifica se a versão do Windows é a 11.
-    if ($Env:WINVER -Match 'Windows 11') {
+    if ($Global:WINVER -Match 'Windows 11') {
                      
         #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
         Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
@@ -1000,7 +1000,7 @@ function WingetModule {
     }
 
     #Verifica se a versão do Windows é a 10.
-    elseif ($Env:WINVER -Match 'Windows 10') {
+    elseif ($Global:WINVER -Match 'Windows 10') {
                      
         #Instala o pacote NuGet.
         Install-PackageProvider -Name NuGet -Force |  Clear-Host
@@ -1411,12 +1411,12 @@ function PerfilTheme {
     }
 
     #Adiciona o Tema Escuro ao Windows.
-    if ($Env:WINVER -Match 'Windows 11') {
+    if ($Global:WINVER -Match 'Windows 11') {
         
         Start-Process -FilePath 'C:\Windows\Resources\Themes\dark.theme'
     }
 
-    elseif ($Env:WINVER -Match 'Windows 10') {
+    elseif ($Global:WINVER -Match 'Windows 10') {
         
         Start-Process -FilePath 'C:\Windows\Resources\Themes\aero.theme'
     }
