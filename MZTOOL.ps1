@@ -146,8 +146,10 @@ function GETMZTOOLMODULE {
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 }
-# Verifica se o módulo MZTOOL já está carregado.
+
+# Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 do {    
+
     # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
     MZTOOLMODULE
     # Importa o módulo MZTOOL para a sessão atual.
@@ -163,6 +165,8 @@ do {
     }
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
+
+# Verifica se o perfil do PowerShell foi carregado e, se não, tenta carregá-lo.
 function GETPROFILE {  
     if ($Global:PROFILELOADED -eq $True) {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
@@ -188,25 +192,23 @@ $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 # Verifica se a sessão está sendo executada como administrador.
 if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 
-    Write-Host "ADMINISTRATOR"
-    pause
-
-    <# Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+    Write-Host "ADMINISTRADOR" -ForegroundColor Green
+    
+    <# 
+    Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -ne "u") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
         } 
-    }#> 
-    Get-ExecutionPolicy -List
-    pause
-
-    #GETPROFILE
+    }
+ 
+    GETPROFILE
+    #>
 
 }
 
 else {
 
-    Write-host "Executando como USUÁRIO." -ForegroundColor Green
-    PAUSE
+    Write-host "USUÁRIO." -ForegroundColor Gray    
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
@@ -215,19 +217,24 @@ else {
 
 }
 
+# Define as variáveis de ambiente no escopo do sistema (Machine) para MZTOOL e MZBETA.
 $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | ForEach-Object { 
+    
     [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
+    
     $loadedValue = [Environment]::GetEnvironmentVariable($_.Key, 'Machine')
+    
     if ($loadedValue -eq $_.Value) {
-        Write-Host "Variável "$_.Key" carregada com sucesso em Machine." -ForegroundColor Green
+        Write-Host "VARIÁVEL "$_.Key" CARREGADA NO SCOPO MACHINE." -ForegroundColor Green
     }
+   
     else {
-        Write-Host "Falha ao carregar a variável "$_.Key" em Machine." -ForegroundColor Red
+        Write-Host "FALHA AO CARREGAR "$_.Key" NO ESCOPO MACHINE." -ForegroundColor Red
     }
 }
 
 
-#MENU MZTOOL -----------------------------------------------------
+#MENU -----------------------------------------------------
 
 function DISPLAYMENU {
 
