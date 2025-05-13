@@ -63,18 +63,14 @@ OPSYS
 
 if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-}   
-
-Get-ExecutionPolicy -List
-
-Pause
+}  
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'DESKTOP'              = "C:\Users\Public\DESKTOP"
+    'Global:TITLE'         = $Global:TITLE 
     'Global:WINVER'        = $Global:WINVER  
-    'Global:PROFILELOADED' = "`$True"  
-    'Global:TITLE'         = $Global:TITLE    
+    'Global:PROFILELOADED' = "`$True"         
     'MZTOOL'               = "PowerShell irm https://bit.ly/MZT00L | iex"
     'MZBETA'               = "PowerShell irm https://bit.ly/MZBETA | iex"
      
@@ -183,7 +179,6 @@ function GETPROFILE {
 }
        
 GETPROFILE
-pause
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -196,8 +191,8 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
     Write-Host "ADMINISTRATOR"
     pause
 
-    <# $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
-        if ($_.ExecutionPolicy -ne "RemoteSigned") {
+    <# Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+        if ($_.ExecutionPolicy -ne "u") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
         } 
     }#> 
@@ -220,22 +215,21 @@ else {
 
 }
 
-
 $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | ForEach-Object { 
     [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
     $loadedValue = [Environment]::GetEnvironmentVariable($_.Key, 'Machine')
     if ($loadedValue -eq $_.Value) {
-        Write-Host "Variável $_.Key carregada com sucesso em Machine." -ForegroundColor Green
+        Write-Host "Variável "$_.Key" carregada com sucesso em Machine." -ForegroundColor Green
     }
     else {
-        Write-Host "Falha ao carregar a variável $_.Key em Machine." -ForegroundColor Red
+        Write-Host "Falha ao carregar a variável "$_.Key" em Machine." -ForegroundColor Red
     }
 }
 
-Pause
+
 #MENU MZTOOL -----------------------------------------------------
 
-function DisplayMenu {
+function DISPLAYMENU {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
     
@@ -387,7 +381,7 @@ ______________________________________________________
             
             Start-Sleep -Seconds 5
 
-            DisplayMenu
+            DISPLAYMENU
             
         }
 
@@ -473,7 +467,7 @@ ______________________________________________________
                     3 {
                         CLOSEAPPS
 
-                        DisplayMenu
+                        DISPLAYMENU
                     }
                     Default {
                         Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
@@ -535,7 +529,7 @@ ______________________________________________________
 
                         Clear-Host
 
-                        DisplayMenu
+                        DISPLAYMENU
             
                     }
         
@@ -568,12 +562,12 @@ ______________________________________________________
 
                         Clear-Host
                                     
-                        DisplayMenu
+                        DISPLAYMENU
                     }
         
                     3 {
 
-                        DisplayMenu
+                        DISPLAYMENU
                 
                     }
         
@@ -647,7 +641,7 @@ ______________________________________________________
 
                         Clear-Host
              
-                        DisplayMenu
+                        DISPLAYMENU
                     }
 
                     2 {
@@ -679,12 +673,12 @@ ______________________________________________________
 
                         Clear-Host
              
-                        DisplayMenu 
+                        DISPLAYMENU 
                     }
 
                     3 {
 
-                        DisplayMenu
+                        DISPLAYMENU
                 
                     }
 
@@ -739,7 +733,7 @@ ______________________________________________________
         any {
 
             NEWPWSH -FunctionNames 'AnyDesk' 
-            DisplayMenu
+            DISPLAYMENU
 
         }
 
@@ -747,7 +741,7 @@ ______________________________________________________
         e {
 
             EnvTool 
-            DisplayMenu
+            DISPLAYMENU
 
         }
 
@@ -756,7 +750,7 @@ ______________________________________________________
         w {
             
             NEWPWSH -FunctionNames 'WingetInstall' -Wait
-            DisplayMenu
+            DISPLAYMENU
 
         }
 
@@ -764,7 +758,7 @@ ______________________________________________________
         u {
 
             NEWPWSH -FunctionNames 'WinUpdateModule', 'WinUpdate' -Wait
-            DisplayMenu
+            DISPLAYMENU
 
         }
         
@@ -772,7 +766,7 @@ ______________________________________________________
         h {
 
             NEWPWSH -FunctionNames 'ClockDate'
-            DisplayMenu
+            DISPLAYMENU
 
         }
 
@@ -780,7 +774,7 @@ ______________________________________________________
         p {
 
             NEWPWSH -FunctionNames 'Pro' 
-            DisplayMenu
+            DISPLAYMENU
 
         }
 
@@ -788,7 +782,7 @@ ______________________________________________________
         sfc {
 
             NEWPWSH -FunctionNames 'ImgHealth', 'DelTemp'             
-            DisplayMenu
+            DISPLAYMENU
 
         }
 
@@ -797,7 +791,7 @@ ______________________________________________________
 
             DownloadMztool
             NEWPWSH -FunctionNames 'DriverBooster'
-            DisplayMenu
+            DISPLAYMENU
 
         }
 
@@ -817,7 +811,7 @@ ______________________________________________________
 
             Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
             Start-Sleep -Seconds 1
-            DisplayMenu
+            DISPLAYMENU
 
         }
     }
@@ -2128,7 +2122,7 @@ ______________________________________________________
                             break
                         }
                         '2' {
-                            DisplayMenu
+                            DISPLAYMENU
                             break
                         }
                         '0' {
@@ -2354,7 +2348,7 @@ function awin {
 
 NEWPWSH -FunctionNames 'ClockDate' -Hidden
 
-DisplayMenu 
+DISPLAYMENU 
 
 EXIT   
 
