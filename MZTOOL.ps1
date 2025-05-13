@@ -70,39 +70,36 @@ Get-ExecutionPolicy -List
 Pause
 
 $Global:ENVIROMENTVARS = @{
-    'TOOL'    = "C:\MZTOOL"
-    'DESKTOP' = "C:\Users\Public\DESKTOP"
-    'WINVER'  = $Global:WINVER           
-    'MZTOOL'  = "PowerShell irm https://bit.ly/MZT00L | iex"
-    'MZBETA'  = "PowerShell irm https://bit.ly/MZBETA | iex"
-       
-}.GetEnumerator() | ForEach-Object {
-    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
-         
-        # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
-        $ENTRY = $_; foreach ($SCOPE in @('Process', 'User')) {
-            [Environment]::SetEnvironmentVariable($ENTRY.Key, $ENTRY.Value, $SCOPE)
-        }
+    'TOOL'                 = "C:\MZTOOL"
+    'DESKTOP'              = "C:\Users\Public\DESKTOP"
+    'Global:WINVER'        = $Global:WINVER  
+    'Global:PROFILELOADED' = "`$True"  
+    'Global:TITLE'         = $Global:TITLE    
+    'MZTOOL'               = "PowerShell irm https://bit.ly/MZT00L | iex"
+    'MZBETA'               = "PowerShell irm https://bit.ly/MZBETA | iex"
      
+}.GetEnumerator() | ForEach-Object {
+    
+    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
+ 
         # Cria o arquivo de perfil do PowerShell se não existir.
-        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Add-Content -Value "`$Global:PROFILELOADED = `$true" | Out-Null > $null 2>&1 }
+        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
                               
         # Cria a linha de definição da variável (com o símbolo $ escapado).
-        $SETENVPROFILE = "[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n`$$($_.Key) = `"$($_.Value)`"`n`n"
-        
-        if (-not (Select-String -Path $PROFILE -Pattern '^\s*\$Global:PROFILELOADED\s*=\s*\$true\s*$' -Quiet)) {
-            # Se a variável não estiver presente, adiciona ao arquivo de perfil
-            Add-Content -Path $PROFILE -Value "`$Global:PROFILELOADED = `$true`n`n"
-        }               
-
+        $SETENVPROFILE = <#"[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n#>"`$$($_.Key) = `"$($_.Value)`"`n`n"
+                
         # Verifica se a variável já existe no arquivo de perfil.
-        if (-Not (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet)) {
-            
+        if (-Not (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet)) {            
             # Se a variável não estiver presente, adiciona ao arquivo de perfil na biblioteca Powershell do ambiente User.
-            Add-Content -Path $PROFILE -Value $SETENVPROFILE                
-
+            Add-Content -Path $PROFILE -Value $SETENVPROFILE             
         }  
-       
+    }
+
+    if ($_.Key -in @('TOOL', 'DESKTOP')) {
+        # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
+        foreach ($SCOPE in @('Process', 'User')) {
+            [Environment]::SetEnvironmentVariable($_.Key, $_.Value, $SCOPE)
+        }
     }
     $_
 }
@@ -172,13 +169,13 @@ do {
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
 function GETPROFILE {  
-    if ($Global:PROFILELOADED -eq $true) {
+    if ($Global:PROFILELOADED -eq $True) {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
     }
     else {
         . $PROFILE
         Start-Sleep -Seconds 2        
-        if ($Global:PROFILELOADED -eq $true) {
+        if ($Global:PROFILELOADED -eq $True) {
             Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
         }
         else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
