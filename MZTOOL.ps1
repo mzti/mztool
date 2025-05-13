@@ -196,7 +196,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
     
     <# 
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
-        if ($_.ExecutionPolicy -ne "u") {
+        if ($_.ExecutionPolicy "Restricted") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
         } 
     }
@@ -1937,9 +1937,10 @@ function NEWPWSH {
         [switch]$Hidden
     )
     
+    
     # Combina as definições das funções (preservando a ordem)
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function "$(MZTOOLMODULE)$fn").Definition
+        (Get-Command -Type Function "$(GETMZTOOLMODULE)$fn").Definition
     } -join "`n"
     
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
@@ -1955,7 +1956,7 @@ function NEWPWSH {
         # Caso Wait seja especificado, aguardamos o término do processo internamente.
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
     }
-    
+
     elseif ($Wait -and $Hidden) {
         # Caso Wait e Hidden sejam especificados, aguardamos o término do processo internamente.
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
