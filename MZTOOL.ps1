@@ -900,7 +900,7 @@ function DownloadMztool {
         
     } while (
         (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
-        ($NEWMZTOOLZIPHASH.Hash -ne @($MZTOOLZIPHASH1, $MZTOOLZIPHASH2))
+        ($NEWMZTOOLZIPHASH.Hash -notin @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2"))
     )
     
     Write-Host "HASH ONEDRIVE    = " -NoNewline; Write-Host "$MZTOOLZIPHASH1" -ForegroundColor Green
