@@ -196,7 +196,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
     
     <# 
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
-        if ($_.ExecutionPolicy "Restricted") {
+        if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
         } 
     }
@@ -903,10 +903,11 @@ function DownloadMztool {
         ($NEWMZTOOLZIPHASH.Hash -notin @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2"))
     )
     
-    Write-Host "HASH ONEDRIVE    = " -NoNewline; Write-Host "$MZTOOLZIPHASH1" -ForegroundColor Green
-    Write-Host "HASH GOOGLEDRIVE = " -NoNewline; Write-Host "$MZTOOLZIPHASH2" -ForegroundColor Green
-    Write-Host "HASH BAIXADO     = " -NoNewline; Write-Host "$($NEWMZTOOLZIPHASH.Hash)" -ForegroundColor Green
-    pause
+    Write-Host "HASH 1   = " ; Write-Host "$MZTOOLZIPHASH1" -ForegroundColor Green
+    Write-Host "HASH 2   = " ; Write-Host "$MZTOOLZIPHASH2" -ForegroundColor Green
+    Write-Host "HASH OK  = " ; Write-Host "$($NEWMZTOOLZIPHASH.Hash)" -ForegroundColor Green   
+    
+    Start-Sleep -Seconds 2
               
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
@@ -1347,10 +1348,10 @@ function Office2007 {
             ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
         )
         
-        Write-Host "HASH ORIGINAL = " -NoNewline; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
-        Write-Host "HASH BAIXADO  = " -NoNewline; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
+        Write-Host "HASH ORIGINAL = " ; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
+        Write-Host "HASH BAIXADO  = " ; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
 
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 2
         
         Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
