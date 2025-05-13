@@ -1248,12 +1248,47 @@ function Microsoft365 {
         Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
 
     }
+
+    else {
+        Clear-Host
+        Write-Host'
+|______________________________________________________
+|                                                    |        
+|                      MZTOOL                        |
+| _________________________________________________  |
+|               MICROSOFT OFFICE 365                 |
+|                                                    |
+|       SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
+|                                                    |
+|   |1| TENTAR NOVAMENTE                             |
+|   |2| VOLTAR AO MENU                               |
+|                                                    |
+|                                                    |      
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|  
+'
+        $365ERROR = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+        switch ($365ERROR) {
+            1 {
+                Microsoft365
+            }
+            2 {
+                #Script continua.
+            }
+            default {
+                Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                Start-Sleep -Seconds 2
+                Return
+            }
+        }
+    }    
     
     #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
     $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-    @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" }
+    @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" -ErrorAction SilentlyContinue }
     
-    Stop-Process -Name OfficeC2RClient -Force
+    Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
     
     Clear-Host
 
