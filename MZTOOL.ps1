@@ -267,8 +267,7 @@ ______________________________________________________
         1 {
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
-            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-            
+                       
             Clear-Host
             Write-Host '
 ______________________________________________________
@@ -395,7 +394,7 @@ ______________________________________________________
             #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
  
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
-            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+           
           
             
                
@@ -827,8 +826,7 @@ ______________________________________________________
 
 function ClockDate {
 
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"   
 
     #Define um novo servidor e sincroniza o relógio e a data do sistema.  
   
@@ -840,9 +838,7 @@ function ClockDate {
 
 function ToolDir {
 
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"   
 
     $ErrorActionPreference = 'silentlycontinue'
      
@@ -863,8 +859,7 @@ function DownloadMztool {
      
     #Download do arquivo MZTOOL.zip
 
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DOWNLOADMZTOOL"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DOWNLOADMZTOOL"  
 
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
@@ -960,7 +955,7 @@ function WinUpdateModule {
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+   
     
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
@@ -977,7 +972,7 @@ function WinUpdateModule {
 function WingetModule {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETMODULE"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue  
+
    
     #Módulo WINGET.
 
@@ -1944,7 +1939,7 @@ function NEWPWSH {
     
     # Combina as definições das funções (preservando a ordem)
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function $fn).Definition
+        (Get-Command -Type Function "$(MZTOOLMODULE)$fn").Definition
     } -join "`n"
     
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
