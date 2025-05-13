@@ -259,7 +259,7 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-    # Solicita ao usuário que insira o número correspondente à opção desejada
+    # Solicita ao usuário que insira o número correspondente à opção desejada.
     $MENU = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
    
     Switch ($MENU) {
@@ -285,12 +285,10 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '
-            # Garante uma linha em branco abaixo do menu
+            # Garante uma linha em branco abaixo do menu.
             Write-Host ""
-
-            # ----------------------------------------------------------------------
-            # Função para exibir a barra de progresso in-place em uma linha fixa.
-            # ----------------------------------------------------------------------
+          
+            # Função para exibir a barra de progresso in-place em uma linha fixa.           
             function DEPLOY-CustomProgress {
                 param(
                     [Parameter(Mandatory = $true)]
@@ -1951,7 +1949,7 @@ function NEWPWSH {
     
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
     $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
-    $arguments = @('-noprofile', '-EncodedCommand', $encodedCommand)
+    $arguments = @(<#'-noprofile',#> '-EncodedCommand', $encodedCommand)
     
     if ($Wait) {
         # Caso Wait seja especificado, aguardamos o término do processo internamente.
