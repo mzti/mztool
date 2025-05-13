@@ -238,9 +238,7 @@ $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | For
 
 function DISPLAYMENU {
 
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
-    
-    GETMZTOOLMODULE    
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE"         
     
     Clear-Host
     Write-Host '
@@ -421,7 +419,7 @@ ______________________________________________________
             function MENUFERRAMENTAS {
                 
                 $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
-                Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+            
                  
 
                 Clear-Host
@@ -704,7 +702,7 @@ ______________________________________________________
             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
-            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
+          
 
             Clear-Host
             Write-Host '
@@ -1050,8 +1048,7 @@ function WingetInstall {
 
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-
+ 
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         WingetModule
     }
@@ -1143,7 +1140,6 @@ function WingetUpdate {
     #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETUPDATE"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     1..3 | ForEach-Object {
             
@@ -1159,7 +1155,6 @@ function WinUpdate {
     #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATE"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Import-Module PSWindowsUpdate -Force 
 
@@ -1174,8 +1169,7 @@ function RemoveGhostDrivers {
     #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> REMOVEGHOSTDEVICES"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue    
-   
+     
     #Obtem a lista de drivers de Dispositivos Ocultos.
     $DISPOSITIVOSOCULTOS = Get-PnpDevice | Where-Object { $_.Status -eq 'Unknown' } 
 
@@ -1192,8 +1186,7 @@ function AnyDesk {
     
     #Download do software Standalone AnyDesk-CM para a área de trabalho pública.  
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> ANYDESK"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue            
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> ANYDESK"         
 
     $wc = New-Object System.Net.WebClient
     $wc.DownloadFile('https://download.anydesk.com/AnyDesk-CM.exe', "$env:DESKTOP\AnyDesk.exe")
@@ -1205,7 +1198,6 @@ function AnyDesk {
 function Microsoft365 {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
     [xml]$XML = @'
@@ -1243,7 +1235,7 @@ function Microsoft365 {
         Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
     }
 
-    else {
+    elseif ($WINGETRUNNING) {
 
         #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
         
@@ -1273,8 +1265,6 @@ function Office2007 {
     #Implementação do Microsoft Office 2007.
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> OFFICE2007"
-    
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
        
     $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
     $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
@@ -1338,7 +1328,6 @@ function Office2007 {
     
         Start-Job -Name NetFx3 -ScriptBlock { 
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> .NETFRAMEWORK3.5"
-            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
             Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
         } | Out-Null
         
@@ -1362,7 +1351,6 @@ function DriverBooster {
     #Extrai e inicializa o software Driver Booster.   
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DRIVER_BOOSTER"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
         
     Expand-Archive -LiteralPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER"
 
@@ -1416,7 +1404,6 @@ function DriverBooster {
 function PerfilTheme {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
@@ -1523,7 +1510,6 @@ function PerfilTheme {
 function PinIcons {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > PINICONS"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     function RefreshUser {
@@ -1695,7 +1681,6 @@ function PinIcons {
 function StartSoftwares {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> STARTSOFTWARES"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Start-Process CHROME
     Start-Process ACROBAT
@@ -1790,7 +1775,6 @@ function StartSoftwares {
 
 function DelTemp {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
@@ -1866,8 +1850,7 @@ function DelTemp {
 function ImgHealth {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> IMGHEALTH"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-    
+
     # Verifica a integridade da imagem do sistema.
     DISM /Online /Cleanup-Image /CheckHealth
 
@@ -1888,7 +1871,6 @@ function Pro {
 
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINDOWSPRO"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
     #Converte a versão do Windows para PRO. (Não ativa o sistema, para a ativação é necessário já haver uma Licença Digital HWID).
 
@@ -2152,7 +2134,6 @@ ______________________________________________________
                             #OPÇÃO 0 - ENCERRAR MZTOOL.
 
                             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
-                            Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
 
                             Clear-Host
                             Write-Host '
