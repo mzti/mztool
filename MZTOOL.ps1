@@ -151,8 +151,7 @@ function GETMZTOOLMODULE {
     }
 }
 # Verifica se o módulo MZTOOL já está carregado.
-do {
-    
+do {    
     # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
     MZTOOLMODULE
     # Importa o módulo MZTOOL para a sessão atual.
@@ -222,7 +221,7 @@ else {
 }
 
 
-$Global:ENVIROMENTVARS | ForEach-Object { 
+$Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | ForEach-Object { 
     [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
     $loadedValue = [Environment]::GetEnvironmentVariable($_.Key, 'Machine')
     if ($loadedValue -eq $_.Value) {
