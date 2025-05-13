@@ -1930,9 +1930,11 @@ function NEWPWSH {
         [switch]$Hidden
     )    
     
+    $GETMZTOOLMODULE = GETMZTOOLMODULE
+    
     # Combina as definições das funções (preservando a ordem)
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function "$(GETMZTOOLMODULE)$fn").Definition
+        (Get-Command -Type Function "$GETMZTOOLMODULE$fn").Definition
     } -join "`n"
     
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
