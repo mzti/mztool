@@ -864,9 +864,15 @@ function DownloadMztool {
     #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
+    $MZTOOLZIPHASH1 = "465B09A547F5FAA30B7CDD1B49126185"
+
+    $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
+
     $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
        
-    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'    
+    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    
+    
     
     # Exibe o status dos links
     if (Test-LinkOnline -Url $ONEDRIVELINK) {
@@ -887,7 +893,22 @@ function DownloadMztool {
     
     # Lista de URLs para teste (OneDrive + Google Drive como fallback)
     $DRIVEURLS = @($ONEDRIVELINK, $GOOGLEDRIVELINK)
-    Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
+
+    do {
+        
+        Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
+
+        $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5
+        
+    } while (
+        (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
+        ($NEWMZTOOLZIPHASH.Hash -ne @($MZTOOLZIPHASH1, $MZTOOLZIPHASH2))
+    )
+    
+    Write-Host "HASH ONEDRIVE    = " -NoNewline; Write-Host "$MZTOOLZIPHASH1" -ForegroundColor Green
+    Write-Host "HASH GOOGLEDRIVE = " -NoNewline; Write-Host "$MZTOOLZIPHASH2" -ForegroundColor Green
+    Write-Host "HASH BAIXADO     = " -NoNewline; Write-Host "$($NEWMZTOOLZIPHASH.Hash)" -ForegroundColor Green
+    pause
               
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
