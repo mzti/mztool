@@ -1671,13 +1671,6 @@ function PinIcons {
           
 }
 
-function DefaultSoftwares {
-
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > DEFAULTSOFTWARES"
-    Import-Module MZTOOL -Force -ErrorAction SilentlyContinue
-   
-}
-
 function StartSoftwares {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> STARTSOFTWARES"
@@ -1935,8 +1928,7 @@ function NEWPWSH {
         [switch]$Wait,
         [switch]$ReturnProcess,
         [switch]$Hidden
-    )
-    
+    )    
     
     # Combina as definições das funções (preservando a ordem)
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
