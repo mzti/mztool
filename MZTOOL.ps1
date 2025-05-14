@@ -125,6 +125,28 @@ function MZTOOLMODULE {
 
     $MODULECONTENT = @'
 # MZTOOL.psm1
+
+#region Importações e API
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class Win32 {
+    public const int GWL_STYLE = -16;
+    public const int WS_SIZEBOX = 0x00040000;
+    public const int WS_MAXIMIZEBOX = 0x00010000;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll")]
+    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+}
+"@
+#endregion
+
 #region Customização do Console
 $Global:TITLE = "MZTOOL BETA"
 $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
@@ -135,8 +157,24 @@ $Win.Width = 58
 $H.UI.RawUI.Set_WindowSize($Win)
 $H.UI.RawUI.Set_BufferSize($Win)
 #endregion
-'@
-    
+
+#region Fixar tamanho e remover redimensionamento
+$global:hwnd = (Get-Process -Id $PID).MainWindowHandle
+if ($global:hwnd -ne [IntPtr]::Zero) {
+    $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
+    $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
+    [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
+
+    # Bloqueia a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
+    $SWP_NOMOVE       = 0x0002
+    $SWP_NOSIZE       = 0x0001
+    $SWP_NOZORDER     = 0x0004
+    $SWP_FRAMECHANGED = 0x0020
+    $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
+    [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
+}
+#endregion
+'@       
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
@@ -1144,7 +1182,7 @@ function WingetUpdate {
 
     1..3 | ForEach-Object {
             
-        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements --Include-Unknown
+        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements
 
         Clear-Host
 
