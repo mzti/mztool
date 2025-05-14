@@ -1180,9 +1180,31 @@ function WingetUpdate {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETUPDATE"
 
-    1..3 | ForEach-Object {
+    1..2 | ForEach-Object {
             
-        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements
+        #Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements
+        # Obtém a lista de pacotes para upgrade, incluindo aqueles com versão desconhecida
+        $upgradeList = winget upgrade --all --accept-source-agreements --accept-package-agreements --include-unknown --output json | ConvertFrom-Json
+
+        # Filtra somente os pacotes que efetivamente precisam de atualização.
+        # Aqui, por exemplo, estamos considerando que:
+        # - Se as versões estão definidas e são diferentes, o pacote deve ser atualizado.
+        # - Se a versão instalada for nula ou contiver a palavra "unknown", você pode optar por atualizar (ou, alternativamente, ignorar).
+        $packagesToUpgrade = $upgradeList | Where-Object {
+    ($_.Version -and $_.AvailableVersion -and ($_.Version -ne $_.AvailableVersion)) `
+                -or
+    ((-not $_.Version) -or ($_.Version -match 'unknown'))
+        }
+
+        if ($packagesToUpgrade.Count -eq 0) {
+            Write-Host "Nenhuma atualização necessária; todos os pacotes estão na versão mais recente ou são inválidos para comparação."
+        }
+        else {
+            foreach ($pkg in $packagesToUpgrade) {
+                Write-Host "Atualizando '$($pkg.Name)': de '$($pkg.Version)' para '$($pkg.AvailableVersion)'."
+                winget upgrade --id $pkg.Id --accept-source-agreements --accept-package-agreements
+            }
+        }
 
         Clear-Host
 
