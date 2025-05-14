@@ -1235,11 +1235,16 @@ function AnyDesk {
 }
 
 function Microsoft365 {
-
+    #Implementação do Microsoft Office 365.
+    
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
-
-    #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
-    [xml]$XML = @'
+    
+    #Verifica se o Microsoft 365 já está instalado.
+    $MS365 = Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue
+    if (-not ($MS365)) {                     
+             
+        #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
+        [xml]$XML = @'
 <Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
   <Add OfficeClientEdition="64" Channel="Current">
     <Product ID="O365ProPlusEEANoTeamsRetail">
@@ -1262,41 +1267,41 @@ function Microsoft365 {
   <Display Level="TRUE" AcceptEULA="TRUE" />
 </Configuration> 
 '@           
-    $XML.save("$env:Temp\MICROSOFT365.xml") 
+        $XML.save("$env:Temp\MICROSOFT365.xml") 
    
-    $365XML = "$env:Temp\MICROSOFT365.xml"
+        $365XML = "$env:Temp\MICROSOFT365.xml"
 
-    $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
-    $WINGETRUNNING = Get-Process -Name winget -ErrorAction SilentlyContinue
+        $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
+        $WINGETRUNNING = Get-Process -Name winget -ErrorAction SilentlyContinue
 
-    if ($WINGETAVAILABLE -and !$WINGETRUNNING) {      
+        if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !($MS365)) {      
         
-        Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
-    }
-
-    elseif ($WINGETRUNNING) {
-
-        #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
-        
-        $365URL1 = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
-        $365URL2 = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
-        
-        $365URLS = @($365URL1, $365URL2)
-        $365EXE = "$env:TEMP\MICROSOFT365.exe"
-
-        #$wc = New-Object System.Net.WebClient
-        #$wc.DownloadFile($365URL, $365EXE)
-        Invoke-DownloadFileWithRedundancy -Urls $365URLS -Destination $365EXE -BarWidth 30
-        
-        if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
-            Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
+            Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
         }
-     
-    }
 
-    else {
-        Clear-Host
-        Write-Host'
+        elseif ($WINGETRUNNING -and !($MS365)) {
+
+            #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
+        
+            $365URL1 = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
+            $365URL2 = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
+        
+            $365URLS = @($365URL1, $365URL2)
+            $365EXE = "$env:TEMP\MICROSOFT365.exe"
+
+            #$wc = New-Object System.Net.WebClient
+            #$wc.DownloadFile($365URL, $365EXE)
+            Invoke-DownloadFileWithRedundancy -Urls $365URLS -Destination $365EXE -BarWidth 30
+        
+            if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
+                Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
+            }
+     
+        }
+
+        else {
+            Clear-Host
+            Write-Host'
 |______________________________________________________
 |                                                    |        
 |                      MZTOOL                        |
@@ -1313,28 +1318,34 @@ function Microsoft365 {
 |                   DANIEL MOZART                    |
 |____________________________________________________|  
 '
-        $365ERROR = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-        switch ($365ERROR) {
-            1 {
-                Microsoft365
+            $365ERROR = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+            switch ($365ERROR) {
+                1 {
+                    Microsoft365
+                }
+                2 {
+                    #Script continua.
+                }
+                default {
+                    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                    Start-Sleep -Seconds 2
+                    Return
+                }
             }
-            2 {
-                #Script continua.
-            }
-            default {
-                Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                Start-Sleep -Seconds 2
-                Return
-            }
-        }
-    }    
+        }    
     
-    #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
-    $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-    @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" -ErrorAction SilentlyContinue }
+        #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
+        $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+        @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" -ErrorAction SilentlyContinue }
     
-    Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
+        Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
+    }
     
+    else {
+        #Script continua.
+        Write-Host 'MICROSOFT 365 JÁ INSTALADO.'    
+        Start-Sleep -Seconds 2
+    }  
     Clear-Host
 
 }   
