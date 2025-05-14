@@ -1356,82 +1356,99 @@ function Office2007 {
     #Implementação do Microsoft Office 2007.
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> OFFICE2007"
-       
-    $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
-    $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
 
-    $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
-    $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
-    $OFFICE2007HASH = "43543423A3EF750BFCA1E1A35696741A"
-
-    $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
-
-    function DownloadOffice2007 {                
+    #Verifica se o Microsoft Office 2007 já está instalado.
+    $OFFICE2007 = Get-Command "C:\Program Files\Microsoft Office\Office12\WINWORD.EXE" -ErrorAction SilentlyContinue
+    if (-NOT ($OFFICE2007)) {        
+        
     
-        #Verifica se a pasta OFFICE2007 já existe. Caso não exista, cria a pasta e baixa o arquivo ZIP do Microsoft Office 2007.
-
-        if (-not (Test-Path -Path $OFFICE2007FOLDER -ErrorAction SilentlyContinue)) {
-
-            ToolDir
-
-            New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
-
-        }    
-    
-        # Exibe o status dos links
-        if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
-        }
-        else {
-            Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
-        }
-
-        if (Test-LinkOnline -Url $OFFICE2007GOOGLEDRIVE) {
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
-        }
-        else {
-            Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
-        }
        
-        do {
-            Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
+        $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
+        $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
 
-            $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm MD5
+        $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
+        $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
+        $OFFICE2007HASH = "43543423A3EF750BFCA1E1A35696741A"
+
+        $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
+
+        function DownloadOffice2007 {   
+        
+            #Download do arquivo OFFICE2007.zip
+    
+            #Verifica se a pasta OFFICE2007 já existe. Caso não exista, cria a pasta e baixa o arquivo ZIP do Microsoft Office 2007.
+
+            if (-not (Test-Path -Path $OFFICE2007FOLDER -ErrorAction SilentlyContinue)) {
+
+                ToolDir
+
+                New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
+
+            }    
+    
+            # Exibe o status dos links
+            if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
+                Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
+            }
+            else {
+                Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
+            }
+
+            if (Test-LinkOnline -Url $OFFICE2007GOOGLEDRIVE) {
+                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
+            }
+            else {
+                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
+            }
+       
+            do {
+                Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
+
+                $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm MD5
             
-        } while (
+            } while (
             (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
             ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
-        )
+            )
         
-        Write-Host "HASH ORIGINAL = " ; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
-        Write-Host "HASH BAIXADO  = " ; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
+            Write-Host "HASH ORIGINAL = " ; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
+            Write-Host "HASH BAIXADO  = " ; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
 
-        Start-Sleep -Seconds 2
+            Start-Sleep -Seconds 2
         
-        Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
+            Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
-        Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
+            Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
 
-    } 
-    function NetFx3 {
+        } 
+        function NetFx3 {
 
-        #Implementa o recurso .NetFramework 3.5 no sistema.
+            #Implementa o recurso .NetFramework 3.5 no sistema.
     
-        Start-Job -Name NetFx3 -ScriptBlock { 
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> .NETFRAMEWORK3.5"
-            Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
-        } | Out-Null
+            Start-Job -Name NetFx3 -ScriptBlock { 
+                $Host.UI.RawUI.WindowTitle = "$Global:TITLE> .NETFRAMEWORK3.5"
+                Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
+            } | Out-Null
         
-    }
+        }
      
-    DownloadOffice2007
+        DownloadOffice2007
 
-    NetFx3
+        NetFx3
     
-    #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
-    Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
-    Wait-Job -Name NetFx3 | Out-Null
-    Start-Process 'winword.exe'
+        #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
+        Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
+        Wait-Job -Name NetFx3 | Out-Null
+        Start-Process 'winword.exe'
+
+    }
+    else {
+        #Script continua.
+        Write-Host 'MICROSOFT OFFICE 2007 JÁ INSTALADO.'    
+        Start-Sleep -Seconds 2
+    }  
+    
+    Clear-Host
    
    
 }
