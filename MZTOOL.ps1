@@ -3,7 +3,7 @@
     Instalação e personalização automatizada de softwares e o perfil de usuário no ambiente Windows.
 
 .DESCRIPTION
-    Instale softwares e personaliza o perfil de usuário no Windows automaticamente a partir da nuvem e de pacotes e módulos da Microsoft. 
+    Instala e atualiza softwares, personaliza o perfil de usuário no Windows automaticamente, realiza o download e executa softwares de diagnósticos a partir de pacotes e módulos da Microsoft, CDN's com redundância e da nuvem.
     
 .NOTES
     Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
@@ -21,9 +21,11 @@ Softwares (Winget): Adobe Acrobat Reader, Google Chrome, Microsoft 365, Powershe
 Atualizações (PSWindowsUpdate): Remoção de drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos) e Implementação e Atualização de novos e atuais Drivers de Dispositivo e Atualizações do Windows Update.
 
 Personalização do Perfil de Usuário (Regedit, XML, Appx): Tema, Ícones da Área de Trabalho e Barra de Tarefas, Remoção de Widgets, Remoção de Bloatwares, Remoção do Microsoft Copilot, Remoção de Ícones Visão de Tarefas e Notícias, Remoção de notificações da Central de Ações, Define o Google Chrome como navegador padrão e o Acrobat Reader como leitor de PDF padrão.
+
 2 - Download e execução standalone automatizada em nuvem de softwares para monitoramento e diagnóstico de hardwares.
 
 HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, GPUZ.
+
 3 - Atualização automátizada de softwares e drivers através do Winget e Módulo Windows Update.
 
 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
