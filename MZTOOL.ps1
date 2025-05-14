@@ -1012,8 +1012,7 @@ function WinUpdateModule {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"
-   
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
@@ -1182,30 +1181,8 @@ function WingetUpdate {
 
     1..2 | ForEach-Object {
             
-        #Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements
-        # Obtém a lista de pacotes para upgrade, incluindo aqueles com versão desconhecida
-        $upgradeList = winget upgrade --all --accept-source-agreements --accept-package-agreements --include-unknown --output json | ConvertFrom-Json
-
-        # Filtra somente os pacotes que efetivamente precisam de atualização.
-        # Aqui, por exemplo, estamos considerando que:
-        # - Se as versões estão definidas e são diferentes, o pacote deve ser atualizado.
-        # - Se a versão instalada for nula ou contiver a palavra "unknown", você pode optar por atualizar (ou, alternativamente, ignorar).
-        $packagesToUpgrade = $upgradeList | Where-Object {
-    ($_.Version -and $_.AvailableVersion -and ($_.Version -ne $_.AvailableVersion)) `
-                -or
-    ((-not $_.Version) -or ($_.Version -match 'unknown'))
-        }
-
-        if ($packagesToUpgrade.Count -eq 0) {
-            Write-Host "Nenhuma atualização necessária; todos os pacotes estão na versão mais recente ou são inválidos para comparação."
-        }
-        else {
-            foreach ($pkg in $packagesToUpgrade) {
-                Write-Host "Atualizando '$($pkg.Name)': de '$($pkg.Version)' para '$($pkg.AvailableVersion)'."
-                winget upgrade --id $pkg.Id --accept-source-agreements --accept-package-agreements
-            }
-        }
-
+        Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements 
+       
         Clear-Host
 
     }
@@ -1247,10 +1224,11 @@ function AnyDesk {
     
     #Download do software Standalone AnyDesk-CM para a área de trabalho pública.  
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> ANYDESK"         
-
-    $wc = New-Object System.Net.WebClient
-    $wc.DownloadFile('https://download.anydesk.com/AnyDesk-CM.exe', "$env:DESKTOP\AnyDesk.exe")
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> ANYDESK"     
+    
+    $ANYDESKLINK = 'https://download.anydesk.com/AnyDesk-CM.exe'
+    
+    New-Object System.Net.WebClient.DownloadFile($ANYDESKLINK, "$env:DESKTOP\AnyDesk.exe")
 
     Clear-Host
     
@@ -1300,14 +1278,20 @@ function Microsoft365 {
 
         #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
         
-        #$365URL = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
-        $365URL = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
+        $365URL1 = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
+        $365URL2 = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
+        
+        $365URLS = @($365URL1, $365URL2)
         $365EXE = "$env:TEMP\MICROSOFT365.exe"
 
-        $wc = New-Object System.Net.WebClient
-        $wc.DownloadFile($365URL, $365EXE)
-        Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
-
+        #$wc = New-Object System.Net.WebClient
+        #$wc.DownloadFile($365URL, $365EXE)
+        Invoke-DownloadFileWithRedundancy -Urls $365URLS -Destination $365EXE -BarWidth 30
+        
+        if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
+            Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
+        }
+     
     }
 
     else {
