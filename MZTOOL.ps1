@@ -2044,7 +2044,7 @@ function NEWPWSH {
     )    
     
     $PRELOADEDFUNCTIONS = @(
-        'GetMzToolModule',
+        'GETMZTOOLMODULE',
         'Test-LinkOnline',
         'DOWNLOADCustomProgress',
         'Invoke-DownloadFileWithProgress'
