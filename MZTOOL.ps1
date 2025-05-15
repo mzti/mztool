@@ -2044,14 +2044,14 @@ function NEWPWSH {
     )    
     
     $PRELOADEDFUNCTIONS = @(
-        'Get-MzToolModule',
+        'GetMzToolModule',
         'Test-LinkOnline',
         'DOWNLOADCustomProgress',
         'Invoke-DownloadFileWithProgress'
         'Invoke-DownloadFileWithRedundancy'
-        'Expand-Archive-WithCustomProgress'       
         'EXPANDCustomProgress'
         'Expand-ArchiveEntryStream'
+        'Expand-Archive-WithCustomProgress'    
         'NEWPSH'          
     )
     # Combina as definições das funções (preservando a ordem)
