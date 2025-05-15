@@ -2043,21 +2043,22 @@ function NEWPWSH {
         [switch]$Hidden
     )    
     
-    $PRELOADEDFUNCTIONS = @(
-        'GETMZTOOLMODULE',
-        'Test-LinkOnline',
-        'DOWNLOADCustomProgress',
-        'Invoke-DownloadFileWithProgress'
-        'Invoke-DownloadFileWithRedundancy'
-        'EXPANDCustomProgress'
-        'Expand-ArchiveEntryStream'
-        'Expand-Archive-WithCustomProgress'    
-        'NEWPSH'          
-    )
+   
     # Combina as definições das funções (preservando a ordem)
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        $PRELOADEDFUNCTIONS | ForEach-Object { (Get-Command -Type Function $PRELOADEDFUNCTIONS).Definition }       
-        (Get-Command -Type Function $fn).Definition
+        $PRELOADEDFUNCTIONS = @(
+            'GETMZTOOLMODULE',
+            'Test-LinkOnline',
+            'DOWNLOADCustomProgress',
+            'Invoke-DownloadFileWithProgress'
+            'Invoke-DownloadFileWithRedundancy'
+            'EXPANDCustomProgress'
+            'Expand-ArchiveEntryStream'
+            'Expand-Archive-WithCustomProgress'    
+            'NEWPSH'          
+        ) | ForEach-Object { (Get-Command -Type Function $_).Definition }       
+        # Junta o código pré-carregado com a definição da função específica.
+        ($PRELOADEDFUNCTIONS, (Get-Command -Type Function $fn).Definition) -join "`n"
     } -join "`n"
     
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
