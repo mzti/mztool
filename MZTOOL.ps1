@@ -179,7 +179,7 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 
 #FUNCÕES
 
-function Test-LinkOnline {
+function TESTLINK {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Url
@@ -198,7 +198,7 @@ function Test-LinkOnline {
     }
 }
 
-function DOWNLOADCustomProgress {
+function DOWNLOADPROGRESS {
     param(
         [Parameter(Mandatory = $true)]
         [int]$PercentComplete,
@@ -226,7 +226,7 @@ function DOWNLOADCustomProgress {
 }
 
 # Função para efetuar o download via HttpWebRequest e atualizar a barra de progresso
-function Invoke-DownloadFileWithProgress {
+function INVOKEDOWNLOAD {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Url,
@@ -274,7 +274,7 @@ function Invoke-DownloadFileWithProgress {
         if ($totalBytes -gt 0) {
             $percent = [math]::Round(($totalRead / $totalBytes) * 100)
             if ($percent -ne $lastPercent) {
-                DOWNLOADCustomProgress -PercentComplete $percent -BarWidth $BarWidth
+                DOWNLOADPROGRESS -PercentComplete $percent -BarWidth $BarWidth
                 $lastPercent = $percent
             }
         }
@@ -286,7 +286,7 @@ function Invoke-DownloadFileWithProgress {
 }
 
 # Função que tenta baixar de uma lista de URLs (ordem de prioridade)
-function Invoke-DownloadFileWithRedundancy {
+function DOWNLOAD {
     param(
         [Parameter(Mandatory = $true)]
         [string[]]$Urls,
@@ -296,8 +296,8 @@ function Invoke-DownloadFileWithRedundancy {
     )
 
     foreach ($url in $Urls) {
-        if (Test-LinkOnline -Url $url) {
-            Invoke-DownloadFileWithProgress -Url $url -Destination $Destination -BarWidth $BarWidth
+        if (TESTLINK -Url $url) {
+            INVOKEDOWNLOAD -Url $url -Destination $Destination -BarWidth $BarWidth
             return
         }
 
@@ -388,7 +388,7 @@ ______________________________________________________
     }
 }
 
-function EXPANDCustomProgress {
+function EXPANDPROGRESS {
     param(
         [Parameter(Mandatory = $true)]
         [int]$PercentComplete
@@ -419,7 +419,7 @@ function EXPANDCustomProgress {
 }
 
 # Função auxiliar para extrair uma entrada via streams (caso ExtractToFile não esteja disponível)
-function Expand-ArchiveEntryStream {
+function EXPANDSTREAM {
     param (
         [Parameter(Mandatory = $true)]
         $Entry,
@@ -455,7 +455,7 @@ function Expand-ArchiveEntryStream {
 }
 
 # Função principal para extrair o ZIP com a barra de progresso customizada na parte inferior
-function Expand-Archive-WithCustomProgress {
+function EXPAND {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -483,7 +483,7 @@ function Expand-Archive-WithCustomProgress {
         $currentEntry++
         $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
         # Atualiza a barra de progresso customizada na última linha
-        EXPANDCustomProgress -PercentComplete $percentComplete
+        EXPANDPROGRESS -PercentComplete $percentComplete
 
         # Define o caminho completo de destino para a entrada
         $destPath = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
@@ -524,14 +524,14 @@ function Expand-Archive-WithCustomProgress {
                     if (-not $Quiet) {
                         Write-Host "Erro em ExtractToFile para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
                     }
-                    Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+                    EXPANDSTREAM -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
                 }
             }
             else {
                 if (-not $Quiet) {
                     Write-Host "Método ExtractToFile indisponível para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
                 }
-                Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+                EXPANDSTREAM -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
             }
         }
     }
@@ -1289,14 +1289,14 @@ function DownloadMztool {
     
     
     # Exibe o status dos links
-    if (Test-LinkOnline -Url $ONEDRIVELINK) {
+    if (TESTLINK -Url $ONEDRIVELINK) {
         Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
     }
     else {
         Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
     }
 
-    if (Test-LinkOnline -Url $GOOGLEDRIVELINK) {
+    if (TESTLINK -Url $GOOGLEDRIVELINK) {
         Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
     }
     else {
@@ -1310,7 +1310,7 @@ function DownloadMztool {
 
     do {
         
-        Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
+        DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
 
         $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5
         
@@ -1329,7 +1329,7 @@ function DownloadMztool {
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
         #Extrai o arquivo MZTOOL.zip para a pasta $Env:TOOL.
-        Expand-Archive-WithCustomProgress -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
+        EXPAND -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
                       
         #Deleta o arquivo MZTOOL.zip.
         Remove-Item $MZTOOLZIP
@@ -1669,7 +1669,7 @@ function MICROSOFT365 {
 
             #$wc = New-Object System.Net.WebClient
             #$wc.DownloadFile($365URL, $365EXE)
-            Invoke-DownloadFileWithRedundancy -Urls $365URLS -Destination $365EXE -BarWidth 30
+            DOWNLOAD -Urls $365URLS -Destination $365EXE -BarWidth 30
         
             if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
                 Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
@@ -1765,14 +1765,14 @@ function Office2007 {
             }    
     
             # Exibe o status dos links
-            if (Test-LinkOnline -Url $OFFICE2007ONEDRIVE) {
+            if (TESTLINK -Url $OFFICE2007ONEDRIVE) {
                 Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
             }
             else {
                 Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
             }
 
-            if (Test-LinkOnline -Url $OFFICE2007GOOGLEDRIVE) {
+            if (TESTLINK -Url $OFFICE2007GOOGLEDRIVE) {
                 Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
             }
             else {
@@ -1780,7 +1780,7 @@ function Office2007 {
             }
        
             do {
-                Invoke-DownloadFileWithRedundancy -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
+                DOWNLOAD -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
                 $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm MD5
             
@@ -1794,7 +1794,7 @@ function Office2007 {
 
             Start-Sleep -Seconds 2
         
-            Expand-Archive-WithCustomProgress -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
+            EXPAND -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
             Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
 
@@ -2458,7 +2458,7 @@ function NEWPWSH {
     }
 }
 <#
-function Test-LinkOnline {
+function TESTLINK {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Url
@@ -2477,7 +2477,7 @@ function Test-LinkOnline {
     }
 }
 
-function DOWNLOADCustomProgress {
+function DOWNLOADPROGRESS {
     param(
         [Parameter(Mandatory = $true)]
         [int]$PercentComplete,
@@ -2505,7 +2505,7 @@ function DOWNLOADCustomProgress {
 }
 
 # Função para efetuar o download via HttpWebRequest e atualizar a barra de progresso
-function Invoke-DownloadFileWithProgress {
+function INVOKEDOWNLOAD {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Url,
@@ -2553,7 +2553,7 @@ function Invoke-DownloadFileWithProgress {
         if ($totalBytes -gt 0) {
             $percent = [math]::Round(($totalRead / $totalBytes) * 100)
             if ($percent -ne $lastPercent) {
-                DOWNLOADCustomProgress -PercentComplete $percent -BarWidth $BarWidth
+                DOWNLOADPROGRESS -PercentComplete $percent -BarWidth $BarWidth
                 $lastPercent = $percent
             }
         }
@@ -2565,7 +2565,7 @@ function Invoke-DownloadFileWithProgress {
 }
 
 # Função que tenta baixar de uma lista de URLs (ordem de prioridade)
-function Invoke-DownloadFileWithRedundancy {
+function DOWNLOAD {
     param(
         [Parameter(Mandatory = $true)]
         [string[]]$Urls,
@@ -2575,8 +2575,8 @@ function Invoke-DownloadFileWithRedundancy {
     )
 
     foreach ($url in $Urls) {
-        if (Test-LinkOnline -Url $url) {
-            Invoke-DownloadFileWithProgress -Url $url -Destination $Destination -BarWidth $BarWidth
+        if (TESTLINK -Url $url) {
+            INVOKEDOWNLOAD -Url $url -Destination $Destination -BarWidth $BarWidth
             return
         }
 
@@ -2667,7 +2667,7 @@ ______________________________________________________
     }
 }
 
-function EXPANDCustomProgress {
+function EXPANDPROGRESS {
     param(
         [Parameter(Mandatory = $true)]
         [int]$PercentComplete
@@ -2698,7 +2698,7 @@ function EXPANDCustomProgress {
 }
 
 # Função auxiliar para extrair uma entrada via streams (caso ExtractToFile não esteja disponível)
-function Expand-ArchiveEntryStream {
+function EXPANDSTREAM {
     param (
         [Parameter(Mandatory = $true)]
         $Entry,
@@ -2734,7 +2734,7 @@ function Expand-ArchiveEntryStream {
 }
 
 # Função principal para extrair o ZIP com a barra de progresso customizada na parte inferior
-function Expand-Archive-WithCustomProgress {
+function EXPAND {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -2762,7 +2762,7 @@ function Expand-Archive-WithCustomProgress {
         $currentEntry++
         $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
         # Atualiza a barra de progresso customizada na última linha
-        EXPANDCustomProgress -PercentComplete $percentComplete
+        EXPANDPROGRESS -PercentComplete $percentComplete
 
         # Define o caminho completo de destino para a entrada
         $destPath = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
@@ -2803,14 +2803,14 @@ function Expand-Archive-WithCustomProgress {
                     if (-not $Quiet) {
                         Write-Host "Erro em ExtractToFile para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
                     }
-                    Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+                    EXPANDSTREAM -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
                 }
             }
             else {
                 if (-not $Quiet) {
                     Write-Host "Método ExtractToFile indisponível para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
                 }
-                Expand-ArchiveEntryStream -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
+                EXPANDSTREAM -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
             }
         }
     }
@@ -2831,12 +2831,12 @@ function Expand-Archive-WithCustomProgress {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
-
 #>
+
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
-
+    
 NEWPWSH -FunctionNames 'ClockDate' -Hidden
 
 DISPLAYMENU 
