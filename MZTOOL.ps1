@@ -179,6 +179,55 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 
 #FUNCÕES
 
+function NEWPWSH {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$FunctionNames,
+        [switch]$Wait,
+        [switch]$ReturnProcess,
+        [switch]$Hidden
+    )    
+    
+   
+    # Combina as definições das funções (preservando a ordem)
+    $combinedDefinitions = foreach ($fn in $FunctionNames) {
+         (Get-Command -Type Function GETMZTOOLMODULE).Definition      
+        # Junta o código pré-carregado com a definição da função específica.
+         (Get-Command -Type Function $fn).Definition
+    } -join "`n"
+    
+    # Converte o conteúdo para Base64 para uso com -EncodedCommand
+    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+    $arguments = @('-EncodedCommand', $encodedCommand)
+    
+    if ($Wait) {
+        # Caso Wait seja especificado, aguardamos o término do processo internamente.
+        [void](Start-Process powershell -ArgumentList $arguments -Wait)
+    }
+      
+    if ($Hidden) {
+        # Caso Wait seja especificado, aguardamos o término do processo internamente.
+        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
+    }
+
+    elseif ($Wait -and $Hidden) {
+        # Caso Wait e Hidden sejam especificados, aguardamos o término do processo internamente.
+        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
+    }
+
+    elseif ($ReturnProcess) {
+        # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
+        $proc = Start-Process powershell -ArgumentList $arguments -PassThru
+        return $proc
+    }
+
+    else {
+        # Se nada for especificado, usamos a forma que não retorna nada – compatível com [void](...)
+        [void](Start-Process powershell -ArgumentList $arguments)
+    }
+}
+
 function TESTLINK {
     param(
         [Parameter(Mandatory = $true)]
@@ -361,17 +410,10 @@ ______________________________________________________
 |____________________________________________________|
 '
         
-                            DelTemp
-
-                            if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
-
-                                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
-                            }
+                            CLEANTEMP                           
 
                             Start-Sleep -Seconds 2
-                            Exit
-                            Exit-PSHostProcess
-                            Exit-PSSession
+                            Exit                            
                         }
                         default {
                             Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
@@ -383,7 +425,7 @@ ______________________________________________________
         
                 DisplayMenuDownloadError
     
-            } while ($true)<# Action when all if and elseif conditions are false #>
+            } while ($true)# Action when all if and elseif conditions are false
         }
     }
 }
@@ -578,6 +620,18 @@ do {
     else {
         Write-Host "Falha ao carregar o módulo MZTOOL." -ForegroundColor Red
         Start-Sleep -Seconds 5
+       
+        $TRY = $TRY + 1 
+        Write-Host "Falha ao carregar o módulo MZTOOL.`nTentativa "$TRY" de 5 para carregar o módulo MZTOOL.`n" -ForegroundColor Yellow
+        
+        #Se o número de tentativas for maior ou igual a 5, encerra o script.
+        if ($TRY -ge 5) {
+
+            Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
+            Start-Sleep -Seconds 5
+            
+        }
+        
     }
 
 } while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
@@ -702,7 +756,7 @@ ______________________________________________________
             Write-Host ""
           
             # Função para exibir a barra de progresso in-place em uma linha fixa.           
-            function DEPLOY-CustomProgress {
+            function DEPLOYFUNCTIONPROGRESS {
                 param(
                     [Parameter(Mandatory = $true)]
                     [int]$PercentComplete,
@@ -733,29 +787,19 @@ ______________________________________________________
                 Write-Host $progressText -NoNewline
             }
 
-            function Invoke-AllGroups {
+            function DEPLOYFUNCTION {
                 param(
                     [int]$BarWidth = 30,
                     [int]$LinePosition = 17
                 )
-    
-                $groups = @(
-                    @{ Functions = 'PerfilTheme' },
-                    @{ Functions = 'AnyDesk' },
-                    @{ Functions = 'WingetModule'; Wait = $true },
-                    @{ Functions = 'WinUpdateModule', 'RemoveGhostDrivers', 'WinUpdate' },
-                    @{ Functions = 'WingetInstall', 'WingetUpdate' },
-                    @{ Functions = 'Microsoft365'; Wait = $true },
-                    @{ Functions = 'PinIcons', 'StartSoftwares' }
-                )
-    
-                $total = $groups.Count
+                      
+                $total = $DEPLOYFUNCTION.Count
                 $completed = 0
 
                 # Exibe a barra inicial (0% concluído)
-                DEPLOY-CustomProgress -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
+                DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
 
-                foreach ($group in $groups) {
+                foreach ($group in $DEPLOYFUNCTION) {
                     if ($group.ContainsKey("Wait") -and $group.Wait) {
                         NEWPWSH -FunctionNames $group.Functions -Wait
                     }
@@ -764,7 +808,7 @@ ______________________________________________________
                     }
                     $completed++
                     $percent = [math]::Round(($completed * 100) / $total)
-                    DEPLOY-CustomProgress -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
+                    DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
                     
                     # Aguarda 3 segundos antes de iniciar o próximo grupo
                     Start-Sleep -Seconds 3
@@ -772,12 +816,20 @@ ______________________________________________________
 
                 # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
                 Write-Host ""
-            }
+            }   
 
-            # ----------------------------------------------------------------------
+            $DEPLOYFUNCTION = @(
+                @{ Functions = 'PerfilTheme' },
+                @{ Functions = 'ANYDESK' },
+                @{ Functions = 'WINGETMODULE'; Wait = $true },
+                @{ Functions = 'WINUPDATEMODULE', 'RemoveGhostDrivers', 'WINUPDATE' },
+                @{ Functions = 'WINGETINSTALL', 'WingetUpdate' },
+                @{ Functions = 'Microsoft365'; Wait = $true },
+                @{ Functions = 'PinIcons', 'StartSoftwares' }
+            )
+                  
             # Chamada final para executar os grupos com a barra de progresso unificada.
-            # ----------------------------------------------------------------------
-            Invoke-AllGroups -BarWidth 30 -LinePosition 17                      
+            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17                      
 
                      
             Clear-Host
@@ -828,7 +880,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '                               
-            DownloadMztool            
+            DOWNLOADMZTOOL            
           
             Start-Sleep -Seconds 1
             DIAGNOSTICS
@@ -937,15 +989,13 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        $proc1 = NEWPWSH -FunctionNames 'WingetModule' -ReturnProcess
-                        $proc2 = NEWPWSH -FunctionNames 'WinUpdateModule' -ReturnProcess
+                        $proc1 = NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
+                        $proc2 = NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
 
                         $validProcesses = @($proc1, $proc2) | Where-Object { $_.Id -gt 0 }
                         Wait-Process -Id $validProcesses.Id          
          
-                        DelTemp
-
-                        Clear-Host
+                        CLEANTEMP
 
                         DISPLAYMENU
             
@@ -971,14 +1021,12 @@ ______________________________________________________
 
                    
                         $proc1 = NEWPWSH -FunctionNames 'WingetUpdate' -ReturnProcess
-                        $proc2 = NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WinUpdate' -ReturnProcess
+                        $proc2 = NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WINUPDATE' -ReturnProcess
 
                         $validProcesses = @($proc1, $proc2) | Where-Object { $_.Id -gt 0 }
                         Wait-Process -Id $validProcesses.Id
 
-                        DelTemp
-
-                        Clear-Host
+                        CLEANTEMP
                                     
                         DISPLAYMENU
                     }
@@ -1055,10 +1103,8 @@ ______________________________________________________
 
                         Start-Sleep 1
 
-                        DelTemp                       
+                        CLEANTEMP                   
 
-                        Clear-Host
-             
                         DISPLAYMENU
                     }
 
@@ -1081,15 +1127,13 @@ ______________________________________________________
 '    
                         
                     
-                        NEWPWSH -FunctionNames 'MICROSOFT365' -Wait
+                        NEWPWSH -FunctionNames 'WINGETMODULE' -Wait
                       
                         NEWPWSH -FunctionNames 'MICROSOFT365' -Wait 
 
                         Start-Sleep -1
 
-                        DelTemp
-
-                        Clear-Host
+                        CLEANTEMP
              
                         DISPLAYMENU 
                     }
@@ -1104,8 +1148,7 @@ ______________________________________________________
                         #ENTRADA INVÁLIDA.
 
                         Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                        Start-Sleep -Seconds 1
-                        Clear-Host
+                        Start-Sleep -Seconds 1                        
                         DisplayMenu4 
                     }
                 }
@@ -1137,20 +1180,20 @@ ______________________________________________________
 |____________________________________________________|
 '
             
-            DelTemp
+            CLEANTEMP
          
-            Start-Sleep -Seconds 2
-            Exit
-            Exit-PSHostProcess
-            Exit-PSSession
+            Start-Sleep -Seconds 1
+            
+            EXIT          
+            
         }
 
         # COMANDOS DE TESTE OCULTOS DO MENU.
         
-        #Testa a função AnyDesk.
+        #Testa a função ANYDESK.
         any {
 
-            NEWPWSH -FunctionNames 'AnyDesk' 
+            NEWPWSH -FunctionNames 'ANYDESK' 
             DISPLAYMENU
 
         }
@@ -1163,19 +1206,19 @@ ______________________________________________________
 
         }
 
-        #Testa a função WingetInstall.
+        #Testa a função WINGETINSTALL.
 
         w {
             
-            NEWPWSH -FunctionNames 'WingetInstall' -Wait
+            NEWPWSH -FunctionNames 'WINGETINSTALL' -Wait
             DISPLAYMENU
 
         }
 
-        #Testa a função WinUpdate.
+        #Testa a função WINUPDATE.
         u {
 
-            NEWPWSH -FunctionNames 'WinUpdateModule', 'WinUpdate' -Wait
+            NEWPWSH -FunctionNames 'WINUPDATEMODULE', 'WINUPDATE' -Wait
             DISPLAYMENU
 
         }
@@ -1199,7 +1242,7 @@ ______________________________________________________
         #Testa a função ImgHealth.
         sfc {
 
-            NEWPWSH -FunctionNames 'ImgHealth', 'DelTemp'             
+            NEWPWSH -FunctionNames 'ImgHealth', 'CLEANTEMP'             
             DISPLAYMENU
 
         }
@@ -1207,7 +1250,7 @@ ______________________________________________________
         #Testa a função DriverBooster.
         db {
 
-            DownloadMztool
+            DOWNLOADMZTOOL
             NEWPWSH -FunctionNames 'DriverBooster'
             DISPLAYMENU
 
@@ -1269,7 +1312,7 @@ function ToolDir {
 
 }
 
-function DownloadMztool {
+function DOWNLOADMZTOOL {
      
     #Download do arquivo MZTOOL.zip
 
@@ -1279,13 +1322,10 @@ function DownloadMztool {
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
     $MZTOOLZIPHASH1 = "465B09A547F5FAA30B7CDD1B49126185"
-
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
 
-    $ONEDRIVELINK = 'https://bit.ly/MZTZIP'
-       
+    $ONEDRIVELINK = 'https://bit.ly/MZTZIP'       
     $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
-    
     
     
     # Exibe o status dos links
@@ -1319,7 +1359,7 @@ function DownloadMztool {
         ($NEWMZTOOLZIPHASH.Hash -notin @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2"))
     )
     
-    Write-Host "HASH 1   = " ; Write-Host "$MZTOOLZIPHASH1" -ForegroundColor Green
+    Write-Host "`nHASH 1   = " ; Write-Host "$MZTOOLZIPHASH1" -ForegroundColor Green
     Write-Host "HASH 2   = " ; Write-Host "$MZTOOLZIPHASH2" -ForegroundColor Green
     Write-Host "HASH OK  = " ; Write-Host "$($NEWMZTOOLZIPHASH.Hash)" -ForegroundColor Green   
     
@@ -1339,8 +1379,7 @@ function DownloadMztool {
             
         #Script continua.
     }
-   
-    Clear-Host
+  
 }
 
 function DIAGNOSTICS {
@@ -1386,7 +1425,7 @@ function DIAGNOSTICS {
 
     return $APPS
 }
-function WinUpdateModule {
+function WINUPDATEMODULE {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
     
@@ -1399,12 +1438,10 @@ function WinUpdateModule {
     #Módulo WINDOWS UPDATE.
     Install-Module PSWindowsUpdate -AllowClobber -Force |  Clear-Host
     Import-Module PSWindowsUpdate -Force |  Clear-Host        
-    
-    Clear-Host
-             
+                
 }
 
-function WingetModule {
+function WINGETMODULE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETMODULE"
 
@@ -1460,13 +1497,13 @@ function WingetModule {
 
 }
 
-function WingetInstall {
+function WINGETINSTALL {
 
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET APPS"
  
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-        WingetModule
+        WINGETMODULE
     }
 
     # Lista dos IDs dos softwares a serem instalados.
@@ -1566,7 +1603,7 @@ function WingetUpdate {
     }
 }
 
-function WinUpdate { 
+function WINUPDATE { 
 
     #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
@@ -1575,9 +1612,7 @@ function WinUpdate {
     Import-Module PSWindowsUpdate -Force 
 
     Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
-      
-    Clear-Host
-    
+       
 }
 
 function RemoveGhostDrivers {
@@ -1592,23 +1627,21 @@ function RemoveGhostDrivers {
     #Remove os drivers de Dispositivos Ocultos da lista obtida.
     ForEach ($DRIVER in $DISPOSITIVOSOCULTOS) {
         
-        pnputil /remove-device $DRIVER.InstanceId | Clear-Host
+        pnputil /remove-device $DRIVER.InstanceId #| Clear-Host
     
     }
        
 }
 
-function AnyDesk {
+function ANYDESK {
     
-    #Download do software Standalone AnyDesk-CM para a área de trabalho pública.  
+    #Download do software Standalone ANYDESK-CM para a área de trabalho pública.  
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> ANYDESK"     
     
     $ANYDESKLINK = 'https://download.anydesk.com/AnyDesk-CM.exe'
     
     New-Object System.Net.WebClient.DownloadFile($ANYDESKLINK, "$env:DESKTOP\AnyDesk.exe")
-
-    Clear-Host
     
 }
 
@@ -1723,8 +1756,7 @@ function MICROSOFT365 {
         #Script continua.
         Write-Host 'MICROSOFT 365 JÁ INSTALADO.'    
         Start-Sleep -Seconds 2
-    }  
-    Clear-Host
+    }   
 
 }   
 
@@ -1824,10 +1856,7 @@ function Office2007 {
         #Script continua.
         Write-Host 'MICROSOFT OFFICE 2007 JÁ INSTALADO.'    
         Start-Sleep -Seconds 2
-    }  
-    
-    Clear-Host
-   
+    }        
    
 }
 
@@ -2259,7 +2288,7 @@ function StartSoftwares {
 
 }
 
-function DelTemp {
+function CLEANTEMP {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
@@ -2408,430 +2437,6 @@ function Install-DeviceDrivers {
         Write-Host "Reinicialização necessária. Por favor, reinicie o computador."
     }
 }
-
-function NEWPWSH {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$FunctionNames,
-        [switch]$Wait,
-        [switch]$ReturnProcess,
-        [switch]$Hidden
-    )    
-    
-   
-    # Combina as definições das funções (preservando a ordem)
-    $combinedDefinitions = foreach ($fn in $FunctionNames) {
-         (Get-Command -Type Function GETMZTOOLMODULE).Definition      
-        # Junta o código pré-carregado com a definição da função específica.
-         (Get-Command -Type Function $fn).Definition
-    } -join "`n"
-    
-    # Converte o conteúdo para Base64 para uso com -EncodedCommand
-    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
-    $arguments = @('-EncodedCommand', $encodedCommand)
-    
-    if ($Wait) {
-        # Caso Wait seja especificado, aguardamos o término do processo internamente.
-        [void](Start-Process powershell -ArgumentList $arguments -Wait)
-    }
-      
-    if ($Hidden) {
-        # Caso Wait seja especificado, aguardamos o término do processo internamente.
-        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
-    }
-
-    elseif ($Wait -and $Hidden) {
-        # Caso Wait e Hidden sejam especificados, aguardamos o término do processo internamente.
-        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
-    }
-
-    elseif ($ReturnProcess) {
-        # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
-        $proc = Start-Process powershell -ArgumentList $arguments -PassThru
-        return $proc
-    }
-
-    else {
-        # Se nada for especificado, usamos a forma que não retorna nada – compatível com [void](...)
-        [void](Start-Process powershell -ArgumentList $arguments)
-    }
-}
-<#
-function TESTLINK {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Url
-    )
-    try {
-        $req = [System.Net.HttpWebRequest]::Create($Url)
-        $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"  # Simula um navegador
-        $req.AllowAutoRedirect = $true  # Permite seguir redirecionamentos automaticamente
-        $req.Method = "GET"  # Usa GET ao invés de HEAD para capturar corretamente a URI final
-        $resp = $req.GetResponse()
-        $resp.Close()
-        return $true
-    }
-    catch {
-        return $false
-    }
-}
-
-function DOWNLOADPROGRESS {
-    param(
-        [Parameter(Mandatory = $true)]
-        [int]$PercentComplete,
-        [int]$BarWidth = 30
-    )
-
-    $rawUI = $Host.UI.RawUI
-    $winSize = $rawUI.WindowSize
-
-    # Posiciona o cursor na última linha
-    $cursorPos = $rawUI.CursorPosition
-    $cursorPos.X = 0
-    $cursorPos.Y = $winSize.Height - 1
-    $rawUI.CursorPosition = $cursorPos
-
-    $filled = [math]::Round($PercentComplete * $BarWidth / 100)
-    $empty = $BarWidth - $filled
-    $bar = ("#" * $filled) + ("-" * $empty)
-    $progress = "BAIXANDO: {0,3}% [{1}]" -f $PercentComplete, $bar
-
-    $clearLine = " " * $winSize.Width
-    Write-Host $clearLine -NoNewline
-    $rawUI.CursorPosition = $cursorPos
-    Write-Host $progress -NoNewline
-}
-
-# Função para efetuar o download via HttpWebRequest e atualizar a barra de progresso
-function INVOKEDOWNLOAD {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Url,
-        [Parameter(Mandatory = $true)]
-        [string]$Destination,
-        [int]$BarWidth = 30
-    )
-
-    Add-Type -AssemblyName "System.Net.Http"
-
-    # Força o uso do TLS 1.2 para conexões seguras (necessário para HTTPS)
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-
-    try {
-        $req = [System.Net.HttpWebRequest]::Create($Url)
-        $req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-        $req.AllowAutoRedirect = $true
-        $resp = $req.GetResponse()
-    }
-    catch {
-        return
-    }
-
-    $totalBytes = $resp.ContentLength
-    if ($totalBytes -eq -1) {
-        return
-    }
-
-    $inputStream = $resp.GetResponseStream()
-
-    try {
-        $fileStream = [System.IO.File]::Create($Destination)
-    }
-    catch {
-        return
-    }
-
-    $buffer = New-Object byte[] 8192
-    $totalRead = 0
-    $lastPercent = 0
-
-    while (($read = $inputStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
-        $fileStream.Write($buffer, 0, $read)
-        $totalRead += $read
-        if ($totalBytes -gt 0) {
-            $percent = [math]::Round(($totalRead / $totalBytes) * 100)
-            if ($percent -ne $lastPercent) {
-                DOWNLOADPROGRESS -PercentComplete $percent -BarWidth $BarWidth
-                $lastPercent = $percent
-            }
-        }
-    }
-
-    $fileStream.Dispose()
-    $inputStream.Dispose()
-    $resp.Dispose()
-}
-
-# Função que tenta baixar de uma lista de URLs (ordem de prioridade)
-function DOWNLOAD {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$Urls,
-        [Parameter(Mandatory = $true)]
-        [string]$Destination,
-        [int]$BarWidth = 30
-    )
-
-    foreach ($url in $Urls) {
-        if (TESTLINK -Url $url) {
-            INVOKEDOWNLOAD -Url $url -Destination $Destination -BarWidth $BarWidth
-            return
-        }
-
-        else {
-            do {
-            
-                #Caso as duas nuvens estejam fora do ar oferece um menu de opções.
-                                              
-                Start-Sleep -Seconds 1
-                function DisplayMenuDownloadError {           
-                    Clear-Host
-                    Write-Host '
-______________________________________________________
-|                                                    |
-|                       MZTOOL                       |
-| __________________________________________________ | 
-|            FERRAMENTAS DE DIAGNÓSTICOS             | 
-|                                                    |'
-                    Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-                    Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-                    Write-Host '|                                                    |
-|                                                    |
-| |1| TENTAR NOVAMENTE                               |
-| |2| VOLTAR AO MENU PRINCIPAL                       |
-| |0| ENCERRAR MZTOOL                                |
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|'
-           
-                    $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
-                    
-                    switch ($choice) {
-                        '1' {                        
-                            return
-                            break
-                        }
-                        '2' {
-                            DISPLAYMENU
-                            break
-                        }
-                        '0' {
-                    
-                            #OPÇÃO 0 - ENCERRAR MZTOOL.
-
-                            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
-
-                            Clear-Host
-                            Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                                                    |
-|                 ENCERRANDO MZTOOL                  |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'
-        
-                            DelTemp
-
-                            if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
-
-                                Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
-                            }
-
-                            Start-Sleep -Seconds 2
-                            Exit
-                            Exit-PSHostProcess
-                            Exit-PSSession
-                        }
-                        default {
-                            Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                            Start-Sleep -Seconds 2
-                            DisplayMenuDownloadError
-                        }
-                    }
-                }
-        
-                DisplayMenuDownloadError
-    
-            } while ($true)# Action when all if and elseif conditions are false
-        }
-    }
-}
-
-function EXPANDPROGRESS {
-    param(
-        [Parameter(Mandatory = $true)]
-        [int]$PercentComplete
-    )
-
-    $rawUI = $Host.UI.RawUI
-    $windowSize = $rawUI.WindowSize
-
-    # Posiciona o cursor na última linha da janela
-    $cursorPos = $rawUI.CursorPosition
-    $cursorPos.X = 0
-    $cursorPos.Y = $windowSize.Height - 1
-    $rawUI.CursorPosition = $cursorPos
-
-    # Define o tamanho da barra (por exemplo, 50 caracteres)
-    $barWidth = 30
-    $filled = [math]::Round($PercentComplete * $barWidth / 100)
-    $empty = $barWidth - $filled
-
-    $bar = ("#" * $filled) + ("-" * $empty)
-    $progressText = "EXTRAINDO: {0,3}% [{1}]" -f $PercentComplete, $bar
-
-    # Limpa a última linha e escreve a barra de progresso
-    $clearLine = " " * $windowSize.Width
-    Write-Host $clearLine -NoNewline
-    $rawUI.CursorPosition = $cursorPos
-    Write-Host $progressText -NoNewline
-}
-
-# Função auxiliar para extrair uma entrada via streams (caso ExtractToFile não esteja disponível)
-function EXPANDSTREAM {
-    param (
-        [Parameter(Mandatory = $true)]
-        $Entry,
-        [Parameter(Mandatory = $true)]
-        [string]$DestinationPath,
-        [switch]$Quiet
-    )
-
-    try {
-        $fileStream = [System.IO.File]::Create($DestinationPath)
-    }
-    catch {
-        if (-not $Quiet) {
-            Write-Host "Falha ao criar '$DestinationPath': $_" -ForegroundColor Red
-        }
-        return
-    }
-
-    if (-not $fileStream) {
-        if (-not $Quiet) {
-            Write-Host "fileStream nulo para '$DestinationPath'." -ForegroundColor Red
-        }
-        return
-    }
-
-    $stream = $Entry.Open()
-    $buffer = New-Object byte[] 8192
-    while (($bytesRead = $stream.Read($buffer, 0, $buffer.Length)) -gt 0) {
-        $fileStream.Write($buffer, 0, $bytesRead)
-    }
-    $fileStream.Dispose()
-    $stream.Dispose()
-}
-
-# Função principal para extrair o ZIP com a barra de progresso customizada na parte inferior
-function EXPAND {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path,
-        [Parameter(Mandatory = $true)]
-        [string]$DestinationPath,
-        [switch]$Force,
-        [switch]$Quiet
-    )
-
-    # Cria o diretório de destino, se não existir
-    if (-not (Test-Path $DestinationPath)) {
-        New-Item -Path $DestinationPath -ItemType Directory | Out-Null
-    }
-
-    # Carrega a assembly para manipulação de arquivos ZIP
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-
-    # Abre o arquivo ZIP para leitura
-    $zipArchive = [System.IO.Compression.ZipFile]::OpenRead($Path)
-    $totalEntries = $zipArchive.Entries.Count
-    $currentEntry = 0
-
-    foreach ($entry in $zipArchive.Entries) {
-        $currentEntry++
-        $percentComplete = [math]::Round(($currentEntry / $totalEntries) * 100)
-        # Atualiza a barra de progresso customizada na última linha
-        EXPANDPROGRESS -PercentComplete $percentComplete
-
-        # Define o caminho completo de destino para a entrada
-        $destPath = Join-Path -Path $DestinationPath -ChildPath $entry.FullName
-
-        if ([string]::IsNullOrEmpty($entry.Name) -or $entry.FullName.EndsWith("/")) {
-            # Trata diretórios
-            if (-not (Test-Path $destPath)) {
-                New-Item -Path $destPath -ItemType Directory | Out-Null
-            }
-        }
-        else {
-            # Garante que o diretório pai exista
-            $directory = Split-Path -Path $destPath -Parent
-            if (-not (Test-Path $directory)) {
-                New-Item -ItemType Directory -Path $directory -Force | Out-Null
-            }
-        
-            # Se necessário, remove o arquivo existente (utilizando -Force)
-            if ((Test-Path $destPath) -and $Force.IsPresent) {
-                try {
-                    Remove-Item $destPath -Force -ErrorAction Stop
-                }
-                catch {
-                    if (-not $Quiet) {
-                        Write-Host "Não foi possível remover '$destPath'. Pulando essa entrada." -ForegroundColor Red
-                    }
-                    continue
-                }
-            }
-        
-            # Tenta usar o método ExtractToFile, se disponível
-            $methInfo = $entry.GetType().GetMethod("ExtractToFile")
-            if ($methInfo) {
-                try {
-                    $entry.ExtractToFile($destPath, $Force.IsPresent)
-                }
-                catch {
-                    if (-not $Quiet) {
-                        Write-Host "Erro em ExtractToFile para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
-                    }
-                    EXPANDSTREAM -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
-                }
-            }
-            else {
-                if (-not $Quiet) {
-                    Write-Host "Método ExtractToFile indisponível para '$($entry.FullName)', usando stream." -ForegroundColor Yellow
-                }
-                EXPANDSTREAM -Entry $entry -DestinationPath $destPath -Quiet:$Quiet
-            }
-        }
-    }
-
-    # Fecha o arquivo ZIP
-    $zipArchive.Dispose()
-
-    # Limpa a última linha da janela após a conclusão
-    $rawUI = $Host.UI.RawUI
-    $windowSize = $rawUI.WindowSize
-    $cursorPos = $rawUI.CursorPosition
-    $cursorPos.X = 0
-    $cursorPos.Y = $windowSize.Height - 1
-    $rawUI.CursorPosition = $cursorPos
-    Write-Host (" " * $windowSize.Width)
-
-    if (-not $Quiet) {
-        Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
-    }
-} 
-#>
 
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
