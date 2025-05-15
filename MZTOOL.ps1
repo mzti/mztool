@@ -2048,14 +2048,14 @@ function NEWPWSH {
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
         $PRELOADEDFUNCTIONS = @(
             'GETMZTOOLMODULE',
-            'Test-LinkOnline',
+            #'Test-LinkOnline',
             'DOWNLOADCustomProgress',
             'Invoke-DownloadFileWithProgress'
             'Invoke-DownloadFileWithRedundancy'
-            'EXPANDCustomProgress'
-            'Expand-ArchiveEntryStream'
-            'Expand-Archive-WithCustomProgress'    
-            'NEWPSH'          
+            #'EXPANDCustomProgress'
+            #'Expand-ArchiveEntryStream'
+            #'Expand-Archive-WithCustomProgress'    
+            #'NEWPSH'          
         ) | ForEach-Object { (Get-Command -Type Function $_).Definition }       
         # Junta o código pré-carregado com a definição da função específica.
         ($PRELOADEDFUNCTIONS, (Get-Command -Type Function $fn).Definition) -join "`n"
