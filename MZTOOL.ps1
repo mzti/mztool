@@ -705,9 +705,9 @@ ______________________________________________________
 '    
                         
                     
-                        NEWPWSH -FunctionNames 'WingetModule' -Wait
+                        NEWPWSH -FunctionNames 'MICROSOFT365' -Wait
                       
-                        NEWPWSH -FunctionNames 'Microsoft365' -Wait 
+                        NEWPWSH -FunctionNames 'MICROSOFT365' -Wait 
 
                         Start-Sleep -1
 
@@ -1236,7 +1236,7 @@ function AnyDesk {
     
 }
 
-function Microsoft365 {
+function MICROSOFT365 {
     #Implementação do Microsoft Office 365.
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
@@ -2043,10 +2043,20 @@ function NEWPWSH {
         [switch]$Hidden
     )    
     
-       
+    $PRELOADEDFUNCTIONS = @(
+        'Get-MzToolModule',
+        'Test-LinkOnline',
+        'DOWNLOADCustomProgress',
+        'Invoke-DownloadFileWithProgress'
+        'Invoke-DownloadFileWithRedundancy'
+        'Expand-Archive-WithCustomProgress'       
+        'EXPANDCustomProgress'
+        'Expand-ArchiveEntryStream'
+        'NEWPSH'          
+    )
     # Combina as definições das funções (preservando a ordem)
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
-        (Get-Command -Type Function GETMZTOOLMODULE).Definition
+        $PRELOADEDFUNCTIONS | ForEach-Object { (Get-Command -Type Function $PRELOADEDFUNCTIONS).Definition }       
         (Get-Command -Type Function $fn).Definition
     } -join "`n"
     
