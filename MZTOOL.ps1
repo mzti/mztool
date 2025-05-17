@@ -659,30 +659,31 @@ $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
 $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
-# Verifica se a sessão está sendo executada como administrador.
-if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
-
-    Write-Host "ADMINISTRADOR" -ForegroundColor Green
-    
-    <# 
-    Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
-        if ($_.ExecutionPolicy -eq "Undefined") {
-            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
-        } 
-    }
- 
-    GETPROFILE
-    #>
-
-}
-
-else {
-
-    Write-host "USUÁRIO." -ForegroundColor Gray    
+function RESTART {
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
     [System.Diagnostics.Process]::Start($newProcess) | Out-Null
+    EXIT
+}
+
+# Verifica se a sessão está sendo executada como administrador.
+if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
+
+    Write-Host "ADMINISTRADOR" -ForegroundColor Green    
+    
+    Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+        if ($_.ExecutionPolicy -eq "Undefined") {
+            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
+            Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray    
+            RESTART
+        } 
+    }       
+}
+
+else {
+
+    RESTART
     EXIT
 
 }
@@ -822,8 +823,8 @@ ______________________________________________________
                 @{ Functions = 'PerfilTheme' },
                 @{ Functions = 'ANYDESK' },
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
-                @{ Functions = 'WINUPDATEMODULE', 'RemoveGhostDrivers', 'WINUPDATE' },
-                @{ Functions = 'WINGETINSTALL', 'WingetUpdate' },
+                @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
+                @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
                 @{ Functions = 'Microsoft365'; Wait = $true },
                 @{ Functions = 'PinIcons', 'StartSoftwares' }
             )
@@ -1019,12 +1020,10 @@ ______________________________________________________
 |____________________________________________________|
 ' 
 
-                   
-                        $proc1 = NEWPWSH -FunctionNames 'WingetUpdate' -ReturnProcess
-                        $proc2 = NEWPWSH -FunctionNames 'RemoveGhostDrivers', 'WINUPDATE' -ReturnProcess
-
-                        $validProcesses = @($proc1, $proc2) | Where-Object { $_.Id -gt 0 }
-                        Wait-Process -Id $validProcesses.Id
+                        $NULL = @(
+                            $1 = NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
+                            $2 = NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
+                        ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id
 
                         CLEANTEMP
                                     
@@ -1099,7 +1098,7 @@ ______________________________________________________
 |____________________________________________________|
  '
                                
-                        Office2007
+                        OFFICE2007
 
                         Start-Sleep 1
 
@@ -1125,10 +1124,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '    
-                        
-                    
-                        NEWPWSH -FunctionNames 'WINGETMODULE' -Wait
-                      
+                                               
                         NEWPWSH -FunctionNames 'MICROSOFT365' -Wait 
 
                         Start-Sleep -1
@@ -1206,11 +1202,11 @@ ______________________________________________________
 
         }
 
-        #Testa a função WINGETINSTALL.
+        #Testa a função WINGETAPPS.
 
         w {
             
-            NEWPWSH -FunctionNames 'WINGETINSTALL' -Wait
+            NEWPWSH -FunctionNames 'WINGETAPPS' -Wait
             DISPLAYMENU
 
         }
@@ -1499,7 +1495,7 @@ function WINGETMODULE {
     }  
 
 }
-function WINGETINSTALL {
+function WINGETAPPS {
 
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET APPS"
@@ -1572,104 +1568,11 @@ function WINGETINSTALL {
     Clear-Host
 }
 
-
-<#
-function WINGETINSTALL {
-
-    # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET APPS"
- 
-    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-        WINGETMODULE
-    }
-
-    # Lista dos IDs dos softwares a serem instalados.
-    $softwareIds = @(
-        "Google.Chrome",
-        "Microsoft.Powershell",
-        "Adobe.Acrobat.Reader.64-bit"
-    )
-
-    # Função local para instalação alternativa dos softwares
-    function InstallFallback ($id) {
-        switch ($id) {
-            "Google.Chrome" {
-                
-                $downloadUrl = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"
-                $tempFile = Join-Path $env:TEMP "GoogleChrome.msi"
-                try {
-                    Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Verb RunAs
-                
-                }
-                catch {
-                    Write-Output "FALHA NA INSTALAÇÃO DO $ID : $_" 
-                }
-            }
-            "Microsoft.Powershell" {
-                
-                $downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"
-                $tempFile = Join-Path $env:TEMP "PowerShell.msi"
-                try {
-                    Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process "msiexec.exe" -ArgumentList '/i', $tempFile, '/qn' -Verb RunAs
-                    
-                }
-                catch {
-                    Write-Output "FALHA NA INSTALAÇÃO DO $ID : $_"  
-                }
-            }
-            "Adobe.Acrobat.Reader.64-bit" {
-               
-                $downloadUrl = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"
-                $tempFile = Join-Path $env:TEMP "AcrobatReader.exe"
-                try {
-                    Start-BitsTransfer -Source $downloadUrl -Destination $tempFile -ErrorAction Stop
-                    Start-Process -FilePath $tempFile -ArgumentList "/sAll", "/rs", "/rps", "/msi", "/norestart" -Verb RunAs
-                    
-                }
-                catch {
-                    Write-Output "FALHA NA INSTALAÇÃO DO $ID : $_"  
-                }
-            }
-            default {
-                Return
-            }
-        }
-    }
-
-    foreach ($id in $softwareIds) {
-        
-        $result = winget install --Id $id --Accept-Source-Agreements --Accept-Package-Agreements 2>&1
-        # Se o winget retornar erro (código diferente de zero)...
-        if ($LASTEXITCODE -ne 0) {
-            # Se a mensagem indicar que o software já está instalado, não inicia o fallback.
-            if ($result -match "já instalado" -or $result -match "installed") {
-                
-            }
-            elseif ($result -match "hash do instalador não corresponde") {
-               
-                InstallFallback $id
-            }
-            else {
-                
-                InstallFallback $id
-            }
-        }
-        else {
-            #Script continua.
-        }
-        Clear-Host
-    }
-
-    Clear-Host
-}
-#>
-function WingetUpdate { 
+function WINGETUPGRADE { 
 
     #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETUPDATE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETUPGRADE"
 
     1..2 | ForEach-Object {
             
@@ -1692,19 +1595,16 @@ function WINUPDATE {
        
 }
 
-function RemoveGhostDrivers {
+function REMOVEGHOSTDRIVERS {
     
     #Remove os drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos)
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> REMOVEGHOSTDEVICES"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> REMOVEGHOSTDRIVERS"
      
-    #Obtem a lista de drivers de Dispositivos Ocultos.
-    $DISPOSITIVOSOCULTOS = Get-PnpDevice | Where-Object { $_.Status -eq 'Unknown' } 
-
-    #Remove os drivers de Dispositivos Ocultos da lista obtida.
-    ForEach ($DRIVER in $DISPOSITIVOSOCULTOS) {
+    #Obtem a lista de drivers de Dispositivos Ocultos e os remove.
+    $null = Get-PnpDevice | Where-Object { $_.Status -eq 'Unknown' } | ForEach-Object {
         
-        pnputil /remove-device $DRIVER.InstanceId #| Clear-Host
+        pnputil /remove-device $_.InstanceId | Clear-Host
     
     }
        
@@ -1723,13 +1623,14 @@ function ANYDESK {
 }
 
 function MICROSOFT365 {
+    
     #Implementação do Microsoft Office 365.
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
     
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue
-    if (-not ($MS365)) {                     
+    if (-not ($MS365)) {             
              
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
         [xml]$XML = @'
@@ -1809,6 +1710,7 @@ function MICROSOFT365 {
             $365ERROR = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
             switch ($365ERROR) {
                 1 {
+                    if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
                     Microsoft365
                 }
                 2 {
@@ -1838,7 +1740,7 @@ function MICROSOFT365 {
 }   
 
 
-function Office2007 {
+function OFFICE2007 {
 
     #Implementação do Microsoft Office 2007.
 
@@ -1846,9 +1748,7 @@ function Office2007 {
 
     #Verifica se o Microsoft Office 2007 já está instalado.
     $OFFICE2007 = Get-Command "C:\Program Files\Microsoft Office\Office12\WINWORD.EXE" -ErrorAction SilentlyContinue
-    if (-NOT ($OFFICE2007)) {        
-        
-    
+    if (-NOT ($OFFICE2007)) {                  
        
         $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
         $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
@@ -1859,7 +1759,7 @@ function Office2007 {
 
         $DRIVEURLS = @($OFFICE2007ONEDRIVE, $OFFICE2007GOOGLEDRIVE)
 
-        function DownloadOffice2007 {   
+        function DOWNLOADOFFICE2007 {   
         
             #Download do arquivo OFFICE2007.zip
     
@@ -1908,20 +1808,20 @@ function Office2007 {
             Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
 
         } 
-        function NetFx3 {
+        function NETFX3 {
 
             #Implementa o recurso .NetFramework 3.5 no sistema.
     
-            Start-Job -Name NetFx3 -ScriptBlock { 
+            Start-Job -Name NETFX3 -ScriptBlock { 
                 $Host.UI.RawUI.WindowTitle = "$Global:TITLE> .NETFRAMEWORK3.5"
                 Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
             } | Out-Null
         
         }
      
-        DownloadOffice2007
+        OFFICE2007Office2007
 
-        NetFx3
+        NETFX3
     
         #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
         Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
@@ -2393,6 +2293,15 @@ function CLEANTEMP {
         
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
     }
+
+    # Redefine a política de execução do PowerShell para "Undefined" para evitar problemas de execução de scripts.
+    Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+        if ($_.ExecutionPolicy -ne "Undefined") {
+            Set-ExecutionPolicy -ExecutionPolicy Undefined -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
+            Write-Host $clearLine -NoNewline          
+            $rawUI.CursorPosition = $cursorPos
+            Write-host "`nREDEFININDO POLITICA DE EXECUÇÃO PARA RESTRITA." -NoNewLine
+        } }
 
     # Remove arquivos temporários do sistema.
     Remove-Files -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
