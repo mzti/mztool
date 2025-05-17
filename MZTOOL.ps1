@@ -43,6 +43,8 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+$Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
+
 
 $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
@@ -660,11 +662,11 @@ $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYW
 $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
 function RESTART {
-    $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-    $newProcess.Arguments = $myInvocation.MyCommand.Definition
-    $newProcess.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($newProcess) | Out-Null
-    #EXIT
+    $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+    $RESTART.Arguments = "-Command `"${global:ScriptCode}`""
+    $RESTART.Verb = 'runas'
+    [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+    EXIT
 }
 
 # Verifica se a sessão está sendo executada como administrador.
