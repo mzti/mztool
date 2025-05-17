@@ -685,7 +685,6 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 else {
 
     RESTART
-    EXIT
 
 }
 
