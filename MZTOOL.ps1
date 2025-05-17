@@ -600,6 +600,8 @@ function EXPAND {
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
+
+# Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 function GETMZTOOLMODULE {
     
     if (-not(Get-Module -Name MZTOOL -ErrorAction SilentlyContinue)) {
@@ -607,9 +609,7 @@ function GETMZTOOLMODULE {
     }
 }
 
-# Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 do {    
-
     # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
     MZTOOLMODULE
     # Importa o módulo MZTOOL para a sessão atual.
@@ -631,7 +631,7 @@ do {
 
             Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
             Start-Sleep -Seconds 5
-            
+            EXIT
         }
         
     }
