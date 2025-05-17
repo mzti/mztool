@@ -1462,6 +1462,8 @@ function WINGETMODULE {
         Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
         Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" |  Clear-Host
         Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.WindowsTerminal --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.NuGet --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
         
     }
 
@@ -1487,7 +1489,8 @@ function WINGETMODULE {
         Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
         Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue  |  Clear-Host
         Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
-    
+        Winget Install Microsoft.WindowsTerminal --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.NuGet --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
     }
 
     else {
@@ -1496,7 +1499,81 @@ function WINGETMODULE {
     }  
 
 }
+function WINGETINSTALL {
 
+    # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET APPS"
+ 
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+        WINGETMODULE
+    }
+
+    function InstallFallbackGeneric {
+        param ([hashtable]$software)
+
+        $tempFile = Join-Path $env:TEMP $software.TempFileName
+
+        try {
+            # Tenta fazer o download do instalador
+            Start-BitsTransfer -Source $software.DownloadUrl -Destination $tempFile -ErrorAction Stop
+
+            # Se houver argumentos definidos, substitui o placeholder "{0}" pelo caminho do arquivo temporário
+            $APPARGS = $null
+            if ($software.Arguments) {
+                $APPARGS = $software.Arguments | ForEach-Object { $_ -f $tempFile }
+            }
+            
+            switch ($software.Install) {          
+                "MSI" {
+                    # Instalação do MSI.
+                    Start-Process -FilePath $tempFile -ArgumentList $APPARGS -Verb RunAs
+                }
+                "APPX" {
+                    # Instalação do APPX.
+                    Add-AppPackage -Path $tempFile -Force -ErrorAction SilentlyContinue                 
+                }
+                default {
+                    Write-Output "Tipo de instalação não suportado para $($software.Id)"
+                }
+            }
+        }
+        catch {
+            Write-Output "FALHA NA INSTALAÇÃO DO $($software.Id) : $_"
+        }
+    }
+    
+    # Define a lista de softwares (incluindo os parâmetros para fallback) em um único array de hashtables
+    $APP = @(
+        @{ Id = "Google.Chrome"; DownloadUrl = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"; TempFileName = "GoogleChrome.msi"; Arguments = @('/i', '{0}', '/qn'); Install = "MSI" },
+        @{ Id = "Microsoft.Powershell"; DownloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"; TempFileName = "PowerShell.msi"; Arguments = @('/i', '{0}', '/qn'); Install = "MSI" },
+        @{ Id = "Adobe.Acrobat.Reader.64-bit"; DownloadUrl = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"; TempFileName = "AcrobatReader.exe"; Arguments = @("/sAll", "/rs", "/rps", "/msi", "/norestart"); Install = "MSI" },
+        @{ Id = "Microsoft.VCRedist.2015+.x64"; DownloadUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"; TempFileName = "vc_redist_x64.exe"; Arguments = @("/quiet", "/norestart"); Install = "MSI" },
+        @{ Id = "Microsoft.VCRedist.2015+.x86"; DownloadUrl = "https://aka.ms/vs/17/release/vc_redist.x86.exe"; TempFileName = "vc_redist_x86.exe"; Arguments = @("/quiet", "/norestart"); Install = "MSI" },
+        @{ Id = "Microsoft.VCLibs.Desktop.14"; DownloadUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"; TempFileName = "Microsoft.VCLibs.x64.14.00.Desktop.appx"; Arguments = $null; Install = "APPX" } 
+    )
+
+    # Iteração otimizada usando ForEach-Object
+    $APP | ForEach-Object {
+        
+        $ERRORCODE = winget install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements #2>&1
+    
+        if ($LASTEXITCODE -ne 0) {
+            if ($ERRORCODE -match "já instalado" -or $ERRORCODE -match "installed") {
+                # Software já instalado; nenhuma ação necessária.
+            }
+            else {
+                InstallFallbackGeneric -software $_
+            }
+        }
+        
+        Clear-Host
+    }
+    
+    Clear-Host
+}
+
+
+<#
 function WINGETINSTALL {
 
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
@@ -1587,7 +1664,7 @@ function WINGETINSTALL {
 
     Clear-Host
 }
-
+#>
 function WingetUpdate { 
 
     #Busca e atualiza todos softwares já previamente instalados compatíveis com o Winget.
