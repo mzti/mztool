@@ -678,7 +678,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
             Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
-            pause  
+            Start-Sleep -Seconds 2
             RESTART
         } 
     }       
