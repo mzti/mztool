@@ -675,7 +675,8 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
-            Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray    
+            Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
+            pause  
             RESTART
         } 
     }       
