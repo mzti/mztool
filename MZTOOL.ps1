@@ -663,7 +663,7 @@ $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
 function RESTART {
     $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-    $RESTART.Arguments = "-Command `"${global:ScriptCode}`""
+    $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
     $RESTART.Verb = 'runas'
     [System.Diagnostics.Process]::Start($RESTART) | Out-Null
     EXIT
@@ -681,9 +681,14 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
             Start-Sleep -Seconds 2
             RESTART
         } 
+
+        else {
+            Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
+        }
     }       
 }
 
+# Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
 else {
 
     RESTART
