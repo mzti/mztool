@@ -45,7 +45,6 @@ $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 
-
 $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
 function OPSYS {
@@ -86,13 +85,15 @@ $Global:ENVIROMENTVARS = @{
         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
                               
         # Cria a linha de definição da variável (com o símbolo $ escapado).
-        $SETENVPROFILE = <#"[Environment]::SetEnvironmentVariable('$($_.Key)', '$($_.Value)', 'User')`n`n#>"`$$($_.Key) = `"$($_.Value)`"`n`n"
+        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"
                 
         # Verifica se a variável já existe no arquivo de perfil.
-        if (-Not (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet)) {            
-            # Se a variável não estiver presente, adiciona ao arquivo de perfil na biblioteca Powershell do ambiente User.
-            Add-Content -Path $PROFILE -Value $SETENVPROFILE             
+        if (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet) {            
+            # Se a variável estiver presente, é removida. 
+            Remove-Content -Path $PROFILE -Value $SETENVPROFILE             
         }  
+        # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
+        Add-Content -Path $PROFILE -Value $SETENVPROFILE
     }
 
     if ($_.Key -in @('TOOL', 'DESKTOP')) {
@@ -180,6 +181,25 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 #endregion
 
 #FUNCÕES
+
+function TOOLDIR {
+
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"   
+
+    $ErrorActionPreference = 'silentlycontinue'
+     
+    #Se o diretório C:\MZTOOL já existir, é deletado.
+    if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+
+        Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    #Criação do diretório C:\MZTOOL.
+    [System.IO.Directory]::CreateDirectory($env:TOOL) | Out-Null
+    $TOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
+    $TOOLFOLDER.Attributes = 'Hidden' 
+
+}
 
 function NEWPWSH {
     [CmdletBinding()]
@@ -1199,15 +1219,7 @@ ______________________________________________________
             NEWPWSH -FunctionNames 'ANYDESK' 
             DISPLAYMENU
 
-        }
-
-        #Testa a função  EnvTool.
-        e {
-
-            EnvTool 
-            DISPLAYMENU
-
-        }
+        }    
 
         #Testa a função WINGETAPPS.
 
@@ -1226,26 +1238,26 @@ ______________________________________________________
 
         }
         
-        #Testa a função ClockDate.
+        #Testa a função CLOCKDATE.
         h {
 
-            NEWPWSH -FunctionNames 'ClockDate'
+            NEWPWSH -FunctionNames 'CLOCKDATE'
             DISPLAYMENU
 
         }
 
-        #Testa a função Pro.
+        #Testa a função PRO.
         p {
 
-            NEWPWSH -FunctionNames 'Pro' 
+            NEWPWSH -FunctionNames 'PRO' 
             DISPLAYMENU
 
         }
 
-        #Testa a função ImgHealth.
+        #Testa a função IMGHEALTH.
         sfc {
 
-            NEWPWSH -FunctionNames 'ImgHealth', 'CLEANTEMP'             
+            NEWPWSH -FunctionNames 'IMGHEALTH', 'CLEANTEMP'             
             DISPLAYMENU
 
         }
@@ -1261,7 +1273,8 @@ ______________________________________________________
 
         dvr {
 
-            Install-DeviceDrivers
+            InstallDeviceDrivers
+            DISPLAYMENU
             
         }
 
@@ -1283,37 +1296,6 @@ ______________________________________________________
 }
 
 #FUNÇÕES---------------------------------------------------------------
-
-function ClockDate {
-
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"   
-
-    #Define um novo servidor e sincroniza o relógio e a data do sistema.  
-  
-    w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
-    net start w32time 
-    w32tm /resync /force
-   
-}  
-
-function ToolDir {
-
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"   
-
-    $ErrorActionPreference = 'silentlycontinue'
-     
-    #Se o diretório C:\MZTOOL já existir, é deletado.
-    if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
-
-        Remove-Item -Path $env:TOOL -Recurse -Force -ErrorAction SilentlyContinue
-    }
-
-    #Criação do diretório C:\MZTOOL.
-    [System.IO.Directory]::CreateDirectory($env:TOOL) | Out-Null
-    $TOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
-    $TOOLFOLDER.Attributes = 'Hidden' 
-
-}
 
 function DOWNLOADMZTOOL {
      
@@ -1346,7 +1328,7 @@ function DOWNLOADMZTOOL {
         Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
     }
 
-    ToolDir
+    TOOLDIR
     
     # Lista de URLs para teste (OneDrive + Google Drive como fallback)
     $DRIVEURLS = @($ONEDRIVELINK, $GOOGLEDRIVELINK)
@@ -1511,61 +1493,113 @@ function WINGETAPPS {
         WINGETMODULE
     }
 
-    function InstallFallbackGeneric {
-        param ([hashtable]$software)
+    # Função responsável por instalar via método redundante (fallback)
+    function REDUNDANTINSTALL {
+        param ([hashtable]$APPFAIL)
 
-        $tempFile = Join-Path $env:TEMP $software.TempFileName
+        # Define o caminho do arquivo temporário para o instalador
+        $APPFILE = Join-Path $env:TEMP $APPFAIL.TempFileName
 
         try {
             # Tenta fazer o download do instalador
-            Start-BitsTransfer -Source $software.DownloadUrl -Destination $tempFile -ErrorAction Stop
+            Start-BitsTransfer -Source $APPFAIL.DownloadUrl -Destination $APPFILE -ErrorAction Stop
 
-            # Se houver argumentos definidos, substitui o placeholder "{0}" pelo caminho do arquivo temporário
+            # Se houver argumentos definidos, substitui o placeholder "{0}" pelo caminho do arquivo
             $APPARGS = $null
-            if ($software.Arguments) {
-                $APPARGS = $software.Arguments | ForEach-Object { $_ -f $tempFile }
+            if ($APPFAIL.Arguments) {
+                $APPARGS = $APPFAIL.Arguments | ForEach-Object { $_ -f $APPFILE }
             }
             
-            switch ($software.Install) {          
+            # Verifica o tipo de instalação e realiza o procedimento adequado
+            switch ($APPFAIL.Install) {  
                 "MSI" {
-                    # Instalação do MSI.
-                    Start-Process -FilePath $tempFile -ArgumentList $APPARGS -Verb RunAs
+                    # Para arquivos MSI, é recomendado iniciar com o msiexec.exe
+                    Get-Process -Name msiexec -ErrorAction SilentlyContinue | Wait-Process
+                    Start-Process -FilePath "msiexec.exe" -ArgumentList $APPARGS -Verb RunAs
+                }
+                "EXE" {
+                    # Para arquivos EXE, iniciamos diretamente o arquivo baixado com os argumentos.
+                    Start-Process -FilePath $APPFILE -ArgumentList $APPARGS -Verb RunAs
                 }
                 "APPX" {
-                    # Instalação do APPX.
-                    Add-AppPackage -Path $tempFile -Force -ErrorAction SilentlyContinue                 
+                    # Para arquivos APPX, utilizamos o Add-AppPackage (sem parâmetros ambiguos como -Force)
+                    Add-AppPackage -Path $APPFILE -ErrorAction SilentlyContinue                 
                 }
                 default {
-                    Write-Output "Tipo de instalação não suportado para $($software.Id)"
+                    Write-Output "Tipo de instalação não suportado para $($APPFAIL.Id)"
                 }
             }
         }
         catch {
-            Write-Output "FALHA NA INSTALAÇÃO DO $($software.Id) : $_"
+            Clear-Host
+            Write-Output "FALHA NA INSTALAÇÃO DO $($APPFAIL.Id) : $_"
+            pause
         }
     }
     
-    # Define a lista de softwares (incluindo os parâmetros para fallback) em um único array de hashtables
+    # Define a lista de softwares (cada entrada contém o ID usado pelo winget
+    # e os parâmetros para a instalação redundante, se necessário)
     $APP = @(
-        @{ Id = "Google.Chrome"; DownloadUrl = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"; TempFileName = "GoogleChrome.msi"; Arguments = @('/i', '{0}', '/qn'); Install = "MSI" },
-        @{ Id = "Microsoft.Powershell"; DownloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"; TempFileName = "PowerShell.msi"; Arguments = @('/i', '{0}', '/qn'); Install = "MSI" },
-        @{ Id = "Adobe.Acrobat.Reader.64-bit"; DownloadUrl = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"; TempFileName = "AcrobatReader.exe"; Arguments = @("/sAll", "/rs", "/rps", "/msi", "/norestart"); Install = "MSI" },
-        @{ Id = "Microsoft.VCRedist.2015+.x64"; DownloadUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"; TempFileName = "vc_redist_x64.exe"; Arguments = @("/quiet", "/norestart"); Install = "MSI" },
-        @{ Id = "Microsoft.VCRedist.2015+.x86"; DownloadUrl = "https://aka.ms/vs/17/release/vc_redist.x86.exe"; TempFileName = "vc_redist_x86.exe"; Arguments = @("/quiet", "/norestart"); Install = "MSI" },
-        @{ Id = "Microsoft.VCLibs.Desktop.14"; DownloadUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"; TempFileName = "Microsoft.VCLibs.x64.14.00.Desktop.appx"; Arguments = $null; Install = "APPX" } 
+        @{ 
+            Id           = "oogle.Chrome"; 
+            DownloadUrl  = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"; 
+            TempFileName = "GoogleChrome.msi"; 
+            Arguments    = @('/i', '{0}', '/qn'); 
+            Install      = "MSI" 
+        },
+        @{ 
+            Id           = "icrosoft.Powershell"; 
+            DownloadUrl  = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"; 
+            TempFileName = "PowerShell.msi"; 
+            Arguments    = @('/i', '{0}', '/qn'); 
+            Install      = "MSI" 
+        },
+        @{ 
+            Id           = "dobe.Acrobat.Reader.64-bit"; 
+            DownloadUrl  = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"; 
+            TempFileName = "AcrobatReader.exe"; 
+            Arguments    = @("/sAll", "/rs", "/rps", "/msi", "/norestart"); 
+            Install      = "EXE" 
+        },
+        @{ 
+            Id           = "icrosoft.VCRedist.2015+.x64"; 
+            DownloadUrl  = "https://aka.ms/vs/17/release/vc_redist.x64.exe"; 
+            TempFileName = "vc_redist_x64.exe"; 
+            Arguments    = @("/quiet", "/norestart"); 
+            Install      = "EXE" 
+        },
+        @{ 
+            Id           = "icrosoft.VCRedist.2015+.x86"; 
+            DownloadUrl  = "https://aka.ms/vs/17/release/vc_redist.x86.exe"; 
+            TempFileName = "vc_redist_x86.exe"; 
+            Arguments    = @("/quiet", "/norestart"); 
+            Install      = "EXE" 
+        },
+        @{ 
+            Id           = "icrosoft.VCLibs.Desktop.14"; 
+            DownloadUrl  = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"; 
+            TempFileName = "Microsoft.VCLibs.x64.14.00.Desktop.appx"; 
+            Arguments    = $null; 
+            Install      = "APPX" 
+        }
     )
 
-    # Iteração otimizada usando ForEach-Object
+    # Processa cada item na lista. Para cada software, tenta instalar com winget.
+    # Se o winget falhar (exceto quando o software já estiver instalado),
+    # chama a função de fallback.
     $APP | ForEach-Object {
-        
-        $ERRORCODE = winget install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements #2>&1
-    
+       
+        $ERRORCODE = winget install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements
+
         if ($LASTEXITCODE -ne 0) {
             if ($ERRORCODE -match "já instalado" -or $ERRORCODE -match "installed") {
                 # Software já instalado; nenhuma ação necessária.
             }
             else {
-                InstallFallbackGeneric -software $_
+                Write-Host "REDUNDANTE $($APP.Id) : $_"
+                Start-Sleep 3
+                REDUNDANTINSTALL -APPFAIL $_
+               
             }
         }
         
@@ -1574,6 +1608,7 @@ function WINGETAPPS {
     
     Clear-Host
 }
+
 
 function WINGETUPGRADE { 
 
@@ -1774,7 +1809,7 @@ function OFFICE2007 {
 
             if (-not (Test-Path -Path $OFFICE2007FOLDER -ErrorAction SilentlyContinue)) {
 
-                ToolDir
+                TOOLDIR
 
                 New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
 
@@ -1894,9 +1929,7 @@ function DriverBooster {
     
     }
 
-    StopDriverBooster
-
-    Clear-Host
+    StopDriverBooster  
     
 }
 
@@ -2355,7 +2388,7 @@ function CLEANTEMP {
     Start-Sleep -Seconds 2
 }
 
-function ImgHealth {
+function IMGHEALTH {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> IMGHEALTH"
 
@@ -2375,7 +2408,7 @@ function ImgHealth {
     Clear-Host
 }
 
-function Pro {
+function PRO {
 
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINDOWSPRO"
@@ -2395,7 +2428,7 @@ function Pro {
 
 }
 
-function Install-DeviceDrivers {
+function InstallDeviceDrivers {
     # Adicionar Serviço de Atualização do Windows
     $UpdateSvc = New-Object -ComObject Microsoft.Update.ServiceManager
     $UpdateSvc.AddService2("7971f918-a847-4430-9279-4a52d1efe18d", 7, "")
@@ -2431,11 +2464,23 @@ function Install-DeviceDrivers {
     }
 }
 
+function CLOCKDATE {
+
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"   
+
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.  
+  
+    w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
+    net start w32time 
+    w32tm /resync /force
+   
+}  
+
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
     
-NEWPWSH -FunctionNames 'ClockDate' -Hidden
+NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
 
 DISPLAYMENU 
 
