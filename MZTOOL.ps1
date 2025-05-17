@@ -664,7 +664,7 @@ function RESTART {
     $newProcess.Arguments = $myInvocation.MyCommand.Definition
     $newProcess.Verb = 'runas'
     [System.Diagnostics.Process]::Start($newProcess) | Out-Null
-    EXIT
+    #EXIT
 }
 
 # Verifica se a sessão está sendo executada como administrador.
