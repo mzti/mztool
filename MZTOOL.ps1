@@ -1618,6 +1618,10 @@ function WINGETAPPS {
         }
     )
 
+    if ($ID) {
+        $APP = $APP | Where-Object { $_.Id -eq $ID }
+    }
+
     # Processa cada item na lista. Para cada software, tenta instalar com winget.
     # Se o winget falhar (exceto quando o software já estiver instalado),
     # chama a função de fallback.
