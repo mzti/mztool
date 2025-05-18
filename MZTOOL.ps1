@@ -628,26 +628,25 @@ $Global:MZTOOLMODULE = $TRUE
 }
 
 # Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
-function GETMZTOOLMODULE {
-    
+function GETMZTOOLMODULE {     
+        
     if (-not($Global:MZTOOLMODULE)) {
-        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
+        try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression }
+        catch { Import-Module MZTOOL -Force -ErrorAction SilentlyContinue }
     }
 }
 
 do {    
 
     try {
-
-        Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression
-
+        # Importa o módulo MZTOOL para a sessão atual.
+        GETMZTOOLMODULE       
     }
 
     catch {
         # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
         MZTOOLMODULE
-        # Importa o módulo MZTOOL para a sessão atual.
-        GETMZTOOLMODULE
+        GETMZTOOLMODULE 
     }
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE) {
