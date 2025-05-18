@@ -88,7 +88,7 @@ $Global:ENVIROMENTVARS = @{
         $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"        
                 
         # Verifica se a variável já existe no arquivo de perfil.
-        if (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet) {            
+        if (Select-String -Path $PROFILE -Pattern "`$$($_.Key) =" -Quiet) {            
             $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
             $PROFILEBKP + $SETENVPROFILE | Set-Content -Path $PROFILE           
         } 
@@ -630,7 +630,7 @@ $Global:MZTOOLMODULE = $TRUE
 # Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 function GETMZTOOLMODULE {     
         
-    if (-not($Global:MZTOOLMODULE)) {
+    if (-not($Global:MZTOOLMODULE -eq $True)) {
         try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression }
         catch { Import-Module MZTOOL -Force -ErrorAction SilentlyContinue }
     }
@@ -649,7 +649,7 @@ do {
         GETMZTOOLMODULE 
     }
     # Verifica se o módulo foi carregado com sucesso.
-    if ($Global:MZTOOLMODULE) {
+    if ($Global:MZTOOLMODULE -eq $True) {
         Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
     }
     else {
@@ -671,7 +671,7 @@ do {
 
     
 
-} while (-not ($Global:MZTOOLMODULE))
+} while (-not ($Global:MZTOOLMODULE -eq $True))
 
 # Verifica se o perfil do PowerShell foi carregado e, se não, tenta carregá-lo.
 function GETPROFILE {  
@@ -713,7 +713,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
             Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
-            Start-Sleep -Seconds 2
+            Start-Sleep -Seconds 3
             RESTART
         } 
 
