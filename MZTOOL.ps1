@@ -1028,8 +1028,8 @@ ______________________________________________________
 |____________________________________________________|
 '
                         $NULL = @( 
-                            $1 = NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
-                            $2 = NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
+                            NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
+                            NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
                         ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
          
                         CLEANTEMP
@@ -1057,8 +1057,8 @@ ______________________________________________________
 ' 
 
                         $NULL = @(
-                            $1 = NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
-                            $2 = NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
+                            NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
+                            NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
                         ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id
 
                         CLEANTEMP
