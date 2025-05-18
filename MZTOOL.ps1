@@ -631,7 +631,7 @@ $Global:MZTOOLMODULE = $TRUE
 function GETMZTOOLMODULE {     
         
     if (-not($Global:MZTOOLMODULE -eq $TRUE)) {
-        try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression }
+        try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.ps1 | Invoke-Expression }
         catch { Import-Module MZTOOL -Force -ErrorAction SilentlyContinue }
     }
 }
