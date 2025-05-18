@@ -635,7 +635,7 @@ function GETMZTOOLMODULE {
         
     if (-not(Get-Module -Name "MZTOOL")) {
         
-        catch { Import-Module MZTOOL -Force -ErrorAction SilentlyContinue }
+        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 }
 
