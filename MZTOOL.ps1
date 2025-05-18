@@ -1497,12 +1497,18 @@ function WINGETAPPS {
     function REDUNDANTINSTALL {
         param ([hashtable]$APPFAIL)
 
+        "REDUNDANTE $($APPFAIL.Id)"
+
         # Define o caminho do arquivo temporário para o instalador
         $APPFILE = Join-Path $env:TEMP $APPFAIL.TempFileName
 
         try {
+
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
             # Tenta fazer o download do instalador
-            Start-BitsTransfer -Source $APPFAIL.DownloadUrl -Destination $APPFILE -ErrorAction Stop
+            Invoke-WebRequest -Uri $APPFAIL.DownloadUrl -OutFile $APPFILE -UseBasicParsing
+
 
             # Se houver argumentos definidos, substitui o placeholder "{0}" pelo caminho do arquivo
             $APPARGS = $null
@@ -1516,6 +1522,7 @@ function WINGETAPPS {
                     # Para arquivos MSI, é recomendado iniciar com o msiexec.exe
                     Get-Process -Name msiexec -ErrorAction SilentlyContinue | Wait-Process
                     Start-Process -FilePath "msiexec.exe" -ArgumentList $APPARGS -Verb RunAs
+                    
                 }
                 "EXE" {
                     # Para arquivos EXE, iniciamos diretamente o arquivo baixado com os argumentos.
@@ -1544,7 +1551,7 @@ function WINGETAPPS {
             Id           = "oogle.Chrome"; 
             DownloadUrl  = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"; 
             TempFileName = "GoogleChrome.msi"; 
-            Arguments    = @('/i', '{0}', '/qn'); 
+            Arguments    = @('/i', '{0}'<#, '/qn'#>); 
             Install      = "MSI" 
         },
         @{ 
@@ -1596,8 +1603,7 @@ function WINGETAPPS {
                 # Software já instalado; nenhuma ação necessária.
             }
             else {
-                Write-Host "REDUNDANTE $($APP.Id) : $_"
-                Start-Sleep 3
+               
                 REDUNDANTINSTALL -APPFAIL $_
                
             }
@@ -1608,7 +1614,6 @@ function WINGETAPPS {
     
     Clear-Host
 }
-
 
 function WINGETUPGRADE { 
 
@@ -1720,8 +1725,6 @@ function MICROSOFT365 {
             $365URLS = @($365URL1, $365URL2)
             $365EXE = "$env:TEMP\MICROSOFT365.exe"
 
-            #$wc = New-Object System.Net.WebClient
-            #$wc.DownloadFile($365URL, $365EXE)
             DOWNLOAD -Urls $365URLS -Destination $365EXE -BarWidth 30
         
             if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
