@@ -1035,7 +1035,7 @@ ______________________________________________________
                         $NULL = @( 
                             $1 = NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
                             $2 = NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
-                        ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $validProcesses.Id          
+                        ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
          
                         CLEANTEMP
 
