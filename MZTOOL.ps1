@@ -707,14 +707,6 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 
     Write-Host "ADMINISTRADOR" -ForegroundColor Green  
     
-    if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
-        Write-Host ""$($PSVersionTable.PSVersion)""
-        WINGETAPPS -FilterId "Microsoft.Powershell"
-        WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
-        pause
-        RESTART
-    }
-    
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
@@ -750,7 +742,6 @@ $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | For
         Write-Host "FALHA AO CARREGAR "$_.Key" NO ESCOPO MACHINE." -ForegroundColor Red
     }
 }
-
 
 #MENU -----------------------------------------------------
 
@@ -2515,6 +2506,14 @@ function awin {
 }
     
 NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
+
+if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
+    Write-Host ""$($PSVersionTable.PSVersion)""
+    WINGETAPPS -FilterId "Microsoft.Powershell"
+    WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
+    pause
+    RESTART
+}
 
 DISPLAYMENU 
 
