@@ -792,7 +792,7 @@ ______________________________________________________
 '
             # Garante uma linha em branco abaixo do menu.
             Write-Host ""
-            <#
+            
             # Função para exibir a barra de progresso in-place em uma linha fixa.           
             function DEPLOYFUNCTIONPROGRESS {
                 param(
@@ -827,9 +827,9 @@ ______________________________________________________
 
             function DEPLOYFUNCTION {
                 param(
+                    [hashtable[]]$DEPLOYFUNCTION,
                     [int]$BarWidth = 30,
                     [int]$LinePosition = 17
-                    [hashtable]$DEPLOYFUNCTION
                 )
                       
                 $total = $DEPLOYFUNCTION.Count
@@ -856,7 +856,7 @@ ______________________________________________________
                 # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
                 Write-Host ""
             }   
-                #>
+                
 
             $DEPLOYFUNCTION = @(
                 @{ Functions = 'PerfilTheme' },
@@ -869,7 +869,7 @@ ______________________________________________________
             )
                   
             # Chamada final para executar os grupos com a barra de progresso unificada.
-            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -Hashtable $DEPLOYFUNCTION                  
+            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTION $DEPLOYFUNCTION                  
                      
             Clear-Host
             Write-Host '
@@ -1022,12 +1022,12 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        $PROCESSES = @( 
+                        $WAITPROCESSES = @( 
                             NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
                             NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
                         ) 
                         
-                        $PROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
+                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
          
                         CLEANTEMP
 
@@ -1057,7 +1057,7 @@ ______________________________________________________
                             NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
                             NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
                         ) 
-                        
+
                         $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id
 
                         CLEANTEMP
