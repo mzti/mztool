@@ -485,3 +485,5 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
+
+$Global:MZTOOLMODULE = $TRUE

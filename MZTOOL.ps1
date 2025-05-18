@@ -106,6 +106,7 @@ $Global:ENVIROMENTVARS = @{
 }
 
 function MZTOOLMODULE {
+
     # Define o nome do módulo
     $MODULENAME = "MZTOOL"
 
@@ -616,6 +617,8 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
+
+$Global:MZTOOLMODULE = $TRUE
 '@       
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
@@ -624,19 +627,27 @@ function EXPAND {
 # Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 function GETMZTOOLMODULE {
     
-    if (-not(Get-Module -Name MZTOOL -ErrorAction SilentlyContinue)) {
+    if (-not($Global:MZTOOLMODULE)) {
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 }
 
 do {    
-    # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
-    MZTOOLMODULE
-    # Importa o módulo MZTOOL para a sessão atual.
-    GETMZTOOLMODULE
 
+    try {
+
+        Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression
+
+    }
+
+    catch {
+        # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
+        MZTOOLMODULE
+        # Importa o módulo MZTOOL para a sessão atual.
+        GETMZTOOLMODULE
+    }
     # Verifica se o módulo foi carregado com sucesso.
-    if (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue) {
+    if ($Global:MZTOOLMODULE) {
         Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
     }
     else {
@@ -656,7 +667,9 @@ do {
         
     }
 
-} while (-not (Get-Module -Name MZTOOL -ErrorAction SilentlyContinue))
+    
+
+} while (-not ($Global:MZTOOLMODULE))
 
 # Verifica se o perfil do PowerShell foi carregado e, se não, tenta carregá-lo.
 function GETPROFILE {  
@@ -1486,8 +1499,10 @@ function WINGETMODULE {
 }
 function WINGETAPPS {
 
+    Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression
+
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGET APPS"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGET APPS"
  
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         WINGETMODULE
@@ -1497,18 +1512,15 @@ function WINGETAPPS {
     function REDUNDANTINSTALL {
         param ([hashtable]$APPFAIL)
 
-        "REDUNDANTE $($APPFAIL.Id)"
+        "INSTALAÇÃO REDUNDANTE $($APPFAIL.Id)"
 
         # Define o caminho do arquivo temporário para o instalador
         $APPFILE = Join-Path $env:TEMP $APPFAIL.TempFileName
 
-        try {
-
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        try {          
 
             # Tenta fazer o download do instalador
-            Invoke-WebRequest -Uri $APPFAIL.DownloadUrl -OutFile $APPFILE -UseBasicParsing
-
+            DOWNLOAD -Urls $APPFAIL.DownloadUrl -Destination $APPFILE -BarWidth 30  
 
             # Se houver argumentos definidos, substitui o placeholder "{0}" pelo caminho do arquivo
             $APPARGS = $null
@@ -1520,7 +1532,7 @@ function WINGETAPPS {
             switch ($APPFAIL.Install) {  
                 "MSI" {
                     # Para arquivos MSI, é recomendado iniciar com o msiexec.exe
-                    Get-Process -Name msiexec -ErrorAction SilentlyContinue | Wait-Process
+                    #Get-Process -Name msiexec -ErrorAction SilentlyContinue | Wait-Process
                     Start-Process -FilePath "msiexec.exe" -ArgumentList $APPARGS -Verb RunAs
                     
                 }
@@ -1540,7 +1552,6 @@ function WINGETAPPS {
         catch {
             Clear-Host
             Write-Output "FALHA NA INSTALAÇÃO DO $($APPFAIL.Id) : $_"
-            pause
         }
     }
     
@@ -1551,35 +1562,28 @@ function WINGETAPPS {
             Id           = "oogle.Chrome"; 
             DownloadUrl  = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"; 
             TempFileName = "GoogleChrome.msi"; 
-            Arguments    = @('/i', '{0}'<#, '/qn'#>); 
-            Install      = "MSI" 
-        },
-        @{ 
-            Id           = "icrosoft.Powershell"; 
-            DownloadUrl  = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"; 
-            TempFileName = "PowerShell.msi"; 
-            Arguments    = @('/i', '{0}', '/qn'); 
+            Arguments    = @('/i', '{0}', '/passive'); 
             Install      = "MSI" 
         },
         @{ 
             Id           = "dobe.Acrobat.Reader.64-bit"; 
-            DownloadUrl  = "https://ardownload.adobe.com/pub/adobe/reader/win/AcrobatDC/2300120155/AcroRdrDC2300120155_en_US.exe"; 
+            DownloadUrl  = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2500120474/AcroRdrDCx642500120474_MUI.exe"; 
             TempFileName = "AcrobatReader.exe"; 
-            Arguments    = @("/sAll", "/rs", "/rps", "/msi", "/norestart"); 
+            Arguments    = @("/msi", "/passive", "/norestart"); 
             Install      = "EXE" 
         },
         @{ 
             Id           = "icrosoft.VCRedist.2015+.x64"; 
             DownloadUrl  = "https://aka.ms/vs/17/release/vc_redist.x64.exe"; 
             TempFileName = "vc_redist_x64.exe"; 
-            Arguments    = @("/quiet", "/norestart"); 
+            Arguments    = @("/msi", "/passive", "/norestart"); 
             Install      = "EXE" 
         },
         @{ 
             Id           = "icrosoft.VCRedist.2015+.x86"; 
             DownloadUrl  = "https://aka.ms/vs/17/release/vc_redist.x86.exe"; 
             TempFileName = "vc_redist_x86.exe"; 
-            Arguments    = @("/quiet", "/norestart"); 
+            Arguments    = @("/msi", "/passive", "/norestart"); 
             Install      = "EXE" 
         },
         @{ 
@@ -1588,6 +1592,13 @@ function WINGETAPPS {
             TempFileName = "Microsoft.VCLibs.x64.14.00.Desktop.appx"; 
             Arguments    = $null; 
             Install      = "APPX" 
+        },
+        @{ 
+            Id           = "icrosoft.Powershell"; 
+            DownloadUrl  = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"; 
+            TempFileName = "PowerShell.msi"; 
+            Arguments    = @('/i', '{0}', '/passive'); 
+            Install      = "MSI" 
         }
     )
 
