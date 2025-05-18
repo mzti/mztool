@@ -131,8 +131,9 @@ function MZTOOLMODULE {
     if (Test-Path -Path $MODULEPATH) {
         Remove-Item -Path $MODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-
-    $MODULECONTENT = @'
+    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
+    catch {
+        $MODULECONTENT = @'
 # MZTOOL.psm1
 
 #region Importações e API
@@ -622,7 +623,8 @@ function EXPAND {
 } 
 
 $Global:MZTOOLMODULE = $TRUE
-'@       
+'@   
+    }    
     # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
     Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
 }
@@ -647,8 +649,7 @@ do {
 
     else {
 
-        MZTOOLMODULE
-        GETMZTOOLMODULE 
+        MZTOOLMODULE      
         
         Write-Host "Falha ao carregar o módulo MZTOOL." -ForegroundColor Red
         Start-Sleep -Seconds 5
