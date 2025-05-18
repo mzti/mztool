@@ -85,15 +85,18 @@ $Global:ENVIROMENTVARS = @{
         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
                               
         # Cria a linha de definição da variável (com o símbolo $ escapado).
-        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"
+        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"        
                 
         # Verifica se a variável já existe no arquivo de perfil.
         if (Select-String -Path $PROFILE -Pattern $($_.Key) -Quiet) {            
-            # Se a variável estiver presente, é removida. 
-            Remove-Content -Path $PROFILE -Value $SETENVPROFILE             
-        }  
+            $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
+            $PROFILEBKP + $SETENVPROFILE | Set-Content -Path $PROFILE           
+        } 
+         
         # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
-        Add-Content -Path $PROFILE -Value $SETENVPROFILE
+        else {
+            Add-Content -Path $PROFILE -Value $SETENVPROFILE
+        }
     }
 
     if ($_.Key -in @('TOOL', 'DESKTOP')) {
