@@ -49,7 +49,7 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 }
 #endregion
 
-#FUNCÕES
+#region FUNCÕES
 
 function TOOLDIR {
 
@@ -549,5 +549,4 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
-
-$Global:MZTOOLMODULE = $TRUE
+#endregion
