@@ -631,28 +631,25 @@ $Global:MZTOOLMODULE = $TRUE
 function GETMZTOOLMODULE {     
         
     if (-not($Global:MZTOOLMODULE -eq $True)) {
-        try { Invoke-RestMethod https://aw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression }
+        try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression }
         catch { Import-Module MZTOOL -Force -ErrorAction SilentlyContinue }
     }
 }
 
-do {    
-
-  
+do {      
     # Importa o módulo MZTOOL para a sessão atual.
     GETMZTOOLMODULE       
-  
-
-    
-    # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
-    MZTOOLMODULE
-    GETMZTOOLMODULE 
-    
+ 
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE -eq $True) {
         Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
     }
+
     else {
+
+        MZTOOLMODULE
+        GETMZTOOLMODULE 
+        
         Write-Host "Falha ao carregar o módulo MZTOOL." -ForegroundColor Red
         Start-Sleep -Seconds 5
        
@@ -667,9 +664,7 @@ do {
             EXIT
         }
         
-    }
-
-    
+    }    
 
 } while (-not ($Global:MZTOOLMODULE -eq $True))
 
@@ -902,10 +897,7 @@ ______________________________________________________
     
             #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
  
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
-           
-          
-            
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"    
                
             Clear-Host
             Write-Host '
@@ -1674,7 +1666,7 @@ function ANYDESK {
     
     $ANYDESKLINK = 'https://download.anydesk.com/AnyDesk-CM.exe'
     
-    New-Object System.Net.WebClient.DownloadFile($ANYDESKLINK, "$env:DESKTOP\AnyDesk.exe")
+    DOWNLOAD -Urls $ANYDESKLINK -Destination "$env:DESKTOP\AnyDesk.exe" -BarWidth 30
     
 }
 
