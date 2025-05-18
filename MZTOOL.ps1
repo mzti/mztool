@@ -2512,9 +2512,8 @@ if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
     WINGETAPPS -FilterId "Microsoft.Powershell"
     WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
     pause
-    Start-Process -FilePath "wt.exe" -ArgumentList "powershell.exe -ExecutionPolicy Bypass -File `"$Global:SCRIPTCODE`"" -Verb RunAs
-    exit
-
+    Start-Process -FilePath "pwsh.exe" -ArgumentList "-ExecutionPolicy Bypass -Command `"$Global:SCRIPTCODE`"" -Verb RunAs
+    exit   
     #RESTART
 }
 
