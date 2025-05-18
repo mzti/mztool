@@ -624,9 +624,10 @@ function EXPAND {
 
 $Global:MZTOOLMODULE = $TRUE
 '@   
-    }    
-    # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
-    Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
+      
+        # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
+        Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
+    }  
 }
 
 # Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
