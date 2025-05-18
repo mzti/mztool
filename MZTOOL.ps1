@@ -48,6 +48,8 @@ $ErrorActionPreference = 'SilentlyContinue'
 
 $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 function OPSYS {
 
     #Verifica se o sistema operacional é suportado.
@@ -1618,7 +1620,7 @@ function WINGETAPPS {
     # chama a função de fallback.
     $APP | ForEach-Object {
        
-        $ERRORCODE = Winget Install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements
+        $ERRORCODE = Winget Install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements | Out-String
 
         if ($LASTEXITCODE -ne 0) {
             if ($ERRORCODE -match "já instalado" -or $ERRORCODE -match "installed") {
