@@ -792,7 +792,7 @@ ______________________________________________________
 '
             # Garante uma linha em branco abaixo do menu.
             Write-Host ""
-            
+            <#            
             # Função para exibir a barra de progresso in-place em uma linha fixa.           
             function DEPLOYFUNCTIONPROGRESS {
                 param(
@@ -857,7 +857,7 @@ ______________________________________________________
                 Write-Host ""
             }   
                 
-
+#>
             $DEPLOYFUNCTION = @(
                 @{ Functions = 'PerfilTheme' },
                 @{ Functions = 'ANYDESK' },
