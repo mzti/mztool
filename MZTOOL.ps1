@@ -1498,9 +1498,7 @@ function WINGETMODULE {
 
 }
 function WINGETAPPS {
-
-    Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Invoke-Expression
-
+    
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGET APPS"
  
@@ -1559,42 +1557,42 @@ function WINGETAPPS {
     # e os parâmetros para a instalação redundante, se necessário)
     $APP = @(
         @{ 
-            Id           = "oogle.Chrome"; 
+            Id           = "Google.Chrome"; 
             DownloadUrl  = "https://dl.google.com/chrome/install/googlechromestandaloneenterprise64.msi"; 
             TempFileName = "GoogleChrome.msi"; 
             Arguments    = @('/i', '{0}', '/passive'); 
             Install      = "MSI" 
         },
         @{ 
-            Id           = "dobe.Acrobat.Reader.64-bit"; 
+            Id           = "Adobe.Acrobat.Reader.64-bit"; 
             DownloadUrl  = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2500120474/AcroRdrDCx642500120474_MUI.exe"; 
             TempFileName = "AcrobatReader.exe"; 
             Arguments    = @("/msi", "/passive", "/norestart"); 
             Install      = "EXE" 
         },
         @{ 
-            Id           = "icrosoft.VCRedist.2015+.x64"; 
+            Id           = "Microsoft.VCRedist.2015+.x64"; 
             DownloadUrl  = "https://aka.ms/vs/17/release/vc_redist.x64.exe"; 
             TempFileName = "vc_redist_x64.exe"; 
             Arguments    = @("/msi", "/passive", "/norestart"); 
             Install      = "EXE" 
         },
         @{ 
-            Id           = "icrosoft.VCRedist.2015+.x86"; 
+            Id           = "Microsoft.VCRedist.2015+.x86"; 
             DownloadUrl  = "https://aka.ms/vs/17/release/vc_redist.x86.exe"; 
             TempFileName = "vc_redist_x86.exe"; 
             Arguments    = @("/msi", "/passive", "/norestart"); 
             Install      = "EXE" 
         },
         @{ 
-            Id           = "icrosoft.VCLibs.Desktop.14"; 
+            Id           = "Microsoft.VCLibs.Desktop.14"; 
             DownloadUrl  = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"; 
             TempFileName = "Microsoft.VCLibs.x64.14.00.Desktop.appx"; 
             Arguments    = $null; 
             Install      = "APPX" 
         },
         @{ 
-            Id           = "icrosoft.Powershell"; 
+            Id           = "Microsoft.Powershell"; 
             DownloadUrl  = "https://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi"; 
             TempFileName = "PowerShell.msi"; 
             Arguments    = @('/i', '{0}', '/passive'); 
@@ -1607,7 +1605,7 @@ function WINGETAPPS {
     # chama a função de fallback.
     $APP | ForEach-Object {
        
-        $ERRORCODE = winget install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements
+        $ERRORCODE = Winget Install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements
 
         if ($LASTEXITCODE -ne 0) {
             if ($ERRORCODE -match "já instalado" -or $ERRORCODE -match "installed") {
