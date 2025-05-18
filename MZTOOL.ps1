@@ -2514,15 +2514,16 @@ if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
     WINGETAPPS -FilterId "Microsoft.Powershell"
     WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
     pause
-
     Write-Host "Definindo Windows Terminal como padrão..."
     $terminalSettingsPath = "$env:LOCALAPPDATA\Microsoft\Windows Terminal\settings.json"
+    
     if (Test-Path $terminalSettingsPath) {
         $settings = Get-Content -Path $terminalSettingsPath | ConvertFrom-Json
         $settings.defaultProfile = "{574e775e-4f2a-5b13-9bfe-33a2cd92b1a6}" # ID do perfil padrão do PowerShell 7
         $settings | ConvertTo-Json -Depth 10 | Set-Content -Path $terminalSettingsPath
         Write-Host "Windows Terminal configurado para abrir com PowerShell 7!"
-    }    
+    }
+    
     Pause
     Start-Process -FilePath "wt.exe" -ArgumentList "pwsh.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
     exit     
