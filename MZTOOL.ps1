@@ -638,16 +638,16 @@ function GETMZTOOLMODULE {
 
 do {    
 
-    try {
-        # Importa o módulo MZTOOL para a sessão atual.
-        GETMZTOOLMODULE       
-    }
+  
+    # Importa o módulo MZTOOL para a sessão atual.
+    GETMZTOOLMODULE       
+  
 
-    catch {
-        # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
-        MZTOOLMODULE
-        GETMZTOOLMODULE 
-    }
+    
+    # Chama a função MZTOOLMODULE para criar e configurar o módulo MZTOOL.
+    MZTOOLMODULE
+    GETMZTOOLMODULE 
+    
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE -eq $True) {
         Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
