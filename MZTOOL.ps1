@@ -44,6 +44,7 @@ $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
+$ErrorActionPreference = 'SilentlyContinue'
 
 $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
@@ -63,6 +64,7 @@ function OPSYS {
 }
 
 OPSYS 
+
 
 if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
@@ -703,7 +705,15 @@ function RESTART {
 # Verifica se a sessão está sendo executada como administrador.
 if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 
-    Write-Host "ADMINISTRADOR" -ForegroundColor Green    
+    Write-Host "ADMINISTRADOR" -ForegroundColor Green  
+    
+    if ($PSVersionTable.PSVersion -lt 7.0.0 ) {
+        Write-Host ""$($PSVersionTable.PSVersion)""
+        WINGETAPPS -ID "Microsoft.Powershell"
+        WINGETAPPS -ID "Microsoft.WindowsTerminal"
+        pause
+        RESTART
+    }
     
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -eq "Undefined") {
@@ -1493,6 +1503,9 @@ function WINGETMODULE {
 
 }
 function WINGETAPPS {
+    param (
+        [string]$ID = $null
+    )
     
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGET APPS"
@@ -1536,6 +1549,10 @@ function WINGETAPPS {
                     # Para arquivos APPX, utilizamos o Add-AppPackage (sem parâmetros ambiguos como -Force)
                     Add-AppPackage -Path $APPFILE -ErrorAction SilentlyContinue                 
                 }
+                "MSIX" {
+                    Add-AppxPackage -Path $APPFILE -ErrorAction SilentlyContinue
+                }
+
                 default {
                     Write-Output "Tipo de instalação não suportado para $($APPFAIL.Id)"
                 }
@@ -1591,6 +1608,13 @@ function WINGETAPPS {
             TempFileName = "PowerShell.msi"; 
             Arguments    = @('/i', '{0}', '/passive'); 
             Install      = "MSI" 
+        }
+        @{ 
+            Id           = "Microsoft.WindowsTerminal"; 
+            DownloadUrl  = "https://github.com/microsoft/terminal/releases/download/v1.22.11141.0/Microsoft.WindowsTerminal_1.22.11141.0_8wekyb3d8bbwe.msixbundle"; 
+            TempFileName = "WindowsTerminal.msixbundle"; 
+            Arguments    = $null; 
+            Install      = "MSIX" 
         }
     )
 
