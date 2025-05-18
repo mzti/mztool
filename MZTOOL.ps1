@@ -633,24 +633,23 @@ $Global:MZTOOLMODULE = $TRUE
 # Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 function GETMZTOOLMODULE {     
         
-    if (-not($Global:MZTOOLMODULE -eq $TRUE)) {
-        try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.ps1 | Invoke-Expression }
+    if (-not(Get-Module -Name "MZTOOL")) {
+        
         catch { Import-Module MZTOOL -Force -ErrorAction SilentlyContinue }
     }
 }
 
 do {      
     # Importa o módulo MZTOOL para a sessão atual.
+    MZTOOLMODULE 
     GETMZTOOLMODULE       
  
     # Verifica se o módulo foi carregado com sucesso.
-    if ($Global:MZTOOLMODULE -eq $TRUE) {
+    if (Get-Module -Name "MZTOOL") {
         Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
     }
 
     else {
-
-        MZTOOLMODULE      
         
         Write-Host "Falha ao carregar o módulo MZTOOL." -ForegroundColor Red
         Start-Sleep -Seconds 5
@@ -668,7 +667,7 @@ do {
         
     }    
 
-} while (-not ($Global:MZTOOLMODULE -eq $TRUE))
+} while (-not (Get-Module -Name "MZTOOL"))
 
 # Verifica se o perfil do PowerShell foi carregado e, se não, tenta carregá-lo.
 function GETPROFILE {  
