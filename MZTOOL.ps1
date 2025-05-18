@@ -708,8 +708,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
-            Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
-            Start-Sleep -Seconds 5
+            Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray           
             RESTART
         } 
 
@@ -1023,10 +1022,12 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        $NULL = @( 
+                        $PROCESSES = @( 
                             NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
                             NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
-                        ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
+                        ) 
+                        
+                        $PROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
          
                         CLEANTEMP
 
@@ -1052,10 +1053,12 @@ ______________________________________________________
 |____________________________________________________|
 ' 
 
-                        $NULL = @(
+                        $WAITPROCESSES = @(
                             NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
                             NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
-                        ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id
+                        ) 
+                        
+                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id
 
                         CLEANTEMP
                                     
