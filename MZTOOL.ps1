@@ -709,8 +709,8 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
     
     if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
         Write-Host ""$($PSVersionTable.PSVersion)""
-        WINGETAPPS -ID "Microsoft.Powershell"
-        WINGETAPPS -ID "Microsoft.WindowsTerminal"
+        WINGETAPPS -FilterId "Microsoft.Powershell"
+        WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
         pause
         RESTART
     }
@@ -1504,7 +1504,7 @@ function WINGETMODULE {
 }
 function WINGETAPPS {
     param (
-        [string]$ID = $null
+        [string]$FilterId = $null
     )
     
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
@@ -1618,8 +1618,8 @@ function WINGETAPPS {
         }
     )
 
-    if ($ID) {
-        $APP = $APP | Where-Object { $_.Id -eq $ID }
+    if ($FilterId) {
+        $APP = $APP | Where-Object { $_.Id -eq $FilterId }
     }
 
     # Processa cada item na lista. Para cada software, tenta instalar com winget.
