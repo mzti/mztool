@@ -77,7 +77,7 @@ $Global:ENVIROMENTVARS = @{
     'MZTOOL'               = "PowerShell irm https://bit.ly/MZT00L | iex"
     'MZBETA'               = "PowerShell irm https://bit.ly/MZBETA | iex"
      
-}<#.GetEnumerator()#> | ForEach-Object {
+}.GetEnumerator() | ForEach-Object {
     
     if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
  
