@@ -707,7 +707,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 
     Write-Host "ADMINISTRADOR" -ForegroundColor Green  
     
-    if ($PSVersionTable.PSVersion -lt 7.0.0 ) {
+    if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
         Write-Host ""$($PSVersionTable.PSVersion)""
         WINGETAPPS -ID "Microsoft.Powershell"
         WINGETAPPS -ID "Microsoft.WindowsTerminal"
