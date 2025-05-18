@@ -1032,11 +1032,10 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        $proc1 = NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
-                        $proc2 = NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
-
-                        $validProcesses = @($proc1, $proc2) | Where-Object { $_.Id -gt 0 }
-                        Wait-Process -Id $validProcesses.Id          
+                        $NULL = @( 
+                            $1 = NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
+                            $2 = NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
+                        ) | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $validProcesses.Id          
          
                         CLEANTEMP
 
