@@ -77,7 +77,7 @@ $Global:ENVIROMENTVARS = @{
     'MZTOOL'               = "PowerShell irm https://bit.ly/MZT00L | iex"
     'MZBETA'               = "PowerShell irm https://bit.ly/MZBETA | iex"
      
-}.GetEnumerator() | ForEach-Object {
+}<#.GetEnumerator()#> | ForEach-Object {
     
     if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
  
@@ -623,8 +623,7 @@ function EXPAND {
 } 
 
 $Global:MZTOOLMODULE = $TRUE
-'@   
-      
+'@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
     }  
@@ -639,7 +638,8 @@ function GETMZTOOLMODULE {
     }
 }
 
-do {      
+do {   
+
     # Importa o módulo MZTOOL para a sessão atual.
     MZTOOLMODULE 
     GETMZTOOLMODULE       
@@ -657,7 +657,7 @@ do {
         $TRY = $TRY + 1 
         Write-Host "Falha ao carregar o módulo MZTOOL.`nTentativa "$TRY" de 5 para carregar o módulo MZTOOL.`n" -ForegroundColor Yellow
         
-        #Se o número de tentativas for maior ou igual a 5, encerra o script.
+        #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
         if ($TRY -ge 5) {
 
             Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
@@ -709,7 +709,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
             Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
-            Start-Sleep -Seconds 3
+            Start-Sleep -Seconds 5
             RESTART
         } 
 
@@ -742,9 +742,6 @@ $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | For
     }
 }
 
-#GETMZTOOLMODULE
-
-PAUSE
 
 #MENU -----------------------------------------------------
 
@@ -796,7 +793,7 @@ ______________________________________________________
 '
             # Garante uma linha em branco abaixo do menu.
             Write-Host ""
-          
+            <#
             # Função para exibir a barra de progresso in-place em uma linha fixa.           
             function DEPLOYFUNCTIONPROGRESS {
                 param(
@@ -833,6 +830,7 @@ ______________________________________________________
                 param(
                     [int]$BarWidth = 30,
                     [int]$LinePosition = 17
+                    [hashtable]$DEPLOYFUNCTION
                 )
                       
                 $total = $DEPLOYFUNCTION.Count
@@ -859,6 +857,7 @@ ______________________________________________________
                 # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
                 Write-Host ""
             }   
+                #>
 
             $DEPLOYFUNCTION = @(
                 @{ Functions = 'PerfilTheme' },
@@ -866,13 +865,12 @@ ______________________________________________________
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
-                @{ Functions = 'Microsoft365'; Wait = $true },
+                @{ Functions = 'MICROSOFT365'; Wait = $true },
                 @{ Functions = 'PinIcons', 'StartSoftwares' }
             )
                   
             # Chamada final para executar os grupos com a barra de progresso unificada.
-            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17                      
-
+            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -Hashtable $DEPLOYFUNCTION                  
                      
             Clear-Host
             Write-Host '
@@ -926,8 +924,6 @@ ______________________________________________________
             function MENUFERRAMENTAS {
                 
                 $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
-            
-                 
 
                 Clear-Host
                 Write-Host '
@@ -1527,8 +1523,7 @@ function WINGETAPPS {
                 "MSI" {
                     # Para arquivos MSI, é recomendado iniciar com o msiexec.exe
                     #Get-Process -Name msiexec -ErrorAction SilentlyContinue | Wait-Process
-                    Start-Process -FilePath "msiexec.exe" -ArgumentList $APPARGS -Verb RunAs
-                    
+                    Start-Process -FilePath "msiexec.exe" -ArgumentList $APPARGS -Verb RunAs                    
                 }
                 "EXE" {
                     # Para arquivos EXE, iniciamos diretamente o arquivo baixado com os argumentos.
