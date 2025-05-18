@@ -2508,11 +2508,16 @@ function awin {
 NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
 
 if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
-    Write-Host "VERSÃO DO POWERSHEL: "$($PSVersionTable.PSVersion)""
+    Write-Host "VERSÃO DO POWERSHELL: "$($PSVersionTable.PSVersion)""
     WINGETAPPS -FilterId "Microsoft.Powershell"
     WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
     pause
-    Start-Process -FilePath "wt.exe" -ArgumentList "powershell.exe -ExecutionPolicy Bypass -Command `"$Global:SCRIPTCODE`"" -Verb RunAs
+    $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+    $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
+    $RESTART.Verb = 'runas'
+    [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+    Pause
+    Start-Process -FilePath "wt.exe" -ArgumentList "powershell.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
     exit     
     #RESTART
 }
