@@ -139,6 +139,7 @@ function MZTOOLMODULE {
     catch {
         $MODULECONTENT = @'
 # MZTOOL.psm1
+#MÓDULO MZTOOL
 
 #region Importações e API
 Add-Type @"
@@ -180,16 +181,16 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
     [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
 
     # Bloqueia a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
-    $SWP_NOMOVE       = 0x0002
-    $SWP_NOSIZE       = 0x0001
-    $SWP_NOZORDER     = 0x0004
+    $SWP_NOMOVE = 0x0002
+    $SWP_NOSIZE = 0x0001
+    $SWP_NOZORDER = 0x0004
     $SWP_FRAMECHANGED = 0x0020
     $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
     [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
 }
 #endregion
 
-#FUNCÕES
+#region FUNCÕES
 
 function TOOLDIR {
 
@@ -258,6 +259,70 @@ function NEWPWSH {
         [void](Start-Process powershell -ArgumentList $arguments)
     }
 }
+
+# Função para exibir a barra de progresso in-place em uma linha fixa.           
+function DEPLOYFUNCTIONPROGRESS {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$PercentComplete,
+        [int]$BarWidth = 30,
+        [string]$Message = "IMPLEMENTANDO",
+        [int]$LinePosition = 17
+    )
+
+    $rawUI = $Host.UI.RawUI
+    $windowSize = $rawUI.WindowSize
+
+    # Posiciona o cursor na linha fixa determinada por -LinePosition
+    $cursorPos = $rawUI.CursorPosition
+    $cursorPos.X = 0
+    $cursorPos.Y = $LinePosition
+    $rawUI.CursorPosition = $cursorPos
+
+    # Calcula o número de caracteres preenchidos e vazios
+    $filled = [math]::Round($PercentComplete * $BarWidth / 100)
+    $empty = $BarWidth - $filled
+    $bar = ("#" * $filled) + ("-" * $empty)
+    $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
+
+    # Limpa a linha completa e escreve a barra de progresso
+    $clearLine = " " * $windowSize.Width
+    Write-Host $clearLine -NoNewline
+    $rawUI.CursorPosition = $cursorPos
+    Write-Host $progressText -NoNewline
+}
+
+function DEPLOYFUNCTION {
+    param(
+        [hashtable[]]$DEPLOYFUNCTIONHASH,
+        [int]$BarWidth = 30,
+        [int]$LinePosition = 17
+    )
+          
+    $total = $DEPLOYFUNCTIONHASH.Count
+    $completed = 0
+
+    # Exibe a barra inicial (0% concluído)
+    DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
+
+    foreach ($group in $DEPLOYFUNCTIONHASH) {
+        if ($group.ContainsKey("Wait") -and $group.Wait) {
+            NEWPWSH -FunctionNames $group.Functions -Wait
+        }
+        else {
+            NEWPWSH -FunctionNames $group.Functions
+        }
+        $completed++
+        $percent = [math]::Round(($completed * 100) / $total)
+        DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
+        
+        # Aguarda 3 segundos antes de iniciar o próximo grupo
+        Start-Sleep -Seconds 3
+    }
+
+    # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
+    Write-Host ""
+}   
 
 function TESTLINK {
     param(
@@ -625,8 +690,8 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
+#endregion
 
-$Global:MZTOOLMODULE = $TRUE
 '@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
