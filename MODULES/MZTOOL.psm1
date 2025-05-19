@@ -153,9 +153,9 @@ function DEPLOYFUNCTIONPROGRESS {
 
 function DEPLOYFUNCTION {
     param(
+        [hashtable[]]$DEPLOYFUNCTIONHASH,
         [int]$BarWidth = 30,
-        [int]$LinePosition = 17,
-        [hashtable]$DEPLOYFUNCTIONHASH
+        [int]$LinePosition = 17
     )
           
     $total = $DEPLOYFUNCTIONHASH.Count
