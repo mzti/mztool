@@ -155,16 +155,16 @@ function DEPLOYFUNCTION {
     param(
         [int]$BarWidth = 30,
         [int]$LinePosition = 17,
-        [hashtable]$DEPLOYFUNCTION
+        [hashtable]$DEPLOYFUNCTIONHASH
     )
           
-    $total = $DEPLOYFUNCTION.Count
+    $total = $DEPLOYFUNCTIONHASH.Count
     $completed = 0
 
     # Exibe a barra inicial (0% concluído)
     DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
 
-    foreach ($group in $DEPLOYFUNCTION) {
+    foreach ($group in $DEPLOYFUNCTIONHASH) {
         if ($group.ContainsKey("Wait") -and $group.Wait) {
             NEWPWSH -FunctionNames $group.Functions -Wait
         }

@@ -872,7 +872,7 @@ ______________________________________________________
             )
                   
             # Chamada final para executar os grupos com a barra de progresso unificada.
-            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTION $DEPLOYFUNCTION                  
+            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTIONHASH $DEPLOYFUNCTION                  
                      
             Clear-Host
             Write-Host '
