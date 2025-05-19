@@ -2508,7 +2508,7 @@ function awin {
 }
     
 NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
-
+<#
 if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
     Write-Host "VERSÃO DO POWERSHELL: "$($PSVersionTable.PSVersion)""
     WINGETAPPS -FilterId "Microsoft.Powershell"
@@ -2558,7 +2558,7 @@ if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
     exit     
     #RESTART
 }
-
+#>
 DISPLAYMENU 
 
 EXIT   
