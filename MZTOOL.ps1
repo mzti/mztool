@@ -2534,7 +2534,7 @@ if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
         $settingsJson = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
 
         # Procura o perfil cujo commandline contenha "pwsh.exe" (PowerShell 7).
-        $pwshProfile = $settingsJson.profiles.list | Where-Object { $_.commandline -match "pwsh.exe" } | Select-Object -First 1
+        $pwshProfile = $settingsJson.profiles.list | Where-Object { $_.guid -match "{574e775e-4f2a-5b96-ac1e-a2962a402336}" } | Select-Object -First 1
 
         if ($pwshProfile) {
             Write-Host "Perfil do PowerShell 7 encontrado com GUID: $($pwshProfile.guid)"
