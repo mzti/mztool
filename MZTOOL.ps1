@@ -44,11 +44,15 @@ $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
-$ErrorActionPreference = 'SilentlyContinue'
+#$ErrorActionPreference = 'SilentlyContinue'
 
 $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+}  
 
 function OPSYS {
 
@@ -66,54 +70,6 @@ function OPSYS {
 }
 
 OPSYS 
-
-
-if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-}  
-
-$Global:ENVIROMENTVARS = @{
-    'TOOL'                 = "C:\MZTOOL"
-    'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
-    'Global:TITLE'         = $Global:TITLE 
-    'Global:WINVER'        = $Global:WINVER  
-    'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
-    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"
-     
-}.GetEnumerator() | ForEach-Object {
-      
-    <#    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
- 
-        # Cria o arquivo de perfil do PowerShell se não existir.
-        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
-                              
-        # Cria a linha de definição da variável (com o símbolo $ escapado).
-        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"        
-                
-        # Verifica se a variável já existe no arquivo de perfil.
-        if (Select-String -Path $PROFILE -Pattern "`$$($_.Key) =" -Quiet) {            
-            $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
-            $PROFILEBKP + $SETENVPROFILE | Set-Content -Path $PROFILE           
-        } 
-         
-        # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
-        else {
-            Add-Content -Path $PROFILE -Value $SETENVPROFILE
-        }
-    }
-#>
-    if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
-       
-        $PWSHKEY = "PowerShell " ; if ($_.Key -eq 'TOOL') { $PWSHKEY = $null } 
-
-        # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
-        foreach ($SCOPE in @('Process', 'User')) {
-            [Environment]::SetEnvironmentVariable("$($PWSHKEY)$($_.Key)", $_.Value, $SCOPE)
-        }
-    }
-    $_
-}
 
 function MZTOOLMODULE {
 
@@ -695,6 +651,11 @@ function EXPAND {
 } 
 #endregion
 
+#region Variáveis Globais
+$Global:TITLE = "MZTOOL BETA"
+$Global:DESKTOP = "C:\Users\Public\DESKTOP"
+#endregion
+
 '@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
@@ -741,6 +702,50 @@ do {
 
 } while (-not (Get-Module -Name "MZTOOL"))
 
+$Global:ENVIROMENTVARS = @{
+    'TOOL'                 = "C:\MZTOOL"
+    'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
+    'Global:TITLE'         = $Global:TITLE 
+    'Global:WINVER'        = $Global:WINVER  
+    'Global:PROFILELOADED' = "`$True"         
+    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
+    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"
+     
+}.GetEnumerator() | ForEach-Object {
+      
+    <#    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
+ 
+        # Cria o arquivo de perfil do PowerShell se não existir.
+        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
+                              
+        # Cria a linha de definição da variável (com o símbolo $ escapado).
+        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"        
+                
+        # Verifica se a variável já existe no arquivo de perfil.
+        if (Select-String -Path $PROFILE -Pattern "`$$($_.Key) =" -Quiet) {            
+            $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
+            $PROFILEBKP + $SETENVPROFILE | Set-Content -Path $PROFILE           
+        } 
+         
+        # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
+        else {
+            Add-Content -Path $PROFILE -Value $SETENVPROFILE
+        }
+    }
+#>
+    if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
+       
+        $PWSHKEY = "PowerShell " ; if ($_.Key -eq 'TOOL') { $PWSHKEY = $null } 
+
+        # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
+        foreach ($SCOPE in @('Process', 'User')) {
+            [Environment]::SetEnvironmentVariable("$($PWSHKEY)$($_.Key)", $_.Value, $SCOPE)
+        }
+    }
+    $_
+}
+
+<#
 # Verifica se o perfil do PowerShell foi carregado e, se não, tenta carregá-lo.
 function GETPROFILE {  
     if ($Global:PROFILELOADED -eq $True) {
@@ -758,6 +763,7 @@ function GETPROFILE {
 }
        
 GETPROFILE
+#>
 
 # Obtém o ID e o Objeto de Segurança do usuário atual.
 $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -797,6 +803,7 @@ else {
 
 }
 
+<#
 # Define as variáveis de ambiente no escopo do sistema (Machine) para MZTOOL e MZBETA.
 $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | ForEach-Object { 
     
@@ -812,6 +819,7 @@ $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | For
         Write-Host "FALHA AO CARREGAR "$_.Key" NO ESCOPO MACHINE." -ForegroundColor Red
     }
 }
+#>
 
 #MENU -----------------------------------------------------
 

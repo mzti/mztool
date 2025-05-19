@@ -1,5 +1,26 @@
 #MÓDULO MZTOOL
 
+#region Variáveis Globais
+$Global:TITLE = "MZTOOL BETA"
+$Global:DESKTOP = "C:\Users\Public\DESKTOP"
+$Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
+$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+#endregion
+
+#region Definições Globais
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+#endregion
+
+#region Customização do Console
+$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+$H = Get-Host
+$Win = $H.UI.RawUI.WindowSize
+$Win.Height = 20
+$Win.Width = 58
+$H.UI.RawUI.Set_WindowSize($Win)
+$H.UI.RawUI.Set_BufferSize($Win)
+#endregion
+
 #region Importações e API
 Add-Type @"
 using System;
@@ -21,16 +42,7 @@ public class Win32 {
 "@
 #endregion
 
-#region Customização do Console
-$Global:TITLE = "MZTOOL BETA"
-$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-$H = Get-Host
-$Win = $H.UI.RawUI.WindowSize
-$Win.Height = 20
-$Win.Width = 58
-$H.UI.RawUI.Set_WindowSize($Win)
-$H.UI.RawUI.Set_BufferSize($Win)
-#endregion
+
 
 #region Fixar tamanho e remover redimensionamento
 $global:hwnd = (Get-Process -Id $PID).MainWindowHandle
@@ -49,10 +61,7 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 }
 #endregion
 
-#region Variáveis Globais
-$Global:TITLE = "MZTOOL BETA"
 
-$Global:DESKTOP = "C:\Users\Public\DESKTOP"
 #region FUNCÕES
 
 function TOOLDIR {
