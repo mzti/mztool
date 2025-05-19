@@ -74,16 +74,16 @@ if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
-    'DESKTOP'              = "C:\Users\Public\DESKTOP"
+    'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:TITLE'         = $Global:TITLE 
     'Global:WINVER'        = $Global:WINVER  
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "PowerShell irm https://bit.ly/MZT00L | iex"
-    'MZBETA'               = "PowerShell irm https://bit.ly/MZBETA | iex"
+    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
+    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"
      
 }.GetEnumerator() | ForEach-Object {
-    
-    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
+      
+    <#    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
  
         # Cria o arquivo de perfil do PowerShell se não existir.
         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
@@ -102,11 +102,14 @@ $Global:ENVIROMENTVARS = @{
             Add-Content -Path $PROFILE -Value $SETENVPROFILE
         }
     }
+#>
+    if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
+       
+        $PWSHKEY = "PowerShell " ; if ($_.Key -eq 'TOOL') { $PWSHKEY = $null } 
 
-    if ($_.Key -in @('TOOL', 'DESKTOP')) {
         # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
         foreach ($SCOPE in @('Process', 'User')) {
-            [Environment]::SetEnvironmentVariable($_.Key, $_.Value, $SCOPE)
+            [Environment]::SetEnvironmentVariable("$($PWSHKEY)$($_.Key)", $_.Value, $SCOPE)
         }
     }
     $_
@@ -773,7 +776,7 @@ function RESTART {
 if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 
     Write-Host "ADMINISTRADOR" -ForegroundColor Green  
-    
+    <#
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
@@ -784,7 +787,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
         else {
             Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
         }
-    }       
+    }#>       
 }
 
 # Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
@@ -860,72 +863,7 @@ ______________________________________________________
 '
             # Garante uma linha em branco abaixo do menu.
             Write-Host ""
-            <#            
-            # Função para exibir a barra de progresso in-place em uma linha fixa.           
-            function DEPLOYFUNCTIONPROGRESS {
-                param(
-                    [Parameter(Mandatory = $true)]
-                    [int]$PercentComplete,
-                    [int]$BarWidth = 30,
-                    [string]$Message = "IMPLEMENTANDO",
-                    [int]$LinePosition = 17
-                )
-    
-                $rawUI = $Host.UI.RawUI
-                $windowSize = $rawUI.WindowSize
 
-                # Posiciona o cursor na linha fixa determinada por -LinePosition
-                $cursorPos = $rawUI.CursorPosition
-                $cursorPos.X = 0
-                $cursorPos.Y = $LinePosition
-                $rawUI.CursorPosition = $cursorPos
-
-                # Calcula o número de caracteres preenchidos e vazios
-                $filled = [math]::Round($PercentComplete * $BarWidth / 100)
-                $empty = $BarWidth - $filled
-                $bar = ("#" * $filled) + ("-" * $empty)
-                $progressText = "${Message}: {0,3}% [$bar]" -f $PercentComplete
-
-                # Limpa a linha completa e escreve a barra de progresso
-                $clearLine = " " * $windowSize.Width
-                Write-Host $clearLine -NoNewline
-                $rawUI.CursorPosition = $cursorPos
-                Write-Host $progressText -NoNewline
-            }
-
-            function DEPLOYFUNCTION {
-                param(
-                    [hashtable[]]$DEPLOYFUNCTION,
-                    [int]$BarWidth = 30,
-                    [int]$LinePosition = 17
-                )
-                      
-                $total = $DEPLOYFUNCTION.Count
-                $completed = 0
-
-                # Exibe a barra inicial (0% concluído)
-                DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-
-                foreach ($group in $DEPLOYFUNCTION) {
-                    if ($group.ContainsKey("Wait") -and $group.Wait) {
-                        NEWPWSH -FunctionNames $group.Functions -Wait
-                    }
-                    else {
-                        NEWPWSH -FunctionNames $group.Functions
-                    }
-                    $completed++
-                    $percent = [math]::Round(($completed * 100) / $total)
-                    DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-                    
-                    # Aguarda 3 segundos antes de iniciar o próximo grupo
-                    Start-Sleep -Seconds 3
-                }
-
-                # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
-                Write-Host ""
-            }   
-                
-#>
             $DEPLOYFUNCTION = @(
                 @{ Functions = 'PerfilTheme' },
                 @{ Functions = 'ANYDESK' },
@@ -1754,7 +1692,7 @@ function ANYDESK {
     
     $ANYDESKLINK = 'https://download.anydesk.com/AnyDesk-CM.exe'
     
-    DOWNLOAD -Urls $ANYDESKLINK -Destination "$env:DESKTOP\AnyDesk.exe" -BarWidth 30
+    DOWNLOAD -Urls $ANYDESKLINK -Destination "$Global:DESKTOP\AnyDesk.exe" -BarWidth 30
     
 }
 
@@ -1860,7 +1798,7 @@ function MICROSOFT365 {
     
         #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
         $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-        @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$env:DESKTOP" -ErrorAction SilentlyContinue }
+        @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
     }

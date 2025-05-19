@@ -49,6 +49,10 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 }
 #endregion
 
+#region Variáveis Globais
+$Global:TITLE = "MZTOOL BETA"
+
+$Global:DESKTOP = "C:\Users\Public\DESKTOP"
 #region FUNCÕES
 
 function TOOLDIR {
