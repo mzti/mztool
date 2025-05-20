@@ -1996,7 +1996,9 @@ function PerfilTheme {
         '{59031a47-3f72-44a7-89c5-5595fe6b30ee}', #Rede
         '{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}', #Grupo Doméstico
         '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}'  #Painel de Controle
-    ) | ForEach-Object {
+    )  
+    
+    $ICONS | ForEach-Object {
         New-ItemProperty -Path "$DESKINCONSREG" -Name $ICONS -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
     }    
 
