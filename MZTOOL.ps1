@@ -685,7 +685,9 @@ do {
  
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE) {
-        Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
+
+        Write-Information($MODULESTATUS = "MÓDULO ON")    
+
     }
 
     else {       
@@ -700,7 +702,7 @@ do {
             EXIT
         }
 
-        Write-Host "Falha ao carregar o módulo MZTOOL.`nTentativa "$TRYGETMODULE" de 5 para carregar o módulo MZTOOL.`n" -ForegroundColor Yellow
+        Write-Warning ($MODULESTATUS = "MÓDULO OFF")
         
     }    
 
@@ -848,6 +850,8 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
+    Write-Information $MODULESTATUS    
+
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
    
@@ -964,7 +968,8 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA                 |
 |                   DANIEL MOZART                    |
 |____________________________________________________|
-'                                    
+'         
+
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
              
                 Switch ($CHOICE) {
