@@ -852,7 +852,8 @@ ______________________________________________________
                 Write-Host "Sem conexão com a internet!"
 
                 do { 
-                    $InternetStatus = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet | Start-Sleep -5 
+                    $InternetStatus = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet 
+                    Start-Sleep -5 
                 }while (-not($InternetStatus))
             }
 
