@@ -42,6 +42,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #MZTOOL - BETA
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
+$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 #$ErrorActionPreference = 'SilentlyContinue'
@@ -653,6 +654,9 @@ function EXPAND {
 #region Variáveis Globais
 $Global:TITLE = "MZTOOL BETA"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
+$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
+$Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
+$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
 #endregion
 
 '@         
@@ -664,19 +668,23 @@ $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 # Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 function GETMZTOOLMODULE {     
         
-    if (-not(Get-Module -Name "MZTOOL")) {
+    if (-not($Global:MZTOOLMODULE)) {
         
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
+
+    $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
+    
 }
 
 do {   
     # Importa o módulo MZTOOL para a sessão atual.
     MZTOOLMODULE 
-    GETMZTOOLMODULE       
+    GETMZTOOLMODULE 
+        
  
     # Verifica se o módulo foi carregado com sucesso.
-    if (Get-Module -Name "MZTOOL") {
+    if ($Global:MZTOOLMODULE) {
         Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
     }
 
@@ -696,7 +704,7 @@ do {
         
     }    
 
-} while (-not (Get-Module -Name "MZTOOL"))
+} while (-not ($Global:MZTOOLMODULE))
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
