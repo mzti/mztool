@@ -735,7 +735,7 @@ $Global:ENVIROMENTVARS = @{
 
         # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
         foreach ($SCOPE in @('Process', 'User')) {
-            [Environment]::SetEnvironmentVariable("$($PWSHKEY)$($_.Key)", $_.Value, $SCOPE)
+            [Environment]::SetEnvironmentVariable($_.Key, "$($PWSHKEY)$($_.Value)", $SCOPE)
         }
     }
     $_
@@ -853,7 +853,7 @@ ______________________________________________________
 
                 do { 
                     $InternetStatus = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet 
-                    Start-Sleep -5 
+                    Start-Sleep Seconds -5 
                 }while (-not($InternetStatus))
             }
 
