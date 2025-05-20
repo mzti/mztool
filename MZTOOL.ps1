@@ -936,7 +936,6 @@ ______________________________________________________
 '                               
             DOWNLOADMZTOOL            
           
-            DIAGNOSTICS
             function DISPLAYMENU2 {
                 
                 $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
@@ -959,30 +958,21 @@ ______________________________________________________
 |____________________________________________________|
 '                                    
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-              
-                <# function CLOSEAPPS { 
-                    $NULL = DIAGNOSTICS | ForEach-Object {
-                        if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
-                            Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
-                        }
-                    }        
-                }#>
-
+             
                 Switch ($CHOICE) {
                     1 {
-                        DIAGNOSTICS -STARTSTOP ${function:GO}
+                        DIAGNOSTICS -START
                                                     
                         DISPLAYMENU2
                     }
-                    2 {
-                        # Fecha todas as ferramentas de diagnóstico se estiverem abertas
+                    2 {                       
                         
-                        DIAGNOSTICS -STARTSTOP ${function:STOP}                                            
+                        DIAGNOSTICS -STOP                                            
 
                         DISPLAYMENU2
                     }
                     3 {
-                        DIAGNOSTICS -STARTSTOP ${function:STOP}   
+                        DIAGNOSTICS -STOP 
 
                         DISPLAYMENU
                     }
@@ -1034,12 +1024,10 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        $WAITPROCESSES = @(                             
+                        $Null = @(                             
                             NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
                             NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
-                        ) 
-                        
-                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
+                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
          
                         CLEANTEMP
 
@@ -1065,12 +1053,10 @@ ______________________________________________________
 |____________________________________________________|
 ' 
 
-                        $WAITPROCESSES = @(
+                        $Null = @(
                             NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
                             NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
-                        ) 
-
-                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }
+                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
 
 
                         CLEANTEMP
@@ -1368,24 +1354,12 @@ function DOWNLOADMZTOOL {
 
 function DIAGNOSTICS {
     param(
-        [ScriptBlock]$STARTSTOP
-    )
+        [Parameter(Mandatory = $true)]
+        [Switch]$START,
+        [Switch]$STOP
+    )  
 
-    if ($null -eq $STARTSTOP) {
-        Write-Host "STARTSTOP é nulo!"
-    }
-    else {
-        & $STARTSTOP
-    }
-
-    if ($PSBoundParameters.ContainsKey('STARTSTOP')) {
-        Write-Host "Tipo de STARTSTOP: $($STARTSTOP.GetType().Name)" -ForegroundColor Cyan
-    }
-    else {
-        Write-Host "Parâmetro STARTSTOP NÃO foi informado." -ForegroundColor Yellow
-    }
-    
-    # Inicializa Softwares de diagnósticos de hardware x64.
+    # Inicializa ou encerra os softwares de diagnósticos de hardware x64 ou x32.
     $TOOLFOLDER = "$env:TOOL\TOOL"
                                 
     $APPS = @(
@@ -1410,12 +1384,11 @@ function DIAGNOSTICS {
         )
     }
     else {
-        Write-Host "ARQUITETURA DO SISTEMA NÃO SUPORTADA."
-        return
+        Write-Host "ARQUITETURA DO SISTEMA NÃO SUPORTADA."       
     }
-
-    # Definição das funções internas (note que elas só estarão disponíveis no escopo interno)
-    function GO { 
+ 
+    if ($START) {
+  
         $APPS | ForEach-Object {
             if (-not (Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
                 Start-Process "$TOOLFOLDER\$($_.Path)"
@@ -1423,26 +1396,19 @@ function DIAGNOSTICS {
         }   
     }
 
-    function STOP { 
+    elseif ($STOP) { 
         $APPS | ForEach-Object {
             if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
                 Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
             }
         }        
     }
-
-    # Se o parâmetro STARTSTOP foi fornecido, invoca o script block.
-    if ($PSBoundParameters.ContainsKey('STARTSTOP') -and ($STARTSTOP)) {
-        Write-Host "Parâmetro STARTSTOP recebido:" 
-        pause
-        & $STARTSTOP
-    }
+    
     else {
-        Write-Host "falha:"
-        pause
-        #Return $APPS
+        Write-Host "SWITCH NÃO DETECTADO."
     }
 }
+
 
 function WINUPDATEMODULE {
     
