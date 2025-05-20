@@ -647,14 +647,7 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
-
-function ENTRYERROR {
-     #ENTRADA INVÁLIDA.
-     Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-     Start-Sleep -Seconds 1                        
-     Return
-}
-     
+   
 #endregion
 
 #region Variáveis Globais
@@ -880,6 +873,16 @@ ______________________________________________________
     Switch ($CHOICE) {
 
         1 {
+            $InternetStatus = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet
+            if (-not($InternetStatus)) {
+
+                Write-Host "Sem conexão com a internet!"
+
+                do { 
+                    $InternetStatus = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet | Start-Sleep -5 
+                }while (-not($InternetStatus))
+            }
+
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
                        
@@ -1445,7 +1448,7 @@ function DIAGNOSTICS {
         }        
     }
 
-    Return $APPS
+    if ($STARTSTOP) { & $STARTSTOP }
 }
 function WINUPDATEMODULE {
     

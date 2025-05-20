@@ -557,10 +557,5 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
-function ENTRYERROR {
-    #ENTRADA INVÁLIDA.
-    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-    Start-Sleep -Seconds 1                        
-    Return
-}
+
 #endregion
