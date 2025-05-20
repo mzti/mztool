@@ -475,9 +475,7 @@ ______________________________________________________
                             Exit                            
                         }
                         default {
-                            Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                            Start-Sleep -Seconds 2
-                            DisplayMenuDownloadError
+                            ENTRYERROR
                         }
                     }
                 }
@@ -653,6 +651,14 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 } 
+
+function ENTRYERROR {
+     #ENTRADA INVÁLIDA.
+     Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+     Start-Sleep -Seconds 1                        
+     Return
+}
+     
 #endregion
 
 #region Variáveis Globais
@@ -980,10 +986,8 @@ ______________________________________________________
 
                         DISPLAYMENU
                     }
-                    Default {
-                        Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
-                        Start-Sleep -Seconds 1
-                        DISPLAYMENU2
+                    default {
+                        ENTRYERROR
                     }
                 }
             }
@@ -1081,11 +1085,7 @@ ______________________________________________________
                     }
         
                     default {
-                        #ENTRADA INVÁLIDA.
-            
-                        Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                        Start-Sleep -Seconds 1
-                        DISPLAYMENU3
+                        ENTRYERROR
                     }
              
                 }
@@ -1178,11 +1178,8 @@ ______________________________________________________
                 
                     }
 
-                    Default {
-                        #ENTRADA INVÁLIDA.
-                        Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                        Start-Sleep -Seconds 1                        
-                        DISPLAYMENU4 
+                    default {
+                        ENTRYERROR
                     }
                 }
 
@@ -1291,13 +1288,7 @@ ______________________________________________________
         }
 
         default {
-
-            #ENTRADA INVÁLIDA.
-
-            Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-            Start-Sleep -Seconds 1
-            DISPLAYMENU
-
+            ENTRYERROR
         }
     }
 }
@@ -1413,6 +1404,7 @@ function DIAGNOSTICS {
     }
 
     function START { 
+        $APPS = DIAGNOSTICS
         $APPS | ForEach-Object {
             # Verifica se o software já estiver em execução e
             if (-not (Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
@@ -1422,12 +1414,15 @@ function DIAGNOSTICS {
     }
 
     function STOP { 
+        $APPS = DIAGNOSTICS  
         $APPS | ForEach-Object {
             if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
                 Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
             }
         }        
     }
+
+    Return $APPS
 }
 function WINUPDATEMODULE {
     
@@ -1784,19 +1779,17 @@ function MICROSOFT365 {
 |                   DANIEL MOZART                    |
 |____________________________________________________|  
 '
-            $365ERROR = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-            switch ($365ERROR) {
+            $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+            switch ($CHOICE) {
                 1 {
                     if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
-                    Microsoft365
+                    MICROSOFT365
                 }
                 2 {
-                    #Script continua.
+                    DISPLAYMENU4
                 }
                 default {
-                    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                    Start-Sleep -Seconds 2
-                    Return
+                    ENTRYERROR
                 }
             }
         }    
@@ -2004,11 +1997,8 @@ function PerfilTheme {
         '{59031a47-3f72-44a7-89c5-5595fe6b30ee}', #Rede
         '{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}', #Grupo Doméstico
         '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}'  #Painel de Controle
-    )
-
-    # Adiciona ou modifica propriedades no registro para exibir ícones.
-    foreach ($ICON in $ICONS) {
-        New-ItemProperty -Path "$DESKINCONSREG" -Name $ICON -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
+    ) | ForEach-Object {
+        New-ItemProperty -Path "$DESKINCONSREG" -Name $ICONS -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
     }    
 
     #Mostra e atualiza a Área de Trabalho.    
@@ -2510,6 +2500,13 @@ function CLOCKDATE {
     w32tm /resync /force
    
 }  
+
+function ENTRYERROR {
+    #ENTRADA INVÁLIDA.
+    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    Start-Sleep -Seconds 1                        
+    Return
+}
 
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
