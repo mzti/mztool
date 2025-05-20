@@ -698,33 +698,6 @@ do {
 
 } while (-not (Get-Module -Name "MZTOOL"))
 
-Register-ObjectEvent -InputObject $Error -EventName "NewError" -Action {
-    $ultimoErro = $Error[0]
-    Write-Warning "Erro detectado: $ultimoErro"
-
-    if ($ultimoErro -match "não reconhecido como nome de cmdlet") {
-        Write-Host "Função não encontrada. Tentando reimportar o módulo GETMZTOOLMODULE..."
-        
-        Try {
-            Import-Module GETMZTOOLMODULE -ErrorAction Stop
-            Write-Host "Módulo GETMZTOOLMODULE importado com sucesso!"
-        }
-        Catch {
-            Write-Warning "Falha na reimportação! Tentando reconstruir MZTOOLMODULE..."
-            
-            Try {
-                # Assumimos que GETMZTOOLMODULE pode ser regenerado a partir de MZTOOLMODULE
-                GETMZTOOLMODULE; Import-Module GETMZTOOLMODULE -ErrorAction Stop
-                Write-Host "Módulo GETMZTOOLMODULE reconstruído e reimportado!"
-            }
-            Catch {
-                Write-Error "Falha na reconstrução e reimportação do módulo! Verifique a integridade do MZTOOLMODULE."
-            }
-        }
-    }
-}
-
-
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
