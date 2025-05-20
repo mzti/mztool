@@ -1875,7 +1875,7 @@ function OFFICE2007 {
         
         }
      
-        OFFICE2007Office2007
+        OFFICE2007
 
         NETFX3
     
