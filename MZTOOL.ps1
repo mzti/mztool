@@ -970,7 +970,7 @@ ______________________________________________________
 
                 Switch ($CHOICE) {
                     1 {
-                        DIAGNOSTICS -STARTSTOP ${function:START}
+                        DIAGNOSTICS -STARTSTOP ${function:GO}
                                                     
                         DISPLAYMENU2
                     }
@@ -1370,6 +1370,20 @@ function DIAGNOSTICS {
     param(
         [ScriptBlock]$STARTSTOP
     )
+
+    if ($null -eq $STARTSTOP) {
+        Write-Host "STARTSTOP é nulo!"
+    }
+    else {
+        & $STARTSTOP
+    }
+
+    if ($PSBoundParameters.ContainsKey('STARTSTOP')) {
+        Write-Host "Tipo de STARTSTOP: $($STARTSTOP.GetType().Name)" -ForegroundColor Cyan
+    }
+    else {
+        Write-Host "Parâmetro STARTSTOP NÃO foi informado." -ForegroundColor Yellow
+    }
     
     # Inicializa Softwares de diagnósticos de hardware x64.
     $TOOLFOLDER = "$env:TOOL\TOOL"
@@ -1401,7 +1415,7 @@ function DIAGNOSTICS {
     }
 
     # Definição das funções internas (note que elas só estarão disponíveis no escopo interno)
-    function START { 
+    function GO { 
         $APPS | ForEach-Object {
             if (-not (Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
                 Start-Process "$TOOLFOLDER\$($_.Path)"
@@ -1418,11 +1432,15 @@ function DIAGNOSTICS {
     }
 
     # Se o parâmetro STARTSTOP foi fornecido, invoca o script block.
-    if ($STARTSTOP) {
+    if ($PSBoundParameters.ContainsKey('STARTSTOP') -and ($STARTSTOP)) {
+        Write-Host "Parâmetro STARTSTOP recebido:" 
+        pause
         & $STARTSTOP
     }
     else {
-        Return $APPS
+        Write-Host "falha:"
+        pause
+        #Return $APPS
     }
 }
 
