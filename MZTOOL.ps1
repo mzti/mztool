@@ -1354,7 +1354,7 @@ function DOWNLOADMZTOOL {
 
 function DIAGNOSTICS {
     param(
-        [Parameter(Mandatory = $true)]
+        #[Parameter(Mandatory = $true)]
         [Switch]$START,
         [Switch]$STOP
     )  
