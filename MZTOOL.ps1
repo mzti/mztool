@@ -43,7 +43,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
-$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture#(Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 #$ErrorActionPreference = 'SilentlyContinue'
 
