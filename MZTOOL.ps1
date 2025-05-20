@@ -50,10 +50,6 @@ $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-Register-ObjectEvent -InputObject $Error -EventName "NewError" -Action {
-    Write-Warning "Erro capturado: $($Error[0])"
-}
-
 if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 }  
@@ -708,6 +704,33 @@ do {
     }    
 
 } while (-not (Get-Module -Name "MZTOOL"))
+
+Register-ObjectEvent -InputObject $Error -EventName "NewError" -Action {
+    $ultimoErro = $Error[0]
+    Write-Warning "Erro detectado: $ultimoErro"
+
+    if ($ultimoErro -match "não reconhecido como nome de cmdlet") {
+        Write-Host "Função não encontrada. Tentando reimportar o módulo GETMZTOOLMODULE..."
+        
+        Try {
+            Import-Module GETMZTOOLMODULE -ErrorAction Stop
+            Write-Host "Módulo GETMZTOOLMODULE importado com sucesso!"
+        }
+        Catch {
+            Write-Warning "Falha na reimportação! Tentando reconstruir MZTOOLMODULE..."
+            
+            Try {
+                # Assumimos que GETMZTOOLMODULE pode ser regenerado a partir de MZTOOLMODULE
+                GETMZTOOLMODULE; Import-Module GETMZTOOLMODULE -ErrorAction Stop
+                Write-Host "Módulo GETMZTOOLMODULE reconstruído e reimportado!"
+            }
+            Catch {
+                Write-Error "Falha na reconstrução e reimportação do módulo! Verifique a integridade do MZTOOLMODULE."
+            }
+        }
+    }
+}
+
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
@@ -2504,8 +2527,25 @@ function CLOCKDATE {
 function ENTRYERROR {
     #ENTRADA INVÁLIDA.
     Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-    Start-Sleep -Seconds 1                        
-    Return
+    Start-Sleep -Seconds 1        
+    
+    $callStack = Get-PSCallStack
+
+    # Verifica se há um chamador. Geralmente, o índice 1 contém o contexto do menu.
+    if ($callStack.Count -gt 1) {
+        $callerFrame = $callStack[1]
+        $callerFunction = $callerFrame.Command  # Normalmente exibe o nome da função chamadora
+
+        Write-Host "Retornando para o menu: $callerFunction" -ForegroundColor Cyan
+        Start-Sleep -Seconds 1
+
+        # Invoca novamente a função chamadora
+        & $callerFunction
+    }
+    else {
+        Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
+        pause
+    }
 }
 
 function awin {
