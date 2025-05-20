@@ -1371,7 +1371,6 @@ function DIAGNOSTICS {
     )
     
     # Inicializa Softwares de diagnósticos de hardware x64.
-
     $TOOLFOLDER = "$env:TOOL\TOOL"
                                 
     $APPS = @(
@@ -1388,7 +1387,6 @@ function DIAGNOSTICS {
             @{ Name = "HWiNFO64"; Path = "HWINFO\HWiNFO64.exe" }
         )
     }
-
     elseif ($Global:WINVER -match '32 bits') {
         $APPS += @(
             @{ Name = "Core_Temp_32"; Path = "CORE_TEMP\Core_Temp_32.exe" },
@@ -1396,22 +1394,21 @@ function DIAGNOSTICS {
             @{ Name = "HWiNFO32"; Path = "HWINFO\HWiNFO32.exe" }
         )
     }
-
     else {
         Write-Host "ARQUITETURA DO SISTEMA NÃO SUPORTADA."
         return
     }
 
-    function START {        
+    # Definição das funções internas (note que elas só estarão disponíveis no escopo interno)
+    function START { 
         $APPS | ForEach-Object {
-            # Verifica se o software já estiver em execução e
             if (-not (Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
                 Start-Process "$TOOLFOLDER\$($_.Path)"
             }
         }   
     }
 
-    function STOP {     
+    function STOP { 
         $APPS | ForEach-Object {
             if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
                 Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
@@ -1419,8 +1416,15 @@ function DIAGNOSTICS {
         }        
     }
 
-    if ($STARTSTOP) { & $STARTSTOP }
+    # Se o parâmetro STARTSTOP foi fornecido, invoca o script block.
+    if ($STARTSTOP) {
+        & $STARTSTOP
+    }
+    else {
+        Return $APPS
+    }
 }
+
 function WINUPDATEMODULE {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
