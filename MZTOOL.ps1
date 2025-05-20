@@ -1402,8 +1402,7 @@ function DIAGNOSTICS {
         return
     }
 
-    function START { 
-        $APPS = DIAGNOSTICS
+    function START {        
         $APPS | ForEach-Object {
             # Verifica se o software já estiver em execução e
             if (-not (Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
@@ -1412,8 +1411,7 @@ function DIAGNOSTICS {
         }   
     }
 
-    function STOP { 
-        $APPS = DIAGNOSTICS  
+    function STOP {     
         $APPS | ForEach-Object {
             if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
                 Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
