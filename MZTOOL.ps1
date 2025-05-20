@@ -2504,10 +2504,8 @@ function ENTRYERROR {
     if ($callStack.Count -gt 1) {
         $callerFrame = $callStack[1]
         $callerFunction = $callerFrame.Command  # Normalmente exibe o nome da função chamadora
-
-        Write-Host "Retornando para o menu: $callerFunction" -ForegroundColor Cyan
+    
         Start-Sleep -Seconds 1
-
         # Invoca novamente a função chamadora
         & $callerFunction
     }
