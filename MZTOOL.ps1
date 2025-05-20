@@ -1034,13 +1034,12 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                        $WAITPROCESSES = @( 
-                            $1, $2 = $null
-                            $1 = NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
-                            $2 = NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
+                        $WAITPROCESSES = @(                             
+                            NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
+                            NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
                         ) 
                         
-                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
+                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
          
                         CLEANTEMP
 
@@ -1067,11 +1066,12 @@ ______________________________________________________
 ' 
 
                         $WAITPROCESSES = @(
-                            $1 = NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
-                            $2 = NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
+                            NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
+                            NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
                         ) 
 
-                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id
+                        $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }
+
 
                         CLEANTEMP
                                     
