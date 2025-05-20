@@ -50,6 +50,10 @@ $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
+Register-ObjectEvent -InputObject $Error -EventName "NewError" -Action {
+    Write-Warning "Erro capturado: $($Error[0])"
+}
+
 if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 }  
@@ -672,7 +676,6 @@ function GETMZTOOLMODULE {
 }
 
 do {   
-
     # Importa o módulo MZTOOL para a sessão atual.
     MZTOOLMODULE 
     GETMZTOOLMODULE       
@@ -682,25 +685,51 @@ do {
         Write-Host "O módulo MZTOOL foi carregado com sucesso." -ForegroundColor Green
     }
 
-    else {
-        
-        Write-Host "Falha ao carregar o módulo MZTOOL." -ForegroundColor Red
-        Start-Sleep -Seconds 5
-       
-        $TRY = $TRY + 1 
-        Write-Host "Falha ao carregar o módulo MZTOOL.`nTentativa "$TRY" de 5 para carregar o módulo MZTOOL.`n" -ForegroundColor Yellow
+    else {       
+               
+        $TRYGETMODULE++      
         
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
-        if ($TRY -ge 5) {
+        if ($TRYGETMODULE -ge 5) {
 
             Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
             Start-Sleep -Seconds 5
             EXIT
         }
+
+        Write-Host "Falha ao carregar o módulo MZTOOL.`nTentativa "$TRYGETMODULE" de 5 para carregar o módulo MZTOOL.`n" -ForegroundColor Yellow
         
     }    
 
 } while (-not (Get-Module -Name "MZTOOL"))
+
+Register-ObjectEvent -InputObject $Error -EventName "NewError" -Action {
+    $ultimoErro = $Error[0]
+    Write-Warning "Erro detectado: $ultimoErro"
+
+    if ($ultimoErro -match "não reconhecido como nome de cmdlet") {
+        Write-Host "Função não encontrada. Tentando reimportar o módulo MZTOOL..."
+        
+        Try {
+            
+            Write-Host "Módulo GETMZTOOLMODULE importado com sucesso!"
+        }
+        Catch {
+            Write-Warning "Falha na reimportação! Tentando reconstruir o módulo MZTOOLMODULE..."
+            
+            Try {
+                # Assumimos que GETMZTOOLMODULE pode ser regenerado a partir de MZTOOLMODULE
+                MZTOOLMODULE
+                GETMZTOOLMODULE
+                
+            }
+            Catch {
+                Write-Error "Falha na reconstrução e reimportação do módulo,`n`n REINICIE O MZTOOL."
+            }
+        }
+    }
+}
+
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
@@ -770,7 +799,7 @@ $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
 $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
-function RESTART {
+function RESTARTADMIN {
     $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
     $RESTART.Verb = 'runas'
@@ -787,7 +816,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
             Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray           
-            RESTART
+            RESTARTADMIN
         } 
 
         else {
@@ -799,7 +828,7 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 # Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
 else {
 
-    RESTART
+    RESTARTADMIN
 
 }
 
@@ -845,9 +874,9 @@ ______________________________________________________
 |____________________________________________________|
 '
     # Solicita ao usuário que insira o número correspondente à opção desejada.
-    $MENU = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+    $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
    
-    Switch ($MENU) {
+    Switch ($CHOICE) {
 
         1 {
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
@@ -869,9 +898,6 @@ ______________________________________________________
 |                                      DANIEL MOZART |
 |____________________________________________________|
 '
-            # Garante uma linha em branco abaixo do menu.
-            Write-Host ""
-
             $DEPLOYFUNCTION = @(
                 @{ Functions = 'PerfilTheme' },
                 @{ Functions = 'ANYDESK' },
@@ -932,9 +958,8 @@ ______________________________________________________
 '                               
             DOWNLOADMZTOOL            
           
-            Start-Sleep -Seconds 1
             DIAGNOSTICS
-            function MENUFERRAMENTAS {
+            function DISPLAYMENU2 {
                 
                 $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
 
@@ -956,50 +981,47 @@ ______________________________________________________
 |____________________________________________________|
 '                                    
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                function CLOSEAPPS { 
+              
+                <# function CLOSEAPPS { 
                     $NULL = DIAGNOSTICS | ForEach-Object {
                         if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
                             Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
                         }
                     }        
-                }
+                }#>
 
                 Switch ($CHOICE) {
                     1 {
-                        DIAGNOSTICS
-
-                        Start-Sleep -Seconds 1
-                            
-                        MENUFERRAMENTAS
+                        DIAGNOSTICS -STARTSTOP ${function:START}
+                                                    
+                        DISPLAYMENU2
                     }
                     2 {
                         # Fecha todas as ferramentas de diagnóstico se estiverem abertas
                         
-                        CLOSEAPPS
-                       
-                        Start-Sleep -Seconds 1
+                        DIAGNOSTICS -STARTSTOP ${function:STOP}                                            
 
-                        MENUFERRAMENTAS
+                        DISPLAYMENU2
                     }
                     3 {
-                        CLOSEAPPS
+                        DIAGNOSTICS -STARTSTOP ${function:STOP}   
 
                         DISPLAYMENU
                     }
                     Default {
                         Write-Host "OPÇÃO INVÁLIDA. INSIRA UMA OPÇÃO VÁLIDA."
                         Start-Sleep -Seconds 1
-                        MENUFERRAMENTAS
+                        DISPLAYMENU2
                     }
                 }
             }
                 
-            MENUFERRAMENTAS
-                         
+            DISPLAYMENU2
+
         }
 
         3 {
-            function DisplayMenu3 {
+            function DISPLAYMENU3 {
     
                 Clear-Host        
                 Write-Host '
@@ -1017,8 +1039,8 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-                $SUBMENU3 = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                Switch ($SUBMENU3) {
+                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                Switch ($CHOICE) {
                     1 {
                         Clear-Host
                         Write-Host '
@@ -1037,8 +1059,9 @@ ______________________________________________________
 |____________________________________________________|
 '
                         $WAITPROCESSES = @( 
-                            NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
-                            NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
+                            $1, $2 = $null
+                            $1 = NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
+                            $2 = NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
                         ) 
                         
                         $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id          
@@ -1068,8 +1091,8 @@ ______________________________________________________
 ' 
 
                         $WAITPROCESSES = @(
-                            NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
-                            NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
+                            $1 = NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
+                            $2 = NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
                         ) 
 
                         $WAITPROCESSES | Where-Object { $_.Id -gt 0 } | Wait-Process -Id $_.Id
@@ -1089,22 +1112,22 @@ ______________________________________________________
                         #ENTRADA INVÁLIDA.
             
                         Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                        Start-Sleep -Seconds 2
-                        DisplayMenu3
+                        Start-Sleep -Seconds 1
+                        DISPLAYMENU3
                     }
              
                 }
                        
             }
 
-            DisplayMenu3
+            DISPLAYMENU3
 
         }
        
 
         4 {
 
-            function DisplayMenu4 {
+            function DISPLAYMENU4 {
             
                 Clear-Host            
                 Write-Host '
@@ -1124,11 +1147,9 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-            
        
-         
-                $SUBMENU4 = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                switch ($SUBMENU4) {
+                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                switch ($CHOICE) {
                     1 { 
                         Clear-Host
                         Write-Host '
@@ -1148,8 +1169,6 @@ ______________________________________________________
  '
                                
                         OFFICE2007
-
-                        Start-Sleep 1
 
                         CLEANTEMP                   
 
@@ -1174,9 +1193,7 @@ ______________________________________________________
 |____________________________________________________|
 '    
                                                
-                        NEWPWSH -FunctionNames 'MICROSOFT365' -Wait 
-
-                        Start-Sleep -1
+                        NEWPWSH -FunctionNames 'MICROSOFT365' -Wait                        
 
                         CLEANTEMP
              
@@ -1191,15 +1208,14 @@ ______________________________________________________
 
                     Default {
                         #ENTRADA INVÁLIDA.
-
                         Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                         Start-Sleep -Seconds 1                        
-                        DisplayMenu4 
+                        DISPLAYMENU4 
                     }
                 }
 
             }
-            DisplayMenu4
+            DISPLAYMENU4
         } 
 
         0 {
@@ -1226,8 +1242,6 @@ ______________________________________________________
 '
             
             CLEANTEMP
-         
-            Start-Sleep -Seconds 1
             
             EXIT          
             
@@ -1390,6 +1404,9 @@ function DOWNLOADMZTOOL {
 }
 
 function DIAGNOSTICS {
+    param(
+        [ScriptBlock]$STARTSTOP
+    )
     
     # Inicializa Softwares de diagnósticos de hardware x64.
 
@@ -1423,14 +1440,22 @@ function DIAGNOSTICS {
         return
     }
 
-    foreach ($APP in $APPS) {
-        # Verifica se o software já está em execução
-        if (-not (Get-Process -Name $APP.Name -ErrorAction SilentlyContinue)) {
-            Start-Process "$TOOLFOLDER\$($APP.Path)"
-        }
+    function START { 
+        $APPS | ForEach-Object {
+            # Verifica se o software já estiver em execução e
+            if (-not (Get-Process -Name $_.Name -ErrorAction SilentlyContinue)) {
+                Start-Process "$TOOLFOLDER\$($_.Path)"
+            }
+        }   
     }
 
-    return $APPS
+    function STOP { 
+        $APPS | ForEach-Object {
+            if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
+                Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
+            }
+        }        
+    }
 }
 function WINUPDATEMODULE {
     

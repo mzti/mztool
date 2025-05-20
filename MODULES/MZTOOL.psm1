@@ -42,8 +42,6 @@ public class Win32 {
 "@
 #endregion
 
-
-
 #region Fixar tamanho e remover redimensionamento
 $global:hwnd = (Get-Process -Id $PID).MainWindowHandle
 if ($global:hwnd -ne [IntPtr]::Zero) {
@@ -60,7 +58,6 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
     [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
 }
 #endregion
-
 
 #region FUNCÕES
 
