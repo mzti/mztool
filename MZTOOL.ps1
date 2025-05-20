@@ -2356,15 +2356,6 @@ function CLEANTEMP {
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    # Redefine a política de execução do PowerShell para "Undefined" para evitar problemas de execução de scripts.
-    Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
-        if ($_.ExecutionPolicy -ne "Undefined") {
-            Set-ExecutionPolicy -ExecutionPolicy Undefined -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
-            Write-Host $clearLine -NoNewline          
-            $rawUI.CursorPosition = $cursorPos
-            Write-host "`nREDEFININDO POLITICA DE EXECUÇÃO PARA RESTRITA." -NoNewLine
-        } }
-
     # Remove arquivos temporários do sistema.
     Remove-Files -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
 
