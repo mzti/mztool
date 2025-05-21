@@ -43,7 +43,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
-$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture#(Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture
+$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 #$ErrorActionPreference = 'SilentlyContinue'
 
@@ -166,8 +166,8 @@ function TOOLDIR {
 
     #Criação do diretório C:\MZTOOL.
     [System.IO.Directory]::CreateDirectory($env:TOOL) | Out-Null
-    $TOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
-    $TOOLFOLDER.Attributes = 'Hidden' 
+    $MZTOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
+    $MZTOOLFOLDER.Attributes = 'Hidden' 
 
 }
 
@@ -1442,7 +1442,6 @@ function WINUPDATEMODULE {
 function WINGETMODULE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETMODULE"
-
    
     #Módulo WINGET.
 
@@ -1912,10 +1911,14 @@ function DriverBooster {
     #Extrai e inicializa o software Driver Booster.   
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DRIVER_BOOSTER"
-        
-    Expand-Archive -LiteralPath "$Env:TOOL\TOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\TOOL\DRIVER_BOOSTER"
 
-    Start-Process "$Env:TOOL\TOOL\DRIVER_BOOSTER\DriverBoosterPortable.exe" -Wait
+    $TOOLFOLDER = "$Env:TOOL\TOOL"
+
+    $DRIVERBOOSTERPATH = "$TOOLFOLDER\DRIVER_BOOSTER"
+        
+    Expand-Archive -LiteralPath "$TOOLFOLDER\DRIVER_BOOSTER.zip" -DestinationPath "$DRIVERBOOSTERPATH"
+
+    Start-Process "$DRIVERBOOSTERPATH\DriverBoosterPortable.exe" -Wait
         
     Start-Sleep -Seconds 1
     #Finaliza os serviços do software Driver Booster e deleta a pasta temporária do mesmo.
@@ -1932,7 +1935,7 @@ function DriverBooster {
                 
             Start-Sleep -Seconds 5
 
-            Remove-Item -Path "$Env:TOOL\TOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$DRIVERBOOSTERPATH" -Recurse -Force -ErrorAction SilentlyContinue
         }
 
         elseif (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
@@ -1946,7 +1949,7 @@ function DriverBooster {
                 
             Start-Sleep -Seconds 5
 
-            Remove-Item -Path "$Env:TOOL:\TOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$DRIVERBOOSTERPATH" -Recurse -Force -ErrorAction SilentlyContinue
         }
 
         else {
@@ -1998,8 +2001,8 @@ function PerfilTheme {
         '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}'  #Painel de Controle
     )  
     
-    $ICONS | ForEach-Object {
-        New-ItemProperty -Path "$DESKINCONSREG" -Name $ICONS -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
+    ForEach ($ICON in $ICONS) {
+        New-ItemProperty -Path "$DESKINCONSREG" -Name $ICON -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
     }    
 
     #Mostra e atualiza a Área de Trabalho.    
