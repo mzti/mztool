@@ -853,7 +853,7 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-    Write-Information $MODULESTATUS    
+    Write-Host $MODULESTATUS -InformationAction
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
