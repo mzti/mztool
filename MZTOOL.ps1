@@ -2005,6 +2005,12 @@ function PerfilTheme {
         New-ItemProperty -Path "$DESKINCONSREG" -Name $ICON -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
     }    
 
+    #Finaliza janela de personalização do Windows.
+    if (Get-Process -Name 'systemsettings') {
+                        
+        Stop-Process -Name 'systemsettings' -Force
+    }
+   
     #Mostra e atualiza a Área de Trabalho.    
     for ($i = 0; $i -le 1; $i++) {
         (New-Object -ComObject shell.application).toggleDesktop()
@@ -2048,19 +2054,6 @@ function PerfilTheme {
     #Remove Widgets.    
     Get-AppxPackage *WebExperience* | Remove-AppxPackage
     
-    #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    RefreshUser
-
-    #Finaliza janela de personalização do Windows.
-    if (Get-Process -Name 'systemsettings') {
-                        
-        Stop-Process -Name 'systemsettings' -Force
-    }
-
-    else {
-        #Script continua.
-    }    
-       
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     RefreshUser
     
