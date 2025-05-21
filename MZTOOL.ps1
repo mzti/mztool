@@ -1913,9 +1913,9 @@ function DriverBooster {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DRIVER_BOOSTER"
         
-    Expand-Archive -LiteralPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\MZTOOL\DRIVER_BOOSTER"
+    Expand-Archive -LiteralPath "$Env:TOOL\TOOL\DRIVER_BOOSTER.zip" -DestinationPath "$Env:TOOL\TOOL\DRIVER_BOOSTER"
 
-    Start-Process "$Env:TOOL\MZTOOL\DRIVER_BOOSTER\DriverBoosterPortable.exe" -Wait
+    Start-Process "$Env:TOOL\TOOL\DRIVER_BOOSTER\DriverBoosterPortable.exe" -Wait
         
     Start-Sleep -Seconds 1
     #Finaliza os serviços do software Driver Booster e deleta a pasta temporária do mesmo.
@@ -1932,7 +1932,7 @@ function DriverBooster {
                 
             Start-Sleep -Seconds 5
 
-            Remove-Item -Path "$Env:TOOL\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$Env:TOOL\TOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
         }
 
         elseif (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
@@ -1946,7 +1946,7 @@ function DriverBooster {
                 
             Start-Sleep -Seconds 5
 
-            Remove-Item -Path "$Env:TOOL:\MZTOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path "$Env:TOOL:\TOOL\DRIVER_BOOSTER" -Recurse -Force -ErrorAction SilentlyContinue
         }
 
         else {
@@ -2526,46 +2526,6 @@ if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
     WINGETAPPS -FilterId "Microsoft.Powershell"
     WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
     pause
-    # 1. Força o uso do novo console (ForceV2) — isso pode ajudar a integrar o Windows Terminal como terminal padrão para o sistema.
-    # Isso define uma propriedade no registro que indica que a nova experiência de console deve ser usada.
-    New-ItemProperty -Path "HKCU:\Console" -Name "ForceV2" -Value 1 -PropertyType DWORD -Force
-    Write-Host "ForceV2 definido; o Windows Terminal poderá ser usado como terminal padrão."
-
-    # 2. Atualiza o arquivo de configurações do Windows Terminal para definir o PowerShell 7 como perfil padrão.
-    # Tenta localizar o arquivo settings.json. Normalmente, se instalado pela Microsoft Store, encontra-se em:
-    $settingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-
-    if (-not (Test-Path $settingsPath)) {
-        # Se não existir neste caminho, tenta o caminho alternativo (instalação direta ou via MSI)
-        $settingsPath = "$env:LOCALAPPDATA\Microsoft\Windows Terminal\settings.json"
-    }
-
-    if (Test-Path $settingsPath) {
-        Write-Host "Arquivo settings.json encontrado em: $settingsPath"
-        # Lê o arquivo completo como uma string e converte o JSON em objeto PowerShell
-        $settingsJson = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
-
-        # Procura o perfil cujo commandline contenha "pwsh.exe" (PowerShell 7).
-        $pwshProfile = $settingsJson.profiles.list | Where-Object { $_.guid -match "{574e775e-4f2a-5b96-ac1e-a2962a402336}" } | Select-Object -First 1
-
-        if ($pwshProfile) {
-            Write-Host "Perfil do PowerShell 7 encontrado com GUID: $($pwshProfile.guid)"
-            # Define esse perfil como o default do Windows Terminal
-            $settingsJson.defaultProfile = $pwshProfile.guid
-
-            # Converte o objeto JSON de volta para string com profundidade suficiente e salva no arquivo.
-            $settingsJson | ConvertTo-Json -Depth 10 | Set-Content -Path $settingsPath -Encoding UTF8
-
-            Write-Host "PowerShell 7 foi definido como perfil padrão do Windows Terminal!"
-        }
-        else {
-            Write-Warning "Não foi possível encontrar um perfil com 'pwsh.exe' em commandline no settings.json."
-        }
-    }
-    else {
-        Write-Warning "Arquivo settings.json do Windows Terminal não foi encontrado. Verifique a instalação do Windows Terminal."
-    }    
-    Pause
     Start-Process -FilePath "wt.exe" -ArgumentList "pwsh.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
     exit     
     #RESTART
@@ -2574,5 +2534,3 @@ if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
 DISPLAYMENU 
 
 EXIT   
-
-
