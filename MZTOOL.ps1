@@ -686,7 +686,7 @@ do {
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE) {
 
-        Write-Information($MODULESTATUS = "MÓDULO ON")    
+        Write-Host($MODULESTATUS = "MÓDULO ON") -ForegroundColor Green   
 
     }
 
@@ -702,7 +702,7 @@ do {
             EXIT
         }
 
-        Write-Warning ($MODULESTATUS = "MÓDULO OFF")
+        Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow
         
     }    
 
@@ -717,9 +717,53 @@ $Global:ENVIROMENTVARS = @{
     'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
     'MZBETA'               = "irm https://bit.ly/MZBETA | iex"
      
-}.GetEnumerator() | ForEach-Object {
+}.GetEnumerator() | ForEach-Object {      
+    
+    if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
+       
+        $PWSHKEY = "PowerShell " ; if ($_.Key -eq 'TOOL') { $PWSHKEY = $null } 
+
+        # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
+        foreach ($SCOPE in @('Process', 'User')) {
+            [Environment]::SetEnvironmentVariable($_.Key, "$($PWSHKEY)$($_.Value)", $SCOPE)
+        }
+    }
+    $_
+}
+
+# Obtém o ID e o Objeto de Segurança do usuário atual.
+$MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
+$ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+
+function RESTARTADMIN {
+    $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+    $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
+    $RESTART.Verb = 'runas'
+    [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+    EXIT
+}
+
+# Verifica se a sessão está sendo executada como administrador.
+if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
+
+    #Script continua.
       
-    <#    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
+}
+
+# Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
+else {
+
+    RESTARTADMIN
+
+}
+
+<#
+# Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
+function GETPROFILE {  
+
+   $Global:ENVIROMENTVARS | ForEach-Object {
+if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
  
         # Cria o arquivo de perfil do PowerShell se não existir.
         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
@@ -738,22 +782,7 @@ $Global:ENVIROMENTVARS = @{
             Add-Content -Path $PROFILE -Value $SETENVPROFILE
         }
     }
-#>
-    if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
-       
-        $PWSHKEY = "PowerShell " ; if ($_.Key -eq 'TOOL') { $PWSHKEY = $null } 
-
-        # Define o a variável para cada Scopo. Se a variável já existir, ela será atualizada.
-        foreach ($SCOPE in @('Process', 'User')) {
-            [Environment]::SetEnvironmentVariable($_.Key, "$($PWSHKEY)$($_.Value)", $SCOPE)
-        }
-    }
-    $_
 }
-
-<#
-# Verifica se o perfil do PowerShell foi carregado e, se não, tenta carregá-lo.
-function GETPROFILE {  
     if ($Global:PROFILELOADED -eq $True) {
         Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
     }
@@ -771,24 +800,7 @@ function GETPROFILE {
 GETPROFILE
 #>
 
-# Obtém o ID e o Objeto de Segurança do usuário atual.
-$MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-$MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
-$ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
-
-function RESTARTADMIN {
-    $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-    $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
-    $RESTART.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($RESTART) | Out-Null
-    EXIT
-}
-
-# Verifica se a sessão está sendo executada como administrador.
-if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
-
-    Write-Host "ADMINISTRADOR" -ForegroundColor Green  
-    <#
+<#
     Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
         if ($_.ExecutionPolicy -eq "Undefined") {
             Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
@@ -799,17 +811,8 @@ if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
         else {
             Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
         }
-    }#>       
-}
+    }
 
-# Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
-else {
-
-    RESTARTADMIN
-
-}
-
-<#
 # Define as variáveis de ambiente no escopo do sistema (Machine) para MZTOOL e MZBETA.
 $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | ForEach-Object { 
     
