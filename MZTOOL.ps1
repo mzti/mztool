@@ -853,18 +853,19 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-    Write-Host $MODULESTATUS -ForegroundColor 
+    # Informa se o Módulo está importado.
+    Write-Host $MODULESTATUS
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
    
     Switch ($CHOICE) {
 
+        #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
         1 {
             #Verifica se há conexão com internet.
             INTERNET
-
-            #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
+           
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
                        
             Clear-Host
@@ -918,11 +919,12 @@ ______________________________________________________
             DISPLAYMENU
             
         }
-
+       
+        #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
         2 {
-    
-            #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
- 
+            #Verifica se há conexão com internet.
+            INTERNET
+            
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"    
                
             Clear-Host
@@ -1016,6 +1018,9 @@ ______________________________________________________
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 Switch ($CHOICE) {
                     1 {
+                        #Verifica se há conexão com internet.
+                        INTERNET
+
                         Clear-Host
                         Write-Host '
 ______________________________________________________
@@ -1043,7 +1048,10 @@ ______________________________________________________
             
                     }
         
-                    2 { 
+                    2 {
+                        #Verifica se há conexão com internet.
+                        INTERNET
+
                         Clear-Host
                         Write-Host '
 ______________________________________________________
@@ -1116,7 +1124,10 @@ ______________________________________________________
        
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 switch ($CHOICE) {
-                    1 { 
+                    1 {
+                        #Verifica se há conexão com internet.
+                        INTERNET
+
                         Clear-Host
                         Write-Host '
 ______________________________________________________
@@ -1143,6 +1154,9 @@ ______________________________________________________
                     }
 
                     2 {
+                        #Verifica se há conexão com internet.
+                        INTERNET
+
                         Clear-Host
                         Write-Host '
 ______________________________________________________
