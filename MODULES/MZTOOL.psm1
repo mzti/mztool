@@ -557,6 +557,91 @@ function EXPAND {
     if (-not $Quiet) {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
-} 
+}
+
+function UNINSTALLOFFICE {
+    function Get-AllInstalledOffice {
+        # Cria um array para armazenar as entradas encontradas
+        $OfficeApps = @()
+    
+        # Define os caminhos de registro para 64 bits e 32 bits (WOW6432Node)
+        $UninstallPaths = @(
+            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+        )
+    
+        # Procura entradas cujo DisplayName contenha "Office"
+        foreach ($path in $UninstallPaths) {
+            $apps = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
+            Where-Object { 
+                $_.DisplayName -like "*Office*" -or 
+                $_.DisplayName -like "*Microsoft Office*" -or 
+                $_.DisplayName -like "*Microsoft 365*" 
+            }
+            if ($apps) {
+                $OfficeApps += $apps
+            }
+        }
+    
+        return $OfficeApps
+    }
+    
+    
+    function Uninstall-OfficeApps {
+        param(
+            [Parameter(Mandatory = $true)]
+            [Array]$OfficeApps
+        )
+    
+        foreach ($app in $OfficeApps) {
+            Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
+            Write-Host "App: $($app.DisplayName)" -ForegroundColor Cyan
+            Write-Host "Versão: $($app.DisplayVersion)" -ForegroundColor Cyan
+            Write-Host "IdentifyingNumber: $($app.IdentifyingNumber)" -ForegroundColor Yellow
+            Write-Host "UninstallString: $($app.UninstallString)" -ForegroundColor Yellow
+    
+            # Tenta usar o IdentifyingNumber, se não existir extrai da UninstallString
+            $guid = $app.IdentifyingNumber
+            if (-not $guid -and $app.UninstallString -match '/X\s*(\{[^}]+\})') {
+                $guid = $matches[1]
+                Write-Host "GUID extraído: $guid" -ForegroundColor Magenta
+             
+            }
+            
+            if ($guid) {
+                Write-Host "Tentando desinstalar $($app.DisplayName) via msiexec usando GUID $guid..." -ForegroundColor Green
+                try {
+                    # Desinstala silenciosamente com msiexec (/qn)
+                    Start-Process -FilePath "msiexec.exe" -ArgumentList "/x $guid /qn" -Wait -NoNewWindow
+                }
+                catch {
+                    Write-Warning "Falha ao tentar desinstalar $($app.DisplayName): $_"
+                }
+            }
+            else {
+                Write-Warning "GUID não encontrado para $($app.DisplayName). Tentando UnistallString."
+                cmd /c $app.UninstallString
+            }
+        }
+    }
+    
+    # Coleta todas as instalações do Office encontradas
+    $InstalledOffice = Get-AllInstalledOffice
+    
+    if ($InstalledOffice.Count -gt 0) {
+        Write-Host "Foram encontradas as seguintes entradas do Office:" -ForegroundColor Cyan
+        foreach ($app in $InstalledOffice) {
+            Write-Host "$($app.DisplayName) - Versão: $($app.DisplayVersion)" -ForegroundColor Green
+        }
+    
+        # Se desejar executar a desinstalação, descomente a linha abaixo:
+        Uninstall-OfficeApps -OfficeApps $InstalledOffice
+    }
+    else {
+        Write-Host "Nenhuma instalação do Office foi encontrada." -ForegroundColor Yellow
+    }
+    
+}
+
 
 #endregion
