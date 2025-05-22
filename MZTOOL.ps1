@@ -1133,7 +1133,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
  '
-                        UNINSTALLOFFICE
+                        NEWPWSH -FunctionNames 'UNINSTALLOFFICE' -Wait
 
                         OFFICE2007
 
@@ -1159,7 +1159,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '    
-                        UNINSTALLOFFICE
+                        NEWPWSH -FunctionNames 'UNINSTALLOFFICE' -Wait
                                                
                         NEWPWSH -FunctionNames 'MICROSOFT365' -Wait                        
 
