@@ -616,12 +616,7 @@ function UNINSTALLOFFICE {
     
             # Tenta usar o IdentifyingNumber, se não existir extrai da UninstallString
             $guid = $app.IdentifyingNumber
-            if (-not $guid -and $app.UninstallString -match '/X\s*(\{[^}]+\})') {
-                $guid = $matches[1]
-                Write-Host "GUID extraído: $guid" -ForegroundColor Magenta
-             
-            }
-            
+                   
             if ($guid) {
                 Write-Host "Tentando desinstalar $($app.DisplayName) via msiexec usando GUID $guid..." -ForegroundColor Green
                 try {
