@@ -853,7 +853,7 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|
 '
-    Write-Host $MODULESTATUS -InformationAction
+    Write-Host $MODULESTATUS -ForegroundColor 
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
@@ -861,16 +861,8 @@ ______________________________________________________
     Switch ($CHOICE) {
 
         1 {
-            $InternetStatus = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet
-            if (-not($InternetStatus)) {
-
-                Write-Host "Sem conexão com a internet!"
-
-                do { 
-                    $InternetStatus = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet 
-                    Start-Sleep Seconds -5 
-                }while (-not($InternetStatus))
-            }
+            #Verifica se há conexão com internet.
+            INTERNET
 
             #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"

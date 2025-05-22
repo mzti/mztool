@@ -558,6 +558,20 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 }
+function INTERNET {
+
+    $INTERNET = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet
+    if (-not($INTERNET)) {
+
+        Write-Warning "AGUARDANDO CONEXÃO COM A INTERNET."
+
+        do { 
+            $INTERNET = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet 
+            Start-Sleep Seconds -5 
+        }while (-not($INTERNET))
+    }
+      
+}
 
 function UNINSTALLOFFICE {
     function Get-AllInstalledOffice {
@@ -642,6 +656,5 @@ function UNINSTALLOFFICE {
     }
     
 }
-
 
 #endregion
