@@ -913,7 +913,6 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-            
             Start-Sleep -Seconds 5
 
             DISPLAYMENU
@@ -1068,12 +1067,10 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 ' 
-
                         $Null = @(
                             NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
                             NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
-
 
                         CLEANTEMP
                                     
@@ -1121,7 +1118,6 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-       
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 switch ($CHOICE) {
                     1 {
@@ -1219,7 +1215,6 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-            
             CLEANTEMP
             
             EXIT          
@@ -1277,11 +1272,11 @@ ______________________________________________________
 
         }
 
-        #Testa a função DriverBooster.
+        #Testa a função DRIVERBOOSTER.
         db {
 
             DOWNLOADMZTOOL
-            NEWPWSH -FunctionNames 'DriverBooster'
+            NEWPWSH -FunctionNames 'DRIVERBOOSTER'
             DISPLAYMENU
 
         }
@@ -1317,6 +1312,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIPHASH1 = "465B09A547F5FAA30B7CDD1B49126185"
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
+    $MZTOOLZIPHASH = @($MZTOOLZIPHASH1, $MZTOOLZIPHASH2)
 
     $ONEDRIVELINK = 'https://bit.ly/MZTZIP'       
     $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
@@ -1347,17 +1343,25 @@ function DOWNLOADMZTOOL {
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
 
         $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5
-        
+    
+        $TRYGETMZTOOLZIP++      
+            
+        #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
+        if ($TRYGETMZTOOLZIP -ge 5) {
+    
+            Write-Warning "FALHA NO CARREGAMENTO DO MZTOOL.ZIP. RETORNANDO AO MENU."
+            Start-Sleep -Seconds 3
+            DISPLAYMENU
+        }
+  
     } while (
         (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
         ($NEWMZTOOLZIPHASH.Hash -notin @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2"))
     )
-    
-    Write-Host "`nHASH 1   = " ; Write-Host "$MZTOOLZIPHASH1" -ForegroundColor Green
-    Write-Host "HASH 2   = " ; Write-Host "$MZTOOLZIPHASH2" -ForegroundColor Green
-    Write-Host "HASH OK  = " ; Write-Host "$($NEWMZTOOLZIPHASH.Hash)" -ForegroundColor Green   
-    
-    Start-Sleep -Seconds 2
+        
+    $MZTOOLZIPHASH | ForEach-Object ( $_.Key -eq $NEWMZTOOLZIPHASH.Hash ) {
+        Write-Host "`nHASH = " ; Write-Host "$($_.Key) | "$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
+    }
               
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
@@ -1369,8 +1373,7 @@ function DOWNLOADMZTOOL {
         Remove-Item $MZTOOLZIP
 
     }
-    else {
-            
+    else {            
         #Script continua.
     }
   
@@ -1421,10 +1424,11 @@ function DIAGNOSTICS {
     }
 
     elseif ($STOP) { 
+        
         $APPS | ForEach-Object {
             if (Get-Process -Name $_.Name -ErrorAction SilentlyContinue) {                 
                 Stop-Process -Name $_.Name -Force -ErrorAction SilentlyContinue
-            }
+            }            
         }        
     }
     
@@ -1432,7 +1436,6 @@ function DIAGNOSTICS {
         Write-Host "SWITCH NÃO DETECTADO."
     }
 }
-
 
 function WINUPDATEMODULE {
     
@@ -1454,9 +1457,8 @@ function WINGETMODULE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETMODULE"
    
-    #Módulo WINGET.
+    #Implementa e ou atualiza o WINGET.
 
-    #Obtém a versão do Windows.   
     $ErrorActionPreference = 'SilentlyContinue'
      
     #Verifica se a versão do Windows é a 11.
@@ -1507,9 +1509,10 @@ function WINGETMODULE {
     }  
 
 }
+
 function WINGETAPPS {
     param (
-        [string]$FilterId = $null
+        [string]$FILTERID = $null
     )
     
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
@@ -1623,31 +1626,24 @@ function WINGETAPPS {
         }
     )
 
-    if ($FilterId) {
-        $APP = $APP | Where-Object { $_.Id -eq $FilterId }
+    if ($FILTERID) {
+        $APP = $APP | Where-Object { $_.Id -eq $FILTERID }
     }
 
-    # Processa cada item na lista. Para cada software, tenta instalar com winget.
-    # Se o winget falhar (exceto quando o software já estiver instalado),
-    # chama a função de fallback.
     $APP | ForEach-Object {
        
         $ERRORCODE = Winget Install --Id $_.Id --Accept-Source-Agreements --Accept-Package-Agreements | Out-String
 
         if ($LASTEXITCODE -ne 0) {
             if ($ERRORCODE -match "já instalado" -or $ERRORCODE -match "installed") {
-                # Software já instalado; nenhuma ação necessária.
+                # SCRIPT CONTINUA.
             }
-            else {
-               
-                REDUNDANTINSTALL -APPFAIL $_
-               
+            else {               
+                REDUNDANTINSTALL -APPFAIL $_               
             }
-        }
-        
+        }        
         Clear-Host
-    }
-    
+    }    
     Clear-Host
 }
 
@@ -1818,7 +1814,6 @@ function MICROSOFT365 {
 
 }   
 
-
 function OFFICE2007 {
 
     #Implementação do Microsoft Office 2007.
@@ -1827,6 +1822,7 @@ function OFFICE2007 {
 
     #Verifica se o Microsoft Office 2007 já está instalado.
     $OFFICE2007 = Get-Command "C:\Program Files\Microsoft Office\Office12\WINWORD.EXE" -ErrorAction SilentlyContinue
+   
     if (-NOT ($OFFICE2007)) {                  
        
         $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
@@ -1871,17 +1867,25 @@ function OFFICE2007 {
                 DOWNLOAD -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
                 $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm MD5
+
+                $TRYGETOFFICE2007ZIP++      
+            
+                #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
+                if ($TRYGETOFFICE2007ZIP -ge 5) {
+        
+                    Write-Warning "FALHA NO CARREGAMENTO DO MZTOOL.ZIP. RETORNANDO AO MENU."
+                    Start-Sleep -Seconds 3
+                    DISPLAYMENU
+               
+                }
             
             } while (
             (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
             ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
             )
         
-            Write-Host "HASH ORIGINAL = " ; Write-Host "$OFFICE2007HASH" -ForegroundColor Green
-            Write-Host "HASH BAIXADO  = " ; Write-Host "$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
-
-            Start-Sleep -Seconds 2
-        
+            Write-Host "HASH = " ; Write-Host "$OFFICE2007HASH | "$($NEWOFFICE2007HASH.Hash)"" -ForegroundColor Green
+                   
             EXPAND -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
             Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
@@ -1916,8 +1920,7 @@ function OFFICE2007 {
    
 }
 
-
-function DriverBooster {
+function DRIVERBOOSTER {
     
     #Extrai e inicializa o software Driver Booster.   
 
@@ -1929,11 +1932,12 @@ function DriverBooster {
         
     Expand-Archive -LiteralPath "$TOOLFOLDER\DRIVER_BOOSTER.zip" -DestinationPath "$DRIVERBOOSTERPATH"
 
-    Start-Process "$DRIVERBOOSTERPATH\DriverBoosterPortable.exe" -Wait
-        
-    Start-Sleep -Seconds 1
+    Start-Process "$DRIVERBOOSTERPATH\DriverBoosterPortable.exe" -Wait        
+    
     #Finaliza os serviços do software Driver Booster e deleta a pasta temporária do mesmo.
-    function StopDriverBooster {
+    function STOPDRIVERBOOSTER {
+
+        Start-Sleep -Seconds 2
             
         if (Get-Process -Name 'DriverBooster'-ErrorAction SilentlyContinue ) {
                 
@@ -1970,7 +1974,7 @@ function DriverBooster {
     
     }
 
-    StopDriverBooster  
+    STOPDRIVERBOOSTER
     
 }
 
@@ -1979,11 +1983,7 @@ function PerfilTheme {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME"
    
     # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    function RefreshUser {
 
-        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
-        Stop-Process -Name explorer        
-    }
 
     #Adiciona o Tema Escuro ao Windows.
     if ($Global:WINVER -Match 'Windows 11') {
@@ -2022,16 +2022,9 @@ function PerfilTheme {
         Stop-Process -Name 'systemsettings' -Force
     }
    
-    #Mostra e atualiza a Área de Trabalho.    
-    for ($i = 0; $i -le 1; $i++) {
-        (New-Object -ComObject shell.application).toggleDesktop()
-        Start-Sleep 2
-        (New-Object -ComObject Wscript.Shell).sendkeys('{F5}')
-        Start-Sleep 1
-        (New-Object -ComObject shell.application).undominimizeall()
-        Start-Sleep 2
-    }
-
+    #Mostra e atualiza a Área de Trabalho.
+    DESKTOPUPDATE    
+  
     #Define as opções de Efeitos Visuais do Windows para personalizado.
     $settings = @{
         'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' = @{
@@ -2066,7 +2059,7 @@ function PerfilTheme {
     Get-AppxPackage *WebExperience* | Remove-AppxPackage
     
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    RefreshUser
+    REFRESHUSER
     
     Clear-Host
 
@@ -2074,14 +2067,7 @@ function PerfilTheme {
 
 function PinIcons {
 
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > PINICONS"
-   
-    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    function RefreshUser {
-
-        Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
-        Stop-Process -Name explorer        
-    }
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > PINICONS"  
 
     #Fixa os ícones dos softwares Google Chrome, Acrobat Reader, Microsoft Word e do Windows Explorer na barra de tarefas e remove os demais ícones.
     $taskbar_layout =
@@ -2166,7 +2152,7 @@ function PinIcons {
         $registry.Dispose()
     }
 
-    function TrayIcons {
+    function TRAYICONS {
 
         #Define e personaliza as configurações dos ícones da barra de tarefas.
         $property = @{
@@ -2213,20 +2199,13 @@ function PinIcons {
 
     }
     
-    TrayIcons
+    TRAYICONS
 
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    RefreshUser
+    REFRESHUSER
 
-    #Mostra e atualiza a Área de Trabalho.    
-    for ($i = 0; $i -le 2; $i++) {
-        (New-Object -ComObject shell.application).toggleDesktop()
-        Start-Sleep 2
-        (New-Object -ComObject Wscript.Shell).sendkeys('{F5}')
-        Start-Sleep 1
-        (New-Object -ComObject shell.application).undominimizeall()
-        Start-Sleep 2
-    }   
+    #Mostra e atualiza a Área de Trabalho.
+    DESKTOPUPDATE    
 
     #Desabilita as notificações da central de ações.    
     If (!(Test-Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -ErrorAction SilentlyContinue)) {
@@ -2236,10 +2215,10 @@ function PinIcons {
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'ToastEnabled' -Type DWord -Value 0
 
     #Ativa plano de energia para Alto Desempenho.    
-    POWERCFG /SETACTIVE SCHEME_MIN
+    #POWERCFG /SETACTIVE SCHEME_MIN
 
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    RefreshUser
+    REFRESHUSER
           
 }
 
@@ -2322,14 +2301,7 @@ function StartSoftwares {
     Start-Sleep 5
 
     #Mostra e atualiza a Área de Trabalho.
-    for ($i = 0; $i -le 2; $i++) {
-        (New-Object -ComObject shell.application).toggleDesktop()
-        Start-Sleep 2
-        (New-Object -ComObject Wscript.Shell).sendkeys('{F5}')
-        Start-Sleep 1
-        (New-Object -ComObject shell.application).undominimizeall()
-        Start-Sleep 2
-    }
+    DESKTOPUPDATE 
 
     Start-Process WINWORD
     Start-Process ACROBAT

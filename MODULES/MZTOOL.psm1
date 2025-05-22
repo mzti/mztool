@@ -573,6 +573,24 @@ function INTERNET {
       
 }
 
+function DESKTOPUPDATE {            
+ 
+    for ($i = 0; $i -le 1; $i++) {
+        (New-Object -ComObject shell.application).toggleDesktop()
+        Start-Sleep 2
+        (New-Object -ComObject Wscript.Shell).sendkeys('{F5}')
+        Start-Sleep 1
+        (New-Object -ComObject shell.application).undominimizeall()
+        Start-Sleep 2
+    }
+}
+
+function REFRESHUSER {
+
+    Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+    Stop-Process -Name explorer        
+}
+
 function UNINSTALLOFFICE {
     function Get-AllInstalledOffice {
         # Cria um array para armazenar as entradas encontradas
@@ -651,5 +669,7 @@ function UNINSTALLOFFICE {
     }
     
 }
+
+
 
 #endregion
