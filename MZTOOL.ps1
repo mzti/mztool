@@ -1359,8 +1359,8 @@ function DOWNLOADMZTOOL {
         ($NEWMZTOOLZIPHASH.Hash -notin @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2"))
     )
         
-    $MZTOOLZIPHASH | ForEach-Object ( $_ -eq $NEWMZTOOLZIPHASH.Hash ) {
-        Write-Host "`nHASH = " ; Write-Host "$($_) | "$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
+    $MZTOOLZIPHASH | Where-Object ( $_ -eq $NEWMZTOOLZIPHASH.Hash ) | ForEach-Object {
+        Write-Host "`nHASH = " ; Write-Host ""$($_)" | "$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
     }
               
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
