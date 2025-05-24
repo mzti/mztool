@@ -885,7 +885,7 @@ ______________________________________________________
 |____________________________________________________|
 '
             $DEPLOYFUNCTION = @(
-                @{ Functions = 'PerfilTheme' },
+                @{ Functions = 'PERFILTHEME' },
                 @{ Functions = 'ANYDESK' },
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
@@ -1978,31 +1978,38 @@ function DRIVERBOOSTER {
     
 }
 
-function PerfilTheme {
+function PERFILTHEME {
 
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME"
-   
-    # Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
+    #Modifica o perfil de usuário e adiciona configurações personalizadas.
 
-
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME"  
+  
     #Adiciona o Tema Escuro ao Windows.
+
+    $THEMESPATH = "C:\Windows\Resources\Themes"
+    
     if ($Global:WINVER -Match 'Windows 11') {
         
-        Start-Process -FilePath 'C:\Windows\Resources\Themes\dark.theme'
+        Start-Process -FilePath "$THEMESPATH\dark.theme"        
     }
 
     elseif ($Global:WINVER -Match 'Windows 10') {
         
-        Start-Process -FilePath 'C:\Windows\Resources\Themes\aero.theme'
+        Start-Process -FilePath "$THEMESPATH\aero.theme"
     }
 
     else {
         Write-Host 'Windows não identificado, tema não aplicado.'
     }    
+
+    #Finaliza janela de personalização do Windows.
+    if (Get-Process -Name 'systemsettings') {
+                        
+        Stop-Process -Name 'systemsettings' -Force
+    }
     
     #Adiciona ícones de sistema a Área de Trabalho.
-    $DESKINCONSREG = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
-
+    
     # Lista de ícones de sistema.
     $ICONS = @(
         '{018D5C66-4533-4307-9B53-224DE2ED1FE6}', #OneDrive
@@ -2012,19 +2019,17 @@ function PerfilTheme {
         '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}'  #Painel de Controle
     )  
     
+    # Chave do registro onde se encontram os ícones da Área de Trabalho.
+    $DESKINCONSREG = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+    
     ForEach ($ICON in $ICONS) {
         New-ItemProperty -Path "$DESKINCONSREG" -Name $ICON -PropertyType dword -Value 0 -ErrorAction SilentlyContinue
     }    
 
-    #Finaliza janela de personalização do Windows.
-    if (Get-Process -Name 'systemsettings') {
-                        
-        Stop-Process -Name 'systemsettings' -Force
-    }
-   
     #Mostra e atualiza a Área de Trabalho.
-    DESKTOPUPDATE    
-  
+    DESKTOPUPDATE  
+
+    <#  
     #Define as opções de Efeitos Visuais do Windows para personalizado.
     $settings = @{
         'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' = @{
@@ -2052,6 +2057,7 @@ function PerfilTheme {
         }
     }
 
+#>
     #Define o nível de efeitos visuais para "Ajustar para melhor desempenho".
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
         
@@ -2059,10 +2065,8 @@ function PerfilTheme {
     Get-AppxPackage *WebExperience* | Remove-AppxPackage
     
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
-    REFRESHUSER
-    
-    Clear-Host
-
+    REFRESHUSER   
+ 
 }
 
 function PinIcons {

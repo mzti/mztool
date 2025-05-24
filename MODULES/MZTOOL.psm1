@@ -647,7 +647,7 @@ function UNINSTALLOFFICE {
             }
             else {
                 Write-Warning "GUID não encontrado para $($app.DisplayName). Tentando UnistallString."
-                cmd /c $app.UninstallString
+                $app.UninstallString | Where-Object ( $_ -notmatch "MsiExec.exe") ForEach-Object { cmd / c $app.UninstallString }
             }
         }
     }
