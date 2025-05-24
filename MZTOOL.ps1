@@ -2001,13 +2001,7 @@ function PERFILTHEME {
     else {
         Write-Host 'Windows não identificado, tema não aplicado.'
     }    
-
-    #Finaliza janela de personalização do Windows.
-    if (Get-Process -Name 'systemsettings') {
-                        
-        Stop-Process -Name 'systemsettings' -Force
-    }
-    
+  
     #Adiciona ícones de sistema a Área de Trabalho.
     
     # Lista de ícones de sistema.
@@ -2059,10 +2053,16 @@ function PERFILTHEME {
 
 #>
     #Define o nível de efeitos visuais para "Ajustar para melhor desempenho".
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2
+    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2 -ErrorAction SilentlyContinue
         
     #Remove Widgets.    
-    Get-AppxPackage *WebExperience* | Remove-AppxPackage
+    Get-AppxPackage *WebExperience* | Remove-AppxPackage -ErrorAction SilentlyContinue
+
+    #Finaliza janela de personalização do Windows.
+    if (Get-Process -Name 'systemsettings' -ErrorAction SilentlyContinue) {
+                        
+        Stop-Process -Name 'systemsettings' -Force
+    }
     
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     REFRESHUSER   
