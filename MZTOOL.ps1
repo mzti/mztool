@@ -890,7 +890,7 @@ ______________________________________________________
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
-                @{ Functions = 'MICROSOFT365'; Wait = $true },
+                @{ Functions = 'UNINSTALLOFFICE', 'MICROSOFT365'; Wait = $true },
                 @{ Functions = 'PinIcons', 'StartSoftwares' }
             )
                   
