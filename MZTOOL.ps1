@@ -1169,7 +1169,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '    
-                        NEWPWSH -FunctionNames 'UNINSTALLOFFICE' -Wait
+                        # NEWPWSH -FunctionNames 'UNINSTALLOFFICE' -Wait
                                                
                         NEWPWSH -FunctionNames 'MICROSOFT365' -Wait                        
 
