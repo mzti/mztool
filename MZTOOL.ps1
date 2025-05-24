@@ -1458,8 +1458,6 @@ function WINGETMODULE {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETMODULE"
    
     #Implementa e ou atualiza o WINGET.
-
-    $ErrorActionPreference = 'SilentlyContinue'
      
     #Verifica se a versão do Windows é a 11.
     if ($Global:WINVER -Match 'Windows 11') {
@@ -1511,7 +1509,7 @@ function WINGETMODULE {
 }
 
 function WINGETAPPS {
-    param (
+    param(
         [string]$FILTERID = $null
     )
     
