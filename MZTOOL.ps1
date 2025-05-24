@@ -1786,10 +1786,10 @@ function MICROSOFT365 {
             switch ($CHOICE) {
                 1 {
                     if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
-                    MICROSOFT365
+                    DISPLAYMENU4
                 }
                 2 {
-                    DISPLAYMENU4
+                    DISPLAYMENU
                 }
                 default {
                     ENTRYERROR
@@ -1811,7 +1811,6 @@ function MICROSOFT365 {
     }   
 
 }   
-
 function OFFICE2007 {
 
     #Implementação do Microsoft Office 2007.

@@ -91,14 +91,22 @@ function NEWPWSH {
         [switch]$Hidden
     )    
     
-   
+    <#
     # Combina as definições das funções (preservando a ordem)
     $combinedDefinitions = foreach ($fn in $FunctionNames) {
          (Get-Command -Type Function GETMZTOOLMODULE).Definition      
         # Junta o código pré-carregado com a definição da função específica.
          (Get-Command -Type Function $fn).Definition
+    } -join "`n"#>
+     
+    $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
+
+    # Junta as definições das funções especificadas
+    $funcDefinitions = foreach ($fn in $FunctionNames) {
+    (Get-Command -Type Function $fn).Definition
     } -join "`n"
-    
+
+    $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
     $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
     $arguments = @('-EncodedCommand', $encodedCommand)
@@ -393,7 +401,6 @@ ______________________________________________________
         }
     }
 }
-
 function EXPANDPROGRESS {
     param(
         [Parameter(Mandatory = $true)]
@@ -423,7 +430,6 @@ function EXPANDPROGRESS {
     $rawUI.CursorPosition = $cursorPos
     Write-Host $progressText -NoNewline
 }
-
 # Função auxiliar para extrair uma entrada via streams (caso ExtractToFile não esteja disponível)
 function EXPANDSTREAM {
     param (
@@ -459,7 +465,6 @@ function EXPANDSTREAM {
     $fileStream.Dispose()
     $stream.Dispose()
 }
-
 # Função principal para extrair o ZIP com a barra de progresso customizada na parte inferior
 function EXPAND {
     [CmdletBinding()]
@@ -572,7 +577,6 @@ function INTERNET {
     }
       
 }
-
 function DESKTOPUPDATE {         
     for ($i = 0; $i -le 1; $i++) {
         (New-Object -ComObject shell.application).toggleDesktop()
@@ -583,12 +587,10 @@ function DESKTOPUPDATE {
         Start-Sleep 2
     }
 }
-
 function REFRESHUSER {
     Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
     Stop-Process -Name explorer        
 }
-
 function UNINSTALLOFFICE {
     function Get-AllInstalledOffice {
         # Cria um array para armazenar as entradas encontradas
