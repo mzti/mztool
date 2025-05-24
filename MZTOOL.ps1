@@ -1509,9 +1509,6 @@ function WINGETMODULE {
 }
 
 function WINGETAPPS {
-    param(
-        [string]$FILTERID = $null
-    )
     
     # Altera o título da janela e garante que o módulo MZTOOL esteja carregado.
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGET APPS"
@@ -1623,10 +1620,6 @@ function WINGETAPPS {
             Install      = "MSIX" 
         }
     )
-
-    if ($FILTERID) {
-        $APP = $APP | Where-Object { $_.Id -eq $FILTERID }
-    }
 
     $APP | ForEach-Object {
        
@@ -2052,14 +2045,14 @@ function PERFILTHEME {
     #Define o nível de efeitos visuais para "Ajustar para melhor desempenho".
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2 -ErrorAction SilentlyContinue
         
-    #Remove Widgets.    
-    Get-AppxPackage *WebExperience* | Remove-AppxPackage -ErrorAction SilentlyContinue
-
     #Finaliza janela de personalização do Windows.
     if (Get-Process -Name 'systemsettings' -ErrorAction SilentlyContinue) {
                         
         Stop-Process -Name 'systemsettings' -Force
     }
+
+    #Remove Widgets.    
+    Get-AppxPackage *WebExperience* | Remove-AppxPackage -ErrorAction SilentlyContinue
     
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     REFRESHUSER   
