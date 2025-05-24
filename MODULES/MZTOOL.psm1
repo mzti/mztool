@@ -573,8 +573,7 @@ function INTERNET {
       
 }
 
-function DESKTOPUPDATE {            
- 
+function DESKTOPUPDATE {         
     for ($i = 0; $i -le 1; $i++) {
         (New-Object -ComObject shell.application).toggleDesktop()
         Start-Sleep 2
@@ -586,7 +585,6 @@ function DESKTOPUPDATE {
 }
 
 function REFRESHUSER {
-
     Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
     Stop-Process -Name explorer        
 }
@@ -645,9 +643,19 @@ function UNINSTALLOFFICE {
                     Write-Warning "Falha ao tentar desinstalar $($app.DisplayName): $_"
                 }
             }
-            else {
+            elseif ($app.UninstallString -and $app.UninstallString -notmatch "MsiExec.exe") {               
+                $uninstallCmd = $app.UninstallString                
+               
+                # Se for um comando do setup.exe do Office, adiciona parâmetros adicionais para desinstalação automática
+                #    if ($uninstallCmd -match "setup.exe") {
+                #        $uninstallCmd = $uninstallCmd + " /quiet /norestart"
+                #   }
                 Write-Warning "GUID não encontrado para $($app.DisplayName). Tentando UnistallString."
-                $app.UninstallString | Where-Object { $_ -notmatch "MsiExec.exe" } | ForEach-Object { cmd / c $_ }
+                #cmd /c $app.UninstallString 
+                Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait -NoNewWindow
+            }
+            else {
+                Write-Warning "Desinstalador parcial ignorado. Buscando desinstalador completo."
             }
         }
     }
@@ -669,7 +677,5 @@ function UNINSTALLOFFICE {
     }
     
 }
-
-
 
 #endregion
