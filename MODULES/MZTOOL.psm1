@@ -173,7 +173,7 @@ function DEPLOYFUNCTION {
         [hashtable[]]$DEPLOYFUNCTIONHASH,
         [int]$BarWidth = 30,
         [int]$LinePosition = 17,
-        [switch]$Hidden
+        [switch]$HIDDENALL
     )
     
     $total = $DEPLOYFUNCTIONHASH.Count
@@ -181,16 +181,11 @@ function DEPLOYFUNCTION {
 
     # Exibe a barra inicial (0% concluído)
     DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-    if ($HIDDEN) { $HIDDEN = "-Hidden" }
+    if ($HIDDENALL) { $HIDDENALL = '-Hidden' }
     foreach ($group in $DEPLOYFUNCTIONHASH) {
-        
-        $WAIT = $null
-        
-        if ($group.ContainsKey("Wait") -and $group.Wait) {
-            $WAIT = "-Wait"
-        }     
-        
-        NEWPWSH -FunctionNames $group.Functions $WAIT $HIDDEN
+        $WAIT = $(if ($group.ContainsKey("Wait") -and $group.Wait) { '-Wait' } else { "$null" })
+       
+        NEWPWSH -FunctionNames $group.Functions $($WAIT) $($HIDDEN)
 
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
