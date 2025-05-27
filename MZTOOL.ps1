@@ -38,8 +38,9 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 #MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
 
+Clear-Host
 
-#MZTOOL - BETA
+#VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
