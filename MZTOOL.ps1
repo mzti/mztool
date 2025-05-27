@@ -1500,11 +1500,11 @@ function WINGETMODULE {
                      
         #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
         Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
-        Add-AppPackage -Path "$env:TEMP\source.msix" |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
         Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
         Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
         Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
-        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
         Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
         Winget Install Microsoft.WindowsTerminal --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
         Winget Install Microsoft.NuGet --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
@@ -1518,7 +1518,7 @@ function WINGETMODULE {
         Install-PackageProvider -Name NuGet -Force |  Clear-Host
         
         #Reinstala, redefine as fontes e atualiza o WINGET.
-        Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery |  Clear-Host
+        Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery -ErrorAction SilentlyContinue |  Clear-Host
         Repair-WinGetPackageManager |  Clear-Host
         Winget Source Remove --Name winget |  Clear-Host
         Winget Source Remove --Name msstore |  Clear-Host

@@ -112,14 +112,17 @@ function NEWPWSH {
     $arguments = @('-EncodedCommand', $encodedCommand)
     
     if ($Wait -and $Hidden) {
-        # Se ambos, Wait e Hidden, são true
+        # Se ambos, Wait e Hidden, forem true:
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
+        return
     }
     elseif ($Wait) {
         [void](Start-Process powershell -ArgumentList $arguments -Wait)
+        return
     }
     elseif ($Hidden) {
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
+        return
     }
     elseif ($ReturnProcess) {
         $proc = Start-Process powershell -ArgumentList $arguments -PassThru
@@ -127,6 +130,7 @@ function NEWPWSH {
     }
     else {
         [void](Start-Process powershell -ArgumentList $arguments)
+        return
     }
     
 }
