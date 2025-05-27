@@ -73,7 +73,7 @@ function OPSYS {
 OPSYS 
 
 function PSVER {
-    
+    PAUSE
     #Verifica se a versão do PowerShell é suportada.
 
     if ($PSVersionTable.PSVersion -lt [version]"5.1.0" ) {
@@ -83,6 +83,7 @@ function PSVER {
         Write-Host "`n`nATUALIZE A SUA VERSÃO DO POWERSHELL PARA CONTINUAR: `nhtps://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi "
         
         Read-Host "`n`nPRESSIONE ENTER PARA SAIR" | Out-Null
+        PAUSE
     
         EXIT     
     
@@ -90,7 +91,7 @@ function PSVER {
 }
 
 PSVER
-
+PAUSE
 function MZTOOLMODULE {
 
     # Define o nome do módulo
