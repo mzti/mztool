@@ -749,7 +749,7 @@ do {
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE) {
 
-        Write-Host($MODULESTATUS = "MÓDULO ON") -ForegroundColor Green   
+        $MODULESTATUS = "MÓDULO ON"
 
     }
 
@@ -890,7 +890,7 @@ ______________________________________________________
 |____________________________________________________|
 '
     # Informa se o Módulo está importado.
-    Write-Host $MODULESTATUS
+    Write-Host $MODULESTATUS -ForegroundColor $(if ($Global:MZTOOLMODULE) { 'Green' } else { 'Red' })
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
@@ -926,7 +926,7 @@ ______________________________________________________
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
-                @{ Functions = 'UNINSTALLOFFICE', 'MICROSOFT365'<#; Wait = $true#> }<#>,
+                @{ Functions = 'UNINSTALLOFFICE', 'MICROSOFT365'<#; Wait = $true#> }<#,
                 @{ Functions = 'PinIcons', 'StartSoftwares' }#>
             )
                   
