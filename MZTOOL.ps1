@@ -77,7 +77,7 @@ function OPSYS {
 OPSYS 
 
 function PSVER {
-    PAUSE
+   
     #Verifica se a versão do PowerShell é suportada.    
 
     if ($Global:PSVER -lt [version]$Global:MZPSVER ) {
@@ -87,15 +87,20 @@ function PSVER {
         Write-Host "`n`nATUALIZE A SUA VERSÃO DO POWERSHELL PARA CONTINUAR: `nhtps://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi" -ForegroundColor Cyan
         
         Read-Host "`n`nPRESSIONE ENTER PARA SAIR" | Out-Null
-        PAUSE
-    
+
+        Clear-Host
+
+        Write-Host "MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
+
+        Start-Slepp -Seconds 2
+       
         EXIT     
     
     }
 }
 
 PSVER
-PAUSE
+
 function MZTOOLMODULE {
 
     # Define o nome do módulo
