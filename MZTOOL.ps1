@@ -926,13 +926,15 @@ ______________________________________________________
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
-                @{ Functions = 'UNINSTALLOFFICE', 'MICROSOFT365'; Wait = $true },
-                @{ Functions = 'PinIcons', 'StartSoftwares' }
+                @{ Functions = 'UNINSTALLOFFICE', 'MICROSOFT365'<#; Wait = $true#> }<#>,
+                @{ Functions = 'PinIcons', 'StartSoftwares' }#>
             )
                   
             # Chamada final para executar os grupos com a barra de progresso unificada.
             DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTIONHASH $DEPLOYFUNCTION                  
                      
+            Pause
+            
             Clear-Host
             Write-Host '
 ______________________________________________________
