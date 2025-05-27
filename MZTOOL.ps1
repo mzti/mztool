@@ -46,7 +46,7 @@ $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:PSVER = $PSVersionTable.PSVersion
-$Global:MZPSVER = "7.1.0"
+$Global:MZPSVER = "5.1.0"
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 
 #$ErrorActionPreference = 'SilentlyContinue'
