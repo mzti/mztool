@@ -890,7 +890,7 @@ ______________________________________________________
 |____________________________________________________|
 '
     # Informa se o Módulo está importado.
-    Write-Host $MODULESTATUS -ForegroundColor $(if ($Global:MZTOOLMODULE) { 'Green' } else { 'Red' })
+    Write-Host "$MODULESTATUS $(if ($Global:GIT) { " - GIT VERSION" } else { " - PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE) { 'Green' } else { 'Red' })
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
