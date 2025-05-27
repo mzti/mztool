@@ -172,7 +172,8 @@ function DEPLOYFUNCTION {
     param(
         [hashtable[]]$DEPLOYFUNCTIONHASH,
         [int]$BarWidth = 30,
-        [int]$LinePosition = 17
+        [int]$LinePosition = 17,
+        [switch]$Hidden
     )
           
     $total = $DEPLOYFUNCTIONHASH.Count
@@ -184,6 +185,9 @@ function DEPLOYFUNCTION {
     foreach ($group in $DEPLOYFUNCTIONHASH) {
         if ($group.ContainsKey("Wait") -and $group.Wait) {
             NEWPWSH -FunctionNames $group.Functions -Wait
+        }
+        elseif ($Hidden) {
+            NEWPWSH -FunctionNames $group.Functions -Hidden
         }
         else {
             NEWPWSH -FunctionNames $group.Functions

@@ -930,8 +930,8 @@ ______________________________________________________
                 @{ Functions = 'PinIcons', 'StartSoftwares' }
             )
                   
-            # Chamada final para executar os grupos com a barra de progresso unificada.
-            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTIONHASH $DEPLOYFUNCTION    
+            # Executa o conjunto de funções com os devidos parâmetros especificados.
+            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTIONHASH $DEPLOYFUNCTION -Hidden   
             
             Clear-Host
             Write-Host '
