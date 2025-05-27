@@ -1355,12 +1355,13 @@ function DOWNLOADMZTOOL {
     
     
     # Exibe o status dos links
-    if (TESTLINK -Url $ONEDRIVELINK) {
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
-    }
-    else {
-        Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
-    }
+    
+    Write-Host "                 ONEDRIVE     = " -NoNewline; $(if (TESTLINK -Url $ONEDRIVELINK) {
+            Write-Host "ONLINE     " -ForegroundColor Green
+        }    
+        else {
+            Write-Host "OFFLINE    " -ForegroundColor Red
+        })
 
     if (TESTLINK -Url $GOOGLEDRIVELINK) {
         Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
@@ -1840,6 +1841,7 @@ function MICROSOFT365 {
     }   
 
 }   
+
 function OFFICE2007 {
 
     #Implementação do Microsoft Office 2007.
@@ -2049,35 +2051,6 @@ function PERFILTHEME {
     #Mostra e atualiza a Área de Trabalho.
     DESKTOPUPDATE  
 
-    <#  
-    #Define as opções de Efeitos Visuais do Windows para personalizado.
-    $settings = @{
-        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' = @{
-            'VisualFXSetting'           = 3
-            'AlwaysHibernateThumbnails' = 0
-            'IconsOnly'                 = 0
-        }
-        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'      = @{
-            'ListviewShadow'      = 1
-            'ListviewAlphaSelect' = 0
-            'TaskbarAnimations'   = 0
-        }
-        'HKCU:\Software\Microsoft\Windows\DWM'                                   = @{
-            'EnableAeroPeek'            = 0
-            'AlwaysHibernateThumbnails' = 0
-        }
-        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'               = @{
-            'ShellState' = [byte[]](24, 0, 0, 0, 62, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 114, 0, 0, 0)
-        }
-    }
-   
-    foreach ($path in $settings.Keys) {
-        foreach ($name in $settings[$path].Keys) {
-            Set-ItemProperty -Path $path -Name $name -Value $settings[$path][$name] -Type DWord -ErrorAction SilentlyContinue
-        }
-    }
-
-#>
     #Define o nível de efeitos visuais para "Ajustar para melhor desempenho".
     Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2 -ErrorAction SilentlyContinue
         
@@ -2100,7 +2073,7 @@ function PinIcons {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > PINICONS"  
 
     #Fixa os ícones dos softwares Google Chrome, Acrobat Reader, Microsoft Word e do Windows Explorer na barra de tarefas e remove os demais ícones.
-    $taskbar_layout =
+    $TASKBAR =
     @"
 <?xml version="1.0" encoding="utf-8"?>
 <LayoutModificationTemplate
@@ -2124,12 +2097,12 @@ function PinIcons {
 </LayoutModificationTemplate>
 "@
 
-    [System.IO.FileInfo]$provisioning = "$($env:ProgramData)\provisioning\taskbar_layout.xml"
-    if (!$provisioning.Directory.Exists) {
-        $provisioning.Directory.Create()
+    [System.IO.FileInfo]$PATH = "$($env:ProgramData)\provisioning\taskbar_layout.xml"
+    if (!$PATH.Directory.Exists) {
+        $PATH.Directory.Create()
     }
 
-    $taskbar_layout | Out-File $provisioning.FullName -Encoding utf8
+    $TASKBAR | Out-File $PATH.FullName -Encoding utf8
 
     $settings = [PSCustomObject]@{
         Path  = "SOFTWARE\Policies\Microsoft\Windows\Explorer"
@@ -2346,69 +2319,59 @@ function CLEANTEMP {
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
     # Função para remoção de arquivos temporários.
-    function Remove-Files {
+    function REMOVEFILE {
         param (
             [string]$Path,
             [string]$Description
         )
-        $rawUI = $Host.UI.RawUI
-        $windowSize = $rawUI.WindowSize
 
-        # Posiciona o cursor na última linha da janela
-        $cursorPos = $rawUI.CursorPosition
-        $cursorPos.X = 0
-        $cursorPos.Y = $windowSize.Height - 1
-        $rawUI.CursorPosition = $cursorPos
-        # Limpa a última linha e escreve a barra de progresso
-        $clearLine = " " * $windowSize.Width
-        Write-Host $clearLine -NoNewline
-          
-        $rawUI.CursorPosition = $cursorPos
+        RESETCURSOR
+
         Write-Host "`rLimpando $Description" -NoNewline   
         
         Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
     }
 
     # Remove arquivos temporários do sistema.
-    Remove-Files -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
+    REMOVEFILE -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
 
     # Remove arquivos temporários do Windows.
-    Remove-Files -Path "C:\Windows\temp\*" -Description "arquivos temporários do Windows"
+    REMOVEFILE -Path "C:\Windows\temp\*" -Description "arquivos temporários do Windows"
 
     # Remove arquivos de Prefetch.
-    Remove-Files -Path "C:\Windows\Prefetch\*" -Description "arquivos de Prefetch"
+    REMOVEFILE -Path "C:\Windows\Prefetch\*" -Description "arquivos de Prefetch"
 
     # Remove arquivos de CrashDumps.
-    Remove-Files -Path "$env:LOCALAPPDATA\CrashDumps\*" -Description "arquivos de CrashDumps"
+    REMOVEFILE -Path "$env:LOCALAPPDATA\CrashDumps\*" -Description "arquivos de CrashDumps"
     
     # Remove arquivos de Internet Temporários.
-    Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*" -Description "arquivos de Internet Temporários"
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*" -Description "arquivos de Internet Temporários"
 
     # Remove arquivos de atualização do Windows.
-    Remove-Files -Path "C:\Windows\SoftwareDistribution\Download\*" -Description "arquivos de atualização do Windows"
+    REMOVEFILE -Path "C:\Windows\SoftwareDistribution\Download\*" -Description "arquivos de atualização do Windows"
 
     # Remove relatórios de erros do Windows.
-    Remove-Files -Path "C:\ProgramData\Microsoft\Windows\WER\ReportQueue\*" -Description "relatórios de erros do Windows"
-    Remove-Files -Path "C:\ProgramData\Microsoft\Windows\WER\Temp\*" -Description "relatórios de erros do Windows"
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows\WER\ReportQueue\*" -Description "relatórios de erros do Windows"
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows\WER\Temp\*" -Description "relatórios de erros do Windows"
     
     # Remove histórico do Microsoft Defender.
-    Remove-Files -Path "C:\ProgramData\Microsoft\Windows Defender\Scans\History\*" -Description "histórico do Microsoft Defender"
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows Defender\Scans\History\*" -Description "histórico do Microsoft Defender"
 
     # Remove arquivos de programas baixados.
-    Remove-Files -Path "C:\Windows\Downloaded Program Files\*" -Description "arquivos de programas baixados"
+    REMOVEFILE -Path "C:\Windows\Downloaded Program Files\*" -Description "arquivos de programas baixados"
 
     # Remove cache de sombreador DirectX.
-    Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\DirectX Shader Cache\*" -Description "cache de sombreador DirectX"
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\DirectX Shader Cache\*" -Description "cache de sombreador DirectX"
 
     # Remove arquivos de otimização de entrega.
-    Remove-Files -Path "C:\Windows\SoftwareDistribution\DeliveryOptimization\*" -Description "arquivos de otimização de entrega"
+    REMOVEFILE -Path "C:\Windows\SoftwareDistribution\DeliveryOptimization\*" -Description "arquivos de otimização de entrega"
 
     # Remove miniaturas.
-    Remove-Files -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
 
     if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
-        Remove-Files -Path $env:TOOL -Description "pasta TOOL."
+        REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
     }
    
     Start-Sleep -Seconds 2
@@ -2430,12 +2393,10 @@ function IMGHEALTH {
 
     # Executa o comando SFC para verificar e reparar arquivos corrompidos do sistema.
     SFC /SCANNOW
-
-    Clear-Host
+    
 }
 
 function PRO {
-
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINDOWSPRO"
 
@@ -2448,9 +2409,7 @@ function PRO {
     Set-Location C:\Windows\System32\SPP\Store\2.0
     Rename-Item Tokens.dat Tokens.old
     SLMGR.VBS /RILC
-    changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
-
-    Clear-Host
+    changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T    
 
 }
 
@@ -2501,9 +2460,12 @@ function CLOCKDATE {
     w32tm /resync /force
    
 }  
-
+<#
 function ENTRYERROR {
+    
     #ENTRADA INVÁLIDA.
+
+    RESETCURSOR
     Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
     Start-Sleep -Seconds 1        
     
@@ -2522,7 +2484,7 @@ function ENTRYERROR {
         Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
         pause
     }
-}
+}#>
 
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }

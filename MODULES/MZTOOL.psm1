@@ -61,7 +61,7 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 }
 #endregion
 
-#region Funções do Módulo
+#region FUNÇÕES DO MÓDULO
 function GETMZTOOLMODULE {     
         
     if (-not($Global:MZTOOLMODULE)) {
@@ -74,7 +74,7 @@ function GETMZTOOLMODULE {
 }
 #endregion
 
-#region FUNCÕES
+#region FUNCÕES GLOBAIS
 
 function TOOLDIR {
 
@@ -105,14 +105,6 @@ function NEWPWSH {
         [switch]$Hidden
     )    
     
-    <#
-    # Combina as definições das funções (preservando a ordem)
-    $combinedDefinitions = foreach ($fn in $FunctionNames) {
-         (Get-Command -Type Function GETMZTOOLMODULE).Definition      
-        # Junta o código pré-carregado com a definição da função específica.
-         (Get-Command -Type Function $fn).Definition
-    } -join "`n"#>
-     
     $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
 
     # Junta as definições das funções especificadas
@@ -435,6 +427,7 @@ ______________________________________________________
         }
     }
 }
+
 function EXPANDPROGRESS {
     param(
         [Parameter(Mandatory = $true)]
@@ -464,6 +457,7 @@ function EXPANDPROGRESS {
     $rawUI.CursorPosition = $cursorPos
     Write-Host $progressText -NoNewline
 }
+
 # Função auxiliar para extrair uma entrada via streams (caso ExtractToFile não esteja disponível)
 function EXPANDSTREAM {
     param (
@@ -499,6 +493,7 @@ function EXPANDSTREAM {
     $fileStream.Dispose()
     $stream.Dispose()
 }
+
 # Função principal para extrair o ZIP com a barra de progresso customizada na parte inferior
 function EXPAND {
     [CmdletBinding()]
@@ -597,6 +592,7 @@ function EXPAND {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
 }
+
 function INTERNET {
 
     $INTERNET = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet
@@ -611,6 +607,7 @@ function INTERNET {
     }
       
 }
+
 function DESKTOPUPDATE {         
     for ($i = 0; $i -le 1; $i++) {
         (New-Object -ComObject shell.application).toggleDesktop()
@@ -621,10 +618,12 @@ function DESKTOPUPDATE {
         Start-Sleep 2
     }
 }
+
 function REFRESHUSER {
     Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
     Stop-Process -Name explorer        
 }
+
 function UNINSTALLOFFICE {
     function Get-AllInstalledOffice {
         # Cria um array para armazenar as entradas encontradas
@@ -714,4 +713,42 @@ function UNINSTALLOFFICE {
     
 }
 
+function RESETCURSOR {
+    $rawUI = $Host.UI.RawUI
+    $windowSize = $rawUI.WindowSize
+    # Posiciona o cursor na última linha da janela
+    $cursorPos = $rawUI.CursorPosition
+    $cursorPos.X = 0
+    $cursorPos.Y = $windowSize.Height - 1
+    $rawUI.CursorPosition = $cursorPos
+    # Limpa a última linha e escreve a barra de progresso
+    $clearLine = " " * $windowSize.Width
+    Write-Host $clearLine -NoNewline          
+    $rawUI.CursorPosition = $cursorPos
+}
+
+function ENTRYERROR {
+    
+    #ENTRADA INVÁLIDA.
+
+    RESETCURSOR
+    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    Start-Sleep -Seconds 1        
+    
+    $callStack = Get-PSCallStack
+
+    # Verifica se há um chamador. Geralmente, o índice 1 contém o contexto do menu.
+    if ($callStack.Count -gt 1) {
+        $callerFrame = $callStack[1]
+        $callerFunction = $callerFrame.Command  # Normalmente exibe o nome da função chamadora
+    
+        Start-Sleep -Seconds 1
+        # Invoca novamente a função chamadora
+        & $callerFunction
+    }
+    else {
+        Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
+        pause
+    }
+}
 #endregion
