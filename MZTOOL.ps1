@@ -69,6 +69,12 @@ function OPSYS {
 
         Read-Host "`n`nPRESSIONE ENTER PARA SAIR" | Out-Null
 
+        Clear-Host
+
+        Write-Host "MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
+
+        Start-Slepp -Seconds 2
+
         EXIT
 
     }
