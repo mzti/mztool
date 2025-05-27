@@ -121,11 +121,11 @@ function NEWPWSH {
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
     }
 
-    elseif ($Wait -and $Hidden) {
+    <#    elseif ($Wait -and $Hidden) {
         # Caso Wait e Hidden sejam especificados, aguardamos o término do processo internamente.
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
     }
-
+#>
     elseif ($ReturnProcess) {
         # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
         $proc = Start-Process powershell -ArgumentList $arguments -PassThru
