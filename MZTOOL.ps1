@@ -7,7 +7,7 @@
     
 .NOTES
     Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
-    Compatibilidade: Windows 11 e 10.
+    Compatibilidade: Windows 11 e 10. PowerShell 5.1 ou superior.
     Versão: BETA.
      
 .EXAMPLE
@@ -63,7 +63,7 @@ function OPSYS {
       
         Write-Host "SISTEMA OPERACIONAL NÃO SUPORTADO.`n`nENCERRANDO MZTOOL - `n`nMOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
 
-        Start-Sleep 5
+        Read-Host "`n`nPRESSIONE ENTER PARA SAIR" | Out-Null
 
         EXIT
 
@@ -71,6 +71,25 @@ function OPSYS {
 }
 
 OPSYS 
+
+function PSVER {
+    
+    #Verifica se a versão do PowerShell é suportada.
+
+    if ($PSVersionTable.PSVersion -lt [version]"5.1.0" ) {
+        Write-Host "VERSÃO NECESSÁRIA DO POWERSHELL: 5.1.0 ou superior"
+        Write-Host "`n`VERSÃO ATUAL DO POWERSHELL: "$($PSVersionTable.PSVersion)""
+
+        Write-Host "`n`nATUALIZE A SUA VERSÃO DO POWERSHELL PARA CONTINUAR: `nhtps://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi "
+        
+        Read-Host "`n`nPRESSIONE ENTER PARA SAIR" | Out-Null
+    
+        EXIT     
+    
+    }
+}
+
+PSVER
 
 function MZTOOLMODULE {
 
@@ -737,10 +756,11 @@ $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYW
 $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
 function RESTARTADMIN {
-    $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+    <#$RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
     $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
     $RESTART.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+    [System.Diagnostics.Process]::Start($RESTART) | Out-Null#>
+    Start-Process -FilePath "wt.exe" -ArgumentList "pwsh.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
     EXIT
 }
 
@@ -2493,17 +2513,7 @@ function awin {
 }
     
 NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
-<#
-if ($PSVersionTable.PSVersion -lt [version]"7.0.0" ) {
-    Write-Host "VERSÃO DO POWERSHELL: "$($PSVersionTable.PSVersion)""
-    WINGETAPPS -FilterId "Microsoft.Powershell"
-    WINGETAPPS -FilterId "Microsoft.WindowsTerminal"
-    pause
-    Start-Process -FilePath "wt.exe" -ArgumentList "pwsh.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
-    exit     
-    #RESTART
-}
-#>
+
 DISPLAYMENU 
 
 EXIT   
