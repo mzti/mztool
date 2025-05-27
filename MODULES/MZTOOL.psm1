@@ -111,31 +111,24 @@ function NEWPWSH {
     $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
     $arguments = @('-EncodedCommand', $encodedCommand)
     
-    if ($Wait) {
-        # Caso Wait seja especificado, aguardamos o término do processo internamente.
-        [void](Start-Process powershell -ArgumentList $arguments -Wait)
-    }
-      
-    if ($Hidden) {
-        # Caso Wait seja especificado, aguardamos o término do processo internamente.
-        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
-    }
-
-    <#    elseif ($Wait -and $Hidden) {
-        # Caso Wait e Hidden sejam especificados, aguardamos o término do processo internamente.
+    if ($Wait -and $Hidden) {
+        # Se ambos, Wait e Hidden, são true
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
     }
-#>
+    elseif ($Wait) {
+        [void](Start-Process powershell -ArgumentList $arguments -Wait)
+    }
+    elseif ($Hidden) {
+        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
+    }
     elseif ($ReturnProcess) {
-        # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
         $proc = Start-Process powershell -ArgumentList $arguments -PassThru
         return $proc
     }
-
     else {
-        # Se nada for especificado, usamos a forma que não retorna nada – compatível com [void](...)
         [void](Start-Process powershell -ArgumentList $arguments)
     }
+    
 }
 
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
