@@ -107,6 +107,34 @@ function PSVER {
 
 PSVER
 
+function RESTARTADMIN {
+    Clear-Host
+    # Obtém o ID e o Objeto de Segurança do usuário atual.
+    $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
+    $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+    
+    # Verifica se a sessão está sendo executada como administrador.
+    if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
+
+        #Script continua.
+          
+    }
+    # Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
+
+    else {  
+
+        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+        $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
+        $RESTART.Verb = 'runas'
+        [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+        EXIT
+
+    }
+}
+
+RESTARTADMIN
+
 function MZTOOLMODULE {
 
     # Define o nome do módulo
@@ -764,34 +792,6 @@ $Global:ENVIROMENTVARS = @{
         }
     }
     $_
-}
-
-# Obtém o ID e o Objeto de Segurança do usuário atual.
-$MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-$MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
-$ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
-
-function RESTARTADMIN {
-    $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-    $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
-    $RESTART.Verb = 'runas'
-    [System.Diagnostics.Process]::Start($RESTART) | Out-Null
-    #Start-Process -FilePath "wt.exe" -ArgumentList "poweshell.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
-    EXIT
-}
-
-# Verifica se a sessão está sendo executada como administrador.
-if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
-
-    #Script continua.
-      
-}
-
-# Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
-else {
-
-    RESTARTADMIN
-
 }
 
 <#
