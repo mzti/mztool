@@ -65,13 +65,13 @@ function OPSYS {
 
     if (-not ($Global:WINVER -match 'Windows 10|Windows 11')) {
       
-        Write-Host "SISTEMA OPERACIONAL NÃO SUPORTADO.`n`nENCERRANDO MZTOOL - `n`nMOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
+        Write-Host "SISTEMA OPERACIONAL NÃO SUPORTADO."
 
         Read-Host "`n`nPRESSIONE ENTER PARA SAIR" | Out-Null
 
         Clear-Host
 
-        Write-Host "MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
+        Write-Host "ENCERRANDO MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
 
         Start-Sleep 2
 
