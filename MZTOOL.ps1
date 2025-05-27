@@ -44,7 +44,10 @@ $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
+$Global:PSVER = $PSVersionTable.PSVersion
+$Global:MZPSVER = "7.1.0"
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
+
 #$ErrorActionPreference = 'SilentlyContinue'
 
 $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
@@ -76,9 +79,11 @@ function PSVER {
     PAUSE
     #Verifica se a versão do PowerShell é suportada.
 
-    if ($PSVersionTable.PSVersion -lt [version]"5.1.0" ) {
-        Write-Host "VERSÃO NECESSÁRIA DO POWERSHELL: 5.1.0 ou superior"
-        Write-Host "`n`VERSÃO ATUAL DO POWERSHELL: "$($PSVersionTable.PSVersion)""
+    
+
+    if ($Global:PSVER -lt [version]$Global:MZPSVER ) {
+        Write-Host "VERSÃO NECESSÁRIA DO POWERSHELL:$($Global:MZPSVER) ou superior"
+        Write-Host "`n`VERSÃO ATUAL DO POWERSHELL: "$($Global:PSVER)""
 
         Write-Host "`n`nATUALIZE A SUA VERSÃO DO POWERSHELL PARA CONTINUAR: `nhtps://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi "
         
@@ -761,7 +766,7 @@ function RESTARTADMIN {
     $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
     $RESTART.Verb = 'runas'
     [System.Diagnostics.Process]::Start($RESTART) | Out-Null#>
-    Start-Process -FilePath "wt.exe" -ArgumentList "pwsh.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
+    Start-Process -FilePath "wt.exe" -ArgumentList "poweshell.exe -ExecutionPolicy Bypass -Command $Global:SCRIPTCODE" -Verb RunAs
     EXIT
 }
 
