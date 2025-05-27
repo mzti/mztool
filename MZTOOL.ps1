@@ -73,7 +73,7 @@ function OPSYS {
 
         Write-Host "MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
 
-        Start-Slepp -Seconds 2
+        Start-Sleep 2
 
         EXIT
 
@@ -98,7 +98,7 @@ function PSVER {
 
         Write-Host "MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART"
 
-        Start-Slepp -Seconds 2
+        Start-Sleep 2
        
         EXIT     
     
