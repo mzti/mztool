@@ -61,6 +61,19 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 }
 #endregion
 
+#region Funções do Módulo
+function GETMZTOOLMODULE {     
+        
+    if (-not($Global:MZTOOLMODULE)) {
+        
+        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
+    }
+
+    $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
+    
+}
+#endregion
+
 #region FUNCÕES
 
 function TOOLDIR {
@@ -181,12 +194,36 @@ function DEPLOYFUNCTION {
 
     # Exibe a barra inicial (0% concluído)
     DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-    if ($HIDDENALL) { $HIDDENALL = '-Hidden' }
-    foreach ($group in $DEPLOYFUNCTIONHASH) {
-        $WAIT = $(if ($group.ContainsKey("Wait") -and $group.Wait) { '-Wait' } else { "$null" })
-       
-        NEWPWSH -FunctionNames $group.Functions $($WAIT) $($HIDDEN)
+    
+   
+    foreach ($group in $DEPLOYFUNCTIONHASH) {       
+        
+        # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
+        # Inicializa os valores padrão para os switches
+        $WAIT = $false
+        if ($group.ContainsKey("Wait") -and $group.Wait) {
+            $WAIT = $true
+        }
 
+        # Aqui, $HIDDENALL é um parâmetro (SwitchParameter) da função DEPLOYFUNCTION.
+        # Se ele estiver presente, vamos garantir que na passagem para NEWPWSH
+        # seja utilizado o valor $true.
+        $hiddenParam = $false
+        if ($HIDDENALL) {
+            $hiddenParam = $true
+        }
+
+        # Monta a tabela de parâmetros para passar à função NEWPWSH
+        $arguments = @{
+            FunctionNames = $group.Functions
+            Wait          = $WAIT
+            Hidden        = $hiddenParam
+        }
+
+        # Chama a função passando os parâmetros via splatting
+        NEWPWSH @arguments
+           
+      
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
