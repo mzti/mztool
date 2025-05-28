@@ -727,7 +727,6 @@ $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstan
     }  
 }
 
-# Verifica se o módulo MZTOOL já está carregado e, se não estiver, tenta carregá-lo.
 function GETMZTOOLMODULE {     
         
     if (-not($Global:MZTOOLMODULE)) {
@@ -928,7 +927,7 @@ ______________________________________________________
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
                 @{ Functions = 'UNINSTALLOFFICE', 'MICROSOFT365'; Wait = $true },
-                @{ Functions = 'PinIcons', 'StartSoftwares' }
+                @{ Functions = 'PINICONS', 'STARTSOFTWARES' }
             )
        
             # Executa o conjunto de funções com os devidos parâmetros especificados.
@@ -1315,13 +1314,6 @@ ______________________________________________________
             NEWPWSH -Functions 'DRIVERBOOSTER'
             DISPLAYMENU
 
-        }
-
-        dvr {
-
-            InstallDeviceDrivers
-            DISPLAYMENU
-            
         }
 
         awin {
@@ -2040,7 +2032,7 @@ function PERFILTHEME {
  
 }
 
-function PinIcons {
+function PINICONS {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PERFILTHEME > PINICONS"  
 
@@ -2197,7 +2189,7 @@ function PinIcons {
           
 }
 
-function StartSoftwares {
+function STARTSOFTWARES {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> STARTSOFTWARES"
 
@@ -2308,52 +2300,17 @@ function PRO {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINDOWSPRO"
 
     #Converte a versão do Windows para PRO. (Não ativa o sistema, para a ativação é necessário já haver uma Licença Digital HWID).
-
-    changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
-    SLMGR.VBS /CPKY
-    SLMGR.VBS /CKMS
-    Net stop Sppsvc
-    Set-Location C:\Windows\System32\SPP\Store\2.0
-    Rename-Item Tokens.dat Tokens.old
-    SLMGR.VBS /RILC
-    changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T    
-
-}
-
-function InstallDeviceDrivers {
-    # Adicionar Serviço de Atualização do Windows
-    $UpdateSvc = New-Object -ComObject Microsoft.Update.ServiceManager
-    $UpdateSvc.AddService2("7971f918-a847-4430-9279-4a52d1efe18d", 7, "")
-
-    # Buscar Atualizações de Drivers
-    $Session = New-Object -ComObject Microsoft.Update.Session
-    $Searcher = $Session.CreateUpdateSearcher()
-    $Searcher.ServiceID = '7971f918-a847-4430-9279-4a52d1efe18d'
-    $Searcher.SearchScope = 1 # Somente na máquina
-    $Searcher.ServerSelection = 3 # Terceiros
-    $Criteria = "IsInstalled=0 and Type='Driver'"
-    $SearchResult = $Searcher.Search($Criteria)
-    $Updates = $SearchResult.Updates
-
-    # Exibir Atualizações de Drivers Disponíveis
-    $Updates | Select-Object Title, DriverModel, DriverVerDate, DriverClass, DriverManufacturer | Format-List
-
-    # Baixar e Instalar as Atualizações
-    $UpdatesToDownload = New-Object -Com Microsoft.Update.UpdateColl
-    $Updates | ForEach-Object { $UpdatesToDownload.Add($_) | Out-Null }
-    $Downloader = $Session.CreateUpdateDownloader()
-    $Downloader.Updates = $UpdatesToDownload
-    $Downloader.Download()
-    $UpdatesToInstall = New-Object -Com Microsoft.Update.UpdateColl
-    $Updates | ForEach-Object { if ($_.IsDownloaded) { $UpdatesToInstall.Add($_) | Out-Null } }
-    $Installer = $Session.CreateUpdateInstaller()
-    $Installer.Updates = $UpdatesToInstall
-    $InstallationResult = $Installer.Install()
-
-    # Reiniciar se Necessário
-    if ($InstallationResult.RebootRequired) {
-        Write-Host "Reinicialização necessária. Por favor, reinicie o computador."
+    1..2 | ForEach-Object {
+        changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
+        SLMGR.VBS /CPKY
+        SLMGR.VBS /CKMS
+        Net stop Sppsvc
+        Set-Location C:\Windows\System32\SPP\Store\2.0
+        Rename-Item Tokens.dat Tokens.old
+        SLMGR.VBS /RILC
+        changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T    
     }
+
 }
 
 function awin {
