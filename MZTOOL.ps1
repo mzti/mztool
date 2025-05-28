@@ -1355,20 +1355,24 @@ function DOWNLOADMZTOOL {
     
     
     # Exibe o status dos links
+    function CLOUDSTATUS {
+        param (
+            [STRING]$CLOUD
+        )
+        
+        $URLCLOUD = Get-Variable -Name "$CLOUD`LINK" -ValueOnly
     
-    Write-Host "                 ONEDRIVE     = " -NoNewline; $(if (TESTLINK -Url $ONEDRIVELINK) {
-            Write-Host "ONLINE     " -ForegroundColor Green
-        }    
-        else {
-            Write-Host "OFFLINE    " -ForegroundColor Red
-        })
+        Write-Host "                 "$($CLOUD)"     = " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
+                Write-Host "ONLINE     " -ForegroundColor Green
+            }    
+            else {
+                Write-Host "OFFLINE    " -ForegroundColor Red
+            })
 
-    if (TESTLINK -Url $GOOGLEDRIVELINK) {
-        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
     }
-    else {
-        Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
-    }
+
+    CLOUDSTATUS -CLOUD ONEDRIVE
+    CLOUDSTATUS -CLOUD GOOGLEDRIVE
 
     TOOLDIR
     
