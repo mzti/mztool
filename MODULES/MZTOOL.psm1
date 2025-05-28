@@ -713,6 +713,70 @@ function UNINSTALLOFFICE {
     
 }
 
+function CLEANTEMP {
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
+
+    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
+
+    # Função para remoção de arquivos temporários.
+    function REMOVEFILE {
+        param (
+            [string]$Path,
+            [string]$Description
+        )
+
+        RESETCURSOR
+
+        Write-Host "`rLimpando $Description" -NoNewline   
+        
+        Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    # Remove arquivos temporários do sistema.
+    REMOVEFILE -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
+
+    # Remove arquivos temporários do Windows.
+    REMOVEFILE -Path "C:\Windows\temp\*" -Description "arquivos temporários do Windows"
+
+    # Remove arquivos de Prefetch.
+    REMOVEFILE -Path "C:\Windows\Prefetch\*" -Description "arquivos de Prefetch"
+
+    # Remove arquivos de CrashDumps.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\CrashDumps\*" -Description "arquivos de CrashDumps"
+    
+    # Remove arquivos de Internet Temporários.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*" -Description "arquivos de Internet Temporários"
+
+    # Remove arquivos de atualização do Windows.
+    REMOVEFILE -Path "C:\Windows\SoftwareDistribution\Download\*" -Description "arquivos de atualização do Windows"
+
+    # Remove relatórios de erros do Windows.
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows\WER\ReportQueue\*" -Description "relatórios de erros do Windows"
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows\WER\Temp\*" -Description "relatórios de erros do Windows"
+    
+    # Remove histórico do Microsoft Defender.
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows Defender\Scans\History\*" -Description "histórico do Microsoft Defender"
+
+    # Remove arquivos de programas baixados.
+    REMOVEFILE -Path "C:\Windows\Downloaded Program Files\*" -Description "arquivos de programas baixados"
+
+    # Remove cache de sombreador DirectX.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\DirectX Shader Cache\*" -Description "cache de sombreador DirectX"
+
+    # Remove arquivos de otimização de entrega.
+    REMOVEFILE -Path "C:\Windows\SoftwareDistribution\DeliveryOptimization\*" -Description "arquivos de otimização de entrega"
+
+    # Remove miniaturas.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
+
+    if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+
+        REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
+    }
+   
+    Start-Sleep -Seconds 2
+}
+
 function RESETCURSOR {
     $rawUI = $Host.UI.RawUI
     $windowSize = $rawUI.WindowSize

@@ -1399,9 +1399,11 @@ function DOWNLOADMZTOOL {
         (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
         ($NEWMZTOOLZIPHASH.Hash -notin @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2"))
     )
-        
+    
+    RESETCURSOR
+
     $MZTOOLZIPHASH | Where-Object ( $_ -eq $NEWMZTOOLZIPHASH.Hash ) | ForEach-Object {
-        Write-Host "`nHASH = " ; Write-Host ""$($_)" | "$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
+        Write-Host "`nHASH = " ; Write-Host "`n"$($_)"`n"$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
     }
               
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
@@ -1496,7 +1498,7 @@ function WINUPDATEMODULE {
 
 function WINGETMODULE {
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETMODULE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
    
     #Implementa e ou atualiza o WINGET.
      
@@ -1562,7 +1564,7 @@ function WINGETAPPS {
     function REDUNDANTINSTALL {
         param ([hashtable]$APPFAIL)
 
-        "INSTALAÇÃO REDUNDANTE $($APPFAIL.Id)"
+        Write-Host "INSTALAÇÃO REDUNDANTE $($APPFAIL.Id)"
 
         # Define o caminho do arquivo temporário para o instalador
         $APPFILE = Join-Path $env:TEMP $APPFAIL.TempFileName
@@ -1574,29 +1576,26 @@ function WINGETAPPS {
 
             # Se houver argumentos definidos, substitui o placeholder "{0}" pelo caminho do arquivo
             $APPARGS = $null
+
             if ($APPFAIL.Arguments) {
                 $APPARGS = $APPFAIL.Arguments | ForEach-Object { $_ -f $APPFILE }
             }
             
             # Verifica o tipo de instalação e realiza o procedimento adequado
             switch ($APPFAIL.Install) {  
+
                 "MSI" {
-                    # Para arquivos MSI, é recomendado iniciar com o msiexec.exe
-                    #Get-Process -Name msiexec -ErrorAction SilentlyContinue | Wait-Process
                     Start-Process -FilePath "msiexec.exe" -ArgumentList $APPARGS -Verb RunAs                    
                 }
-                "EXE" {
-                    # Para arquivos EXE, iniciamos diretamente o arquivo baixado com os argumentos.
+                "EXE" {                    
                     Start-Process -FilePath $APPFILE -ArgumentList $APPARGS -Verb RunAs
                 }
-                "APPX" {
-                    # Para arquivos APPX, utilizamos o Add-AppPackage (sem parâmetros ambiguos como -Force)
+                "APPX" {                   
                     Add-AppPackage -Path $APPFILE -ErrorAction SilentlyContinue                 
                 }
                 "MSIX" {
                     Add-AppxPackage -Path $APPFILE -ErrorAction SilentlyContinue
                 }
-
                 default {
                     Write-Output "Tipo de instalação não suportado para $($APPFAIL.Id)"
                 }
@@ -1607,9 +1606,7 @@ function WINGETAPPS {
             Write-Output "FALHA NA INSTALAÇÃO DO $($APPFAIL.Id) : $_"
         }
     }
-    
-    # Define a lista de softwares (cada entrada contém o ID usado pelo winget
-    # e os parâmetros para a instalação redundante, se necessário)
+      
     $APP = @(
         @{ 
             Id           = "Google.Chrome"; 
@@ -1668,15 +1665,15 @@ function WINGETAPPS {
 
         if ($LASTEXITCODE -ne 0) {
             if ($ERRORCODE -match "já instalado" -or $ERRORCODE -match "installed") {
-                # SCRIPT CONTINUA.
+                Write-Host "$($APPFAIL.Id) JÁ INSTALADO."
             }
             else {               
                 REDUNDANTINSTALL -APPFAIL $_               
             }
         }        
-        Clear-Host
+        # Clear-Host
     }    
-    Clear-Host
+    # Clear-Host
 }
 
 function WINGETUPGRADE { 
@@ -1881,20 +1878,25 @@ function OFFICE2007 {
             }    
     
             # Exibe o status dos links
-            if (TESTLINK -Url $OFFICE2007ONEDRIVE) {
-                Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "ONLINE     " -ForegroundColor Green
+            function CLOUDSTATUS {
+                param (
+                    [STRING]$CLOUD
+                )
+                
+                $URLCLOUD = Get-Variable -Name "OFFICE2007$CLOUD" -ValueOnly
+            
+                Write-Host "               "$($CLOUD)"       = " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
+                        Write-Host "ONLINE     " -ForegroundColor Green
+                    }    
+                    else {
+                        Write-Host "OFFLINE    " -ForegroundColor Red
+                    })
+        
             }
-            else {
-                Write-Host "                 ONEDRIVE     = " -NoNewline; Write-Host "OFFLINE    " -ForegroundColor Red
-            }
-
-            if (TESTLINK -Url $OFFICE2007GOOGLEDRIVE) {
-                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "ONLINE     " -NoNewline -ForegroundColor Green
-            }
-            else {
-                Write-Host "                 GOOGLE DRIVE = " -NoNewline; Write-Host "OFFLINE    " -NoNewline -ForegroundColor Red
-            }
-       
+        
+            CLOUDSTATUS -CLOUD ONEDRIVE
+            CLOUDSTATUS -CLOUD GOOGLEDRIVE
+      
             do {
                 DOWNLOAD -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
@@ -2316,7 +2318,7 @@ function StartSoftwares {
     Start-Process -FilePath "C:\Windows\System32\SystemPropertiesPerformance.exe"    
 
 }
-
+<#
 function CLEANTEMP {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
@@ -2379,7 +2381,7 @@ function CLEANTEMP {
     }
    
     Start-Sleep -Seconds 2
-}
+}#>
 
 function IMGHEALTH {
 
@@ -2464,31 +2466,6 @@ function CLOCKDATE {
     w32tm /resync /force
    
 }  
-<#
-function ENTRYERROR {
-    
-    #ENTRADA INVÁLIDA.
-
-    RESETCURSOR
-    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-    Start-Sleep -Seconds 1        
-    
-    $callStack = Get-PSCallStack
-
-    # Verifica se há um chamador. Geralmente, o índice 1 contém o contexto do menu.
-    if ($callStack.Count -gt 1) {
-        $callerFrame = $callStack[1]
-        $callerFunction = $callerFrame.Command  # Normalmente exibe o nome da função chamadora
-    
-        Start-Sleep -Seconds 1
-        # Invoca novamente a função chamadora
-        & $callerFunction
-    }
-    else {
-        Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
-        pause
-    }
-}#>
 
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
