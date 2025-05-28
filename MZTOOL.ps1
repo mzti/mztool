@@ -35,7 +35,6 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
     
 #>
 
-
 #MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
 
 Clear-Host
@@ -793,6 +792,8 @@ $Global:ENVIROMENTVARS = @{
     }
     $_
 }
+
+NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
 
 <#
 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
@@ -2355,24 +2356,10 @@ function InstallDeviceDrivers {
     }
 }
 
-function CLOCKDATE {
-
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"   
-
-    #Define um novo servidor e sincroniza o relógio e a data do sistema.  
-  
-    w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
-    net start w32time 
-    w32tm /resync /force
-   
-}  
-
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
     
-#NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
-
 DISPLAYMENU 
 
 EXIT   

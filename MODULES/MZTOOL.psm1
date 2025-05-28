@@ -830,4 +830,16 @@ function ENTRYERROR {
         pause
     }
 }
+
+function CLOCKDATE {
+
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"   
+
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.  
+  
+    w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
+    net start w32time 
+    w32tm /resync /force
+   
+}  
 #endregion
