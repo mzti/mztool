@@ -246,6 +246,23 @@ function TESTLINK {
         return $false
     }
 }
+# Exibe o status dos links
+function CLOUDSTATUS {
+    param (
+        [STRING]$PATH,
+        [STRING]$CLOUD
+    )
+    
+    $URLCLOUD = Get-Variable -Name "$PATH$CLOUD" -ValueOnly
+
+    Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
+            Write-Host "ONLINE" -ForegroundColor Green
+        }    
+        else {
+            Write-Host "OFFLINE" -ForegroundColor Red
+        })
+
+}
 
 function DOWNLOADPROGRESS {
     param(

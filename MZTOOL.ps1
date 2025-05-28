@@ -1350,34 +1350,17 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @($MZTOOLZIPHASH1, $MZTOOLZIPHASH2)
 
-    $ONEDRIVELINK = 'https://bit.ly/MZTZIP'       
-    $GOOGLEDRIVELINK = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $MZTOOLONEDRIVE = 'https://bit.ly/MZTZIP'       
+    $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
-    
-    # Exibe o status dos links
-    function CLOUDSTATUS {
-        param (
-            [STRING]$CLOUD
-        )
-        
-        $URLCLOUD = Get-Variable -Name "$CLOUD`LINK" -ValueOnly
-    
-        Write-Host "               "$($CLOUD)"       = " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
-                Write-Host "ONLINE     " -ForegroundColor Green
-            }    
-            else {
-                Write-Host "OFFLINE    " -ForegroundColor Red
-            })
-
-    }
-
-    CLOUDSTATUS -CLOUD ONEDRIVE
-    CLOUDSTATUS -CLOUD GOOGLEDRIVE
-
     TOOLDIR
     
+    # Exibe o status dos links 
+    CLOUDSTATUS -PATH MZTOOL -CLOUD ONEDRIVE
+    CLOUDSTATUS -PATH MZTOOL -CLOUD GOOGLEDRIVE   
+    
     # Lista de URLs para teste (OneDrive + Google Drive como fallback)
-    $DRIVEURLS = @($ONEDRIVELINK, $GOOGLEDRIVELINK)
+    $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)
 
     do {
         
@@ -1875,27 +1858,10 @@ function OFFICE2007 {
 
                 New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
 
-            }    
-    
-            # Exibe o status dos links
-            function CLOUDSTATUS {
-                param (
-                    [STRING]$CLOUD
-                )
-                
-                $URLCLOUD = Get-Variable -Name "OFFICE2007$CLOUD" -ValueOnly
-            
-                Write-Host "               "$($CLOUD)"       = " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
-                        Write-Host "ONLINE     " -ForegroundColor Green
-                    }    
-                    else {
-                        Write-Host "OFFLINE    " -ForegroundColor Red
-                    })
-        
-            }
-        
-            CLOUDSTATUS -CLOUD ONEDRIVE
-            CLOUDSTATUS -CLOUD GOOGLEDRIVE
+            }        
+                   
+            CLOUDSTATUS -PATH OFFICE2007 -CLOUD ONEDRIVE
+            CLOUDSTATUS -PATH OFFICE2007 -CLOUD GOOGLEDRIVE
       
             do {
                 DOWNLOAD -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
