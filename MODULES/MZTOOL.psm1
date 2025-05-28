@@ -6,7 +6,6 @@ $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
 $Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
-$Global:GIT = $TRUE
 #endregion
 
 #region Definições Globais
@@ -843,3 +842,5 @@ function CLOCKDATE {
    
 }  
 #endregion
+
+$Global:GIT = $TRUE

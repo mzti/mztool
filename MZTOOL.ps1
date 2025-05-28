@@ -160,8 +160,30 @@ function MZTOOLMODULE {
     try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
     catch {
         $MODULECONTENT = @'
-# MZTOOL.psm1
 #MÓDULO MZTOOL
+
+#region Variáveis Globais
+$Global:TITLE = "MZTOOL BETA"
+$Global:DESKTOP = "C:\Users\Public\DESKTOP"
+$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
+$Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
+$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
+
+#endregion
+
+#region Definições Globais
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+#endregion
+
+#region Customização do Console
+$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+$H = Get-Host
+$Win = $H.UI.RawUI.WindowSize
+$Win.Height = 20
+$Win.Width = 58
+$H.UI.RawUI.Set_WindowSize($Win)
+$H.UI.RawUI.Set_BufferSize($Win)
+#endregion
 
 #region Importações e API
 Add-Type @"
@@ -184,17 +206,6 @@ public class Win32 {
 "@
 #endregion
 
-#region Customização do Console
-$Global:TITLE = "MZTOOL BETA"
-$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-$H = Get-Host
-$Win = $H.UI.RawUI.WindowSize
-$Win.Height = 20
-$Win.Width = 58
-$H.UI.RawUI.Set_WindowSize($Win)
-$H.UI.RawUI.Set_BufferSize($Win)
-#endregion
-
 #region Fixar tamanho e remover redimensionamento
 $global:hwnd = (Get-Process -Id $PID).MainWindowHandle
 if ($global:hwnd -ne [IntPtr]::Zero) {
@@ -212,7 +223,20 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 }
 #endregion
 
-#region FUNCÕES
+#region FUNÇÕES DO MÓDULO
+function GETMZTOOLMODULE {     
+        
+    if (-not($Global:MZTOOLMODULE)) {
+        
+        Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
+    }
+
+    $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
+    
+}
+#endregion
+
+#region FUNCÕES GLOBAIS
 
 function TOOLDIR {
 
@@ -228,8 +252,8 @@ function TOOLDIR {
 
     #Criação do diretório C:\MZTOOL.
     [System.IO.Directory]::CreateDirectory($env:TOOL) | Out-Null
-    $MZTOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
-    $MZTOOLFOLDER.Attributes = 'Hidden' 
+    $TOOLFOLDER = Get-Item $env:TOOL -ErrorAction SilentlyContinue
+    $TOOLFOLDER.Attributes = 'Hidden' 
 
 }
 
@@ -243,43 +267,40 @@ function NEWPWSH {
         [switch]$Hidden
     )    
     
-   
-    # Combina as definições das funções (preservando a ordem)
-    $combinedDefinitions = foreach ($fn in $Functions) {
-         (Get-Command -Type Function GETMZTOOLMODULE).Definition      
-        # Junta o código pré-carregado com a definição da função específica.
-         (Get-Command -Type Function $fn).Definition
+    $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
+
+    # Junta as definições das funções especificadas
+    $funcDefinitions = foreach ($fn in $Functions) {
+    (Get-Command -Type Function $fn).Definition
     } -join "`n"
-    
+
+    $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
     # Converte o conteúdo para Base64 para uso com -EncodedCommand
     $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
     $arguments = @('-EncodedCommand', $encodedCommand)
     
-    if ($Wait) {
-        # Caso Wait seja especificado, aguardamos o término do processo internamente.
-        [void](Start-Process powershell -ArgumentList $arguments -Wait)
-    }
-      
-    if ($Hidden) {
-        # Caso Wait seja especificado, aguardamos o término do processo internamente.
-        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
-    }
-
-    elseif ($Wait -and $Hidden) {
-        # Caso Wait e Hidden sejam especificados, aguardamos o término do processo internamente.
+    if ($Wait -and $Hidden) {
+        # Se ambos, Wait e Hidden, forem true:
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
+        return
     }
-
+    elseif ($Wait) {
+        [void](Start-Process powershell -ArgumentList $arguments -Wait)
+        return
+    }
+    elseif ($Hidden) {
+        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden)
+        return
+    }
     elseif ($ReturnProcess) {
-        # Se o usuário quer o objeto do processo para controlar externamente, retornamos-o.
         $proc = Start-Process powershell -ArgumentList $arguments -PassThru
         return $proc
     }
-
     else {
-        # Se nada for especificado, usamos a forma que não retorna nada – compatível com [void](...)
         [void](Start-Process powershell -ArgumentList $arguments)
+        return
     }
+    
 }
 
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
@@ -318,22 +339,45 @@ function DEPLOYFUNCTION {
     param(
         [hashtable[]]$DEPLOYFUNCTIONHASH,
         [int]$BarWidth = 30,
-        [int]$LinePosition = 17
+        [int]$LinePosition = 17,
+        [switch]$HIDDENALL
     )
-          
+    
     $total = $DEPLOYFUNCTIONHASH.Count
     $completed = 0
 
     # Exibe a barra inicial (0% concluído)
     DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-
-    foreach ($group in $DEPLOYFUNCTIONHASH) {
+    
+   
+    foreach ($group in $DEPLOYFUNCTIONHASH) {       
+        
+        # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
+        # Inicializa os valores padrão para os switches
+        $WAIT = $false
         if ($group.ContainsKey("Wait") -and $group.Wait) {
-            NEWPWSH -Functions $group.Functions -Wait
+            $WAIT = $true
         }
-        else {
-            NEWPWSH -Functions $group.Functions
+
+        # Aqui, $HIDDENALL é um parâmetro (SwitchParameter) da função DEPLOYFUNCTION.
+        # Se ele estiver presente, vamos garantir que na passagem para NEWPWSH
+        # seja utilizado o valor $true.
+        $hiddenParam = $false
+        if ($HIDDENALL) {
+            $hiddenParam = $true
         }
+
+        # Monta a tabela de parâmetros para passar à função NEWPWSH
+        $arguments = @{
+            Functions = $group.Functions
+            Wait      = $WAIT
+            Hidden    = $hiddenParam
+        }
+
+        # Chama a função passando os parâmetros via splatting
+        NEWPWSH @arguments
+           
+      
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
@@ -364,6 +408,21 @@ function TESTLINK {
         return $false
     }
 }
+# Exibe o status dos links
+function CLOUDSTATUS {
+    param (
+        [STRING]$URL,
+        [STRING]$CLOUD
+    )
+  
+    Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URL) {
+            Write-Host "ONLINE" -ForegroundColor Green
+        }    
+        else {
+            Write-Host "OFFLINE" -ForegroundColor Red
+        })
+
+}     
 
 function DOWNLOADPROGRESS {
     param(
@@ -709,18 +768,243 @@ function EXPAND {
     if (-not $Quiet) {
         Write-Host "Extração de '$Path' concluída com sucesso em '$DestinationPath'." -ForegroundColor Green
     }
-} 
+}
+
+function INTERNET {
+
+    $INTERNET = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet
+    if (-not($INTERNET)) {
+
+        Write-Warning "AGUARDANDO CONEXÃO COM A INTERNET."
+
+        do { 
+            $INTERNET = Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet 
+            Start-Sleep Seconds -5 
+        }while (-not($INTERNET))
+    }
+      
+}
+
+function DESKTOPUPDATE {         
+    for ($i = 0; $i -le 1; $i++) {
+        (New-Object -ComObject shell.application).toggleDesktop()
+        Start-Sleep 2
+        (New-Object -ComObject Wscript.Shell).sendkeys('{F5}')
+        Start-Sleep 1
+        (New-Object -ComObject shell.application).undominimizeall()
+        Start-Sleep 2
+    }
+}
+
+function REFRESHUSER {
+    Start-Process -FilePath "rundll32.exe" -ArgumentList "user32.dll,UpdatePerUserSystemParameters"
+    Stop-Process -Name explorer        
+}
+
+function UNINSTALLOFFICE {
+    function Get-AllInstalledOffice {
+        # Cria um array para armazenar as entradas encontradas
+        $OfficeApps = @()
+    
+        # Define os caminhos de registro para 64 bits e 32 bits (WOW6432Node)
+        $UninstallPaths = @(
+            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+        )
+    
+        # Procura entradas cujo DisplayName contenha "Office"
+        foreach ($path in $UninstallPaths) {
+            $apps = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
+            Where-Object { 
+                $_.DisplayName -like "*Office*" -or 
+                $_.DisplayName -like "*Microsoft Office*" -or 
+                $_.DisplayName -like "*Microsoft 365*" 
+            }
+            if ($apps) {
+                $OfficeApps += $apps
+            }
+        }
+    
+        return $OfficeApps
+    }
+    
+    
+    function Uninstall-OfficeApps {
+        param(
+            [Parameter(Mandatory = $true)]
+            [Array]$OfficeApps
+        )
+    
+        foreach ($app in $OfficeApps) {
+            Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
+            Write-Host "App: $($app.DisplayName)" -ForegroundColor Cyan
+            Write-Host "Versão: $($app.DisplayVersion)" -ForegroundColor Cyan
+            Write-Host "IdentifyingNumber: $($app.IdentifyingNumber)" -ForegroundColor Yellow
+            Write-Host "UninstallString: $($app.UninstallString)" -ForegroundColor Yellow
+    
+            # Tenta usar o IdentifyingNumber, se não existir extrai da UninstallString
+            $guid = $app.IdentifyingNumber
+                   
+            if ($guid) {
+                Write-Host "Tentando desinstalar $($app.DisplayName) via msiexec usando GUID $guid..." -ForegroundColor Green
+                try {
+                    # Desinstala silenciosamente com msiexec (/qn)
+                    Start-Process -FilePath "msiexec.exe" -ArgumentList "/x $guid /qn" -Wait -NoNewWindow
+                }
+                catch {
+                    Write-Warning "Falha ao tentar desinstalar $($app.DisplayName): $_"
+                }
+            }
+            elseif ($app.UninstallString -and $app.UninstallString -notmatch "MsiExec.exe") {               
+                $uninstallCmd = $app.UninstallString                
+               
+                # Se for um comando do setup.exe do Office, adiciona parâmetros adicionais para desinstalação automática
+                #    if ($uninstallCmd -match "setup.exe") {
+                #        $uninstallCmd = $uninstallCmd + " /quiet /norestart"
+                #   }
+                Write-Warning "GUID não encontrado para $($app.DisplayName). Tentando UnistallString."
+                #cmd /c $app.UninstallString 
+                Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait -NoNewWindow
+            }
+            else {
+                Write-Warning "Desinstalador parcial ignorado. Buscando desinstalador completo."
+            }
+        }
+    }
+    
+    # Coleta todas as instalações do Office encontradas
+    $InstalledOffice = Get-AllInstalledOffice
+    
+    if ($InstalledOffice.Count -gt 0) {
+        Write-Host "Foram encontradas as seguintes entradas do Office:" -ForegroundColor Cyan
+        foreach ($app in $InstalledOffice) {
+            Write-Host "$($app.DisplayName) - Versão: $($app.DisplayVersion)" -ForegroundColor Green
+        }
+    
+        # Se desejar executar a desinstalação, descomente a linha abaixo:
+        Uninstall-OfficeApps -OfficeApps $InstalledOffice
+    }
+    else {
+        Write-Host "Nenhuma instalação do Office foi encontrada." -ForegroundColor Yellow
+    }
+    
+}
+
+function CLEANTEMP {
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
+
+    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
+
+    # Função para remoção de arquivos temporários.
+    function REMOVEFILE {
+        param (
+            [string]$Path,
+            [string]$Description
+        )
+
+        RESETCURSOR
+
+        Write-Host "`rLimpando $Description" -NoNewline   
+        
+        Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    # Remove arquivos temporários do sistema.
+    REMOVEFILE -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
+
+    # Remove arquivos temporários do Windows.
+    REMOVEFILE -Path "C:\Windows\temp\*" -Description "arquivos temporários do Windows"
+
+    # Remove arquivos de Prefetch.
+    REMOVEFILE -Path "C:\Windows\Prefetch\*" -Description "arquivos de Prefetch"
+
+    # Remove arquivos de CrashDumps.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\CrashDumps\*" -Description "arquivos de CrashDumps"
+    
+    # Remove arquivos de Internet Temporários.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*" -Description "arquivos de Internet Temporários"
+
+    # Remove arquivos de atualização do Windows.
+    REMOVEFILE -Path "C:\Windows\SoftwareDistribution\Download\*" -Description "arquivos de atualização do Windows"
+
+    # Remove relatórios de erros do Windows.
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows\WER\ReportQueue\*" -Description "relatórios de erros do Windows"
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows\WER\Temp\*" -Description "relatórios de erros do Windows"
+    
+    # Remove histórico do Microsoft Defender.
+    REMOVEFILE -Path "C:\ProgramData\Microsoft\Windows Defender\Scans\History\*" -Description "histórico do Microsoft Defender"
+
+    # Remove arquivos de programas baixados.
+    REMOVEFILE -Path "C:\Windows\Downloaded Program Files\*" -Description "arquivos de programas baixados"
+
+    # Remove cache de sombreador DirectX.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\DirectX Shader Cache\*" -Description "cache de sombreador DirectX"
+
+    # Remove arquivos de otimização de entrega.
+    REMOVEFILE -Path "C:\Windows\SoftwareDistribution\DeliveryOptimization\*" -Description "arquivos de otimização de entrega"
+
+    # Remove miniaturas.
+    REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
+
+    if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
+
+        REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
+    }
    
-#endregion
+    Start-Sleep -Seconds 2
+}
 
-#region Variáveis Globais
-$Global:TITLE = "MZTOOL BETA"
-$Global:DESKTOP = "C:\Users\Public\DESKTOP"
-$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" 
-$Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
-$Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
-#endregion
+function RESETCURSOR {
+    $rawUI = $Host.UI.RawUI
+    $windowSize = $rawUI.WindowSize
+    # Posiciona o cursor na última linha da janela
+    $cursorPos = $rawUI.CursorPosition
+    $cursorPos.X = 0
+    $cursorPos.Y = $windowSize.Height - 1
+    $rawUI.CursorPosition = $cursorPos
+    # Limpa a última linha e escreve a barra de progresso
+    $clearLine = " " * $windowSize.Width
+    Write-Host $clearLine -NoNewline          
+    $rawUI.CursorPosition = $cursorPos
+}
 
+function ENTRYERROR {
+    
+    #ENTRADA INVÁLIDA.
+
+    RESETCURSOR
+    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    Start-Sleep -Seconds 1        
+    
+    $callStack = Get-PSCallStack
+
+    # Verifica se há um chamador. Geralmente, o índice 1 contém o contexto do menu.
+    if ($callStack.Count -gt 1) {
+        $callerFrame = $callStack[1]
+        $callerFunction = $callerFrame.Command  # Normalmente exibe o nome da função chamadora
+    
+        Start-Sleep -Seconds 1
+        # Invoca novamente a função chamadora
+        & $callerFunction
+    }
+    else {
+        Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
+        pause
+    }
+}
+
+function CLOCKDATE {
+
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLOCK|DATE"   
+
+    #Define um novo servidor e sincroniza o relógio e a data do sistema.  
+  
+    w32tm /config /manualpeerlist:pool.ntp.br /syncfromflags:manual /update
+    net start w32time 
+    w32tm /resync /force
+   
+}  
+#endregion
 '@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
