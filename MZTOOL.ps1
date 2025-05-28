@@ -31,8 +31,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
 
 .LINK
-    https://github.com/DanielMozartt/MZTOOL
-    
+    https://github.com/DanielMozartt/MZTOOL    
 #>
 
 #MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
@@ -107,7 +106,7 @@ function PSVER {
 PSVER
 
 function RESTARTADMIN {
-    Clear-Host
+    
     # Obtém o ID e o Objeto de Segurança do usuário atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
@@ -119,8 +118,8 @@ function RESTARTADMIN {
         #Script continua.
           
     }
-    # Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
 
+    # Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
     else {  
 
         $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
@@ -1923,15 +1922,13 @@ function WINGETAPPS {
 
         if ($LASTEXITCODE -ne 0) {
             if ($ERRORCODE -match "já instalado" -or $ERRORCODE -match "installed") {
-                Write-Host "$($APPFAIL.Id) JÁ INSTALADO."
+                Write-Host "$($_.Id) JÁ INSTALADO."
             }
             else {               
                 REDUNDANTINSTALL -APPFAIL $_               
             }
-        }        
-        # Clear-Host
+        }     
     }    
-    # Clear-Host
 }
 
 function WINGETUPGRADE { 
@@ -1995,8 +1992,8 @@ function MICROSOFT365 {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
     
     #Verifica se o Microsoft 365 já está instalado.
-    $MS365 = Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue
-    if (-not ($MS365)) {             
+    $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
+    if (-not (& $MS365)) {             
              
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
         [xml]$XML = @'
@@ -2019,7 +2016,7 @@ function MICROSOFT365 {
     <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
     <User Key="software\microsoft\office\16.0\word\options" Name="verticalruler" Value="1" Type="REG_DWORD" App="word16" Id="L_VerticalrulerPrintviewonly" />
   </AppSettings>
-  <Display Level="TRUE" AcceptEULA="TRUE" />
+  <Display Level="FALSE" AcceptEULA="TRUE" />
 </Configuration> 
 '@           
         $XML.save("$env:Temp\MICROSOFT365.xml") 
@@ -2091,7 +2088,7 @@ function MICROSOFT365 {
         @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
-        if ($MS365) { Start-Process WINWORD }
+        if (& $MS365) { Start-Process WINWORD }
     }
     
     else {
@@ -2109,9 +2106,9 @@ function OFFICE2007 {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> OFFICE2007"
 
     #Verifica se o Microsoft Office 2007 já está instalado.
-    $OFFICE2007 = Get-Command "C:\Program Files\Microsoft Office\Office12\WINWORD.EXE" -ErrorAction SilentlyContinue
+    $OFFICE2007 = { Get-Command "C:\Program Files\Microsoft Office\Office12\WINWORD.EXE" -ErrorAction SilentlyContinue }
    
-    if (-NOT ($OFFICE2007)) {                  
+    if (-NOT (& $OFFICE2007)) {                  
        
         $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
         $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
@@ -2173,7 +2170,7 @@ function OFFICE2007 {
     
             Start-Job -Name NETFX3 -ScriptBlock { 
                 $Host.UI.RawUI.WindowTitle = "$Global:TITLE> .NETFRAMEWORK3.5"
-                Dism.exe /Online /NoRestart /Add-Package /PackagePath:C:\TOOL\OFFICE\2007\NetFx35\update.mum | Out-Null
+                Dism.exe /Online /NoRestart /Add-Package /PackagePath:$OFFICE2007FOLDER\NetFx35\update.mum | Out-Null
             } | Out-Null
         
         }
@@ -2185,7 +2182,7 @@ function OFFICE2007 {
         #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
         Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
         Wait-Job -Name NetFx3 | Out-Null
-        Start-Process 'winword.exe'
+        if (& $OFFICE2007) { Start-Process 'winword.exe' }
 
     }
     else {
