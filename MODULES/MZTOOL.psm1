@@ -252,14 +252,7 @@ function CLOUDSTATUS {
         [STRING]$URL,
         [STRING]$CLOUD
     )
-    #$URLCLOUD = Get-Variable -Name "`$$PATH$CLOUD" -ValueOnly
-    #$URLCLOUD = Get-Variable -Name ""$PATH"$CLOUD"" -ValueOnly
-    #$URLCLOUD = $(if (Get-Variable -Name "$PATH$CLOUD" -ErrorAction SilentlyContinue) { Get-Variable -Name "$PATH$CLOUD" -ValueOnly } else { $null })
-    Pause
-    Write-Host "$URL"
-    Pause
-    TESTLINK -Url $URL
-    PAUSE
+  
     Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URL) {
             Write-Host "ONLINE" -ForegroundColor Green
         }    
