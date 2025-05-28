@@ -1356,8 +1356,8 @@ function DOWNLOADMZTOOL {
     TOOLDIR
     
     # Exibe o status dos links 
-    CLOUDSTATUS -PATH MZTOOL -CLOUD ONEDRIVE
-    CLOUDSTATUS -PATH MZTOOL -CLOUD GOOGLEDRIVE   
+    CLOUDSTATUS -URL $MZTOOLONEDRIVE -CLOUD ONEDRIVE
+    CLOUDSTATUS -URL $MZTOOLGOOGLEDRIVE -CLOUD GOOGLEDRIVE   
     
     # Lista de URLs para teste (OneDrive + Google Drive como fallback)
     $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)
@@ -1858,11 +1858,10 @@ function OFFICE2007 {
 
                 New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
 
-            }        
-                   
+            }                           
            
-            CLOUDSTATUS -PATH OFFICE2007 -CLOUD ONEDRIVE
-            CLOUDSTATUS -PATH OFFICE2007 -CLOUD GOOGLEDRIVE
+            CLOUDSTATUS -URL $OFFICE2007ONEDRIVE -CLOUD ONEDRIVE
+            CLOUDSTATUS -URL $OFFICE2007GOOGLEDRIVE -CLOUD GOOGLEDRIVE
       
             do {
                 DOWNLOAD -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30

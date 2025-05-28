@@ -249,18 +249,18 @@ function TESTLINK {
 # Exibe o status dos links
 function CLOUDSTATUS {
     param (
-        [STRING]$PATH,
+        [STRING]$URL,
         [STRING]$CLOUD
     )
-    $URLCLOUD = Get-Variable -Name "`$$PATH$CLOUD" -ValueOnly
+    #$URLCLOUD = Get-Variable -Name "`$$PATH$CLOUD" -ValueOnly
     #$URLCLOUD = Get-Variable -Name ""$PATH"$CLOUD"" -ValueOnly
     #$URLCLOUD = $(if (Get-Variable -Name "$PATH$CLOUD" -ErrorAction SilentlyContinue) { Get-Variable -Name "$PATH$CLOUD" -ValueOnly } else { $null })
     Pause
-    Write-Host "$URLCLOUD"
+    Write-Host "$URL"
     Pause
-    TESTLINK -Url $URLCLOUD
+    TESTLINK -Url $URL
     PAUSE
-    Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
+    Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URL) {
             Write-Host "ONLINE" -ForegroundColor Green
         }    
         else {
