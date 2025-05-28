@@ -700,7 +700,7 @@ function UNINSTALLOFFICE {
                 #        $uninstallCmd = $uninstallCmd + " /quiet /norestart"
                 #   }
                 Write-Warning "GUID não encontrado para $($app.DisplayName). Tentando UnistallString."
-                #cmd /c $app.UninstallString 
+         
                 Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait -NoNewWindow
             }
             else {
@@ -716,15 +716,26 @@ function UNINSTALLOFFICE {
         Write-Host "Foram encontradas as seguintes entradas do Office:" -ForegroundColor Cyan
         foreach ($app in $InstalledOffice) {
             Write-Host "$($app.DisplayName) - Versão: $($app.DisplayVersion)" -ForegroundColor Green
-        }
-    
-        # Se desejar executar a desinstalação, descomente a linha abaixo:
+        }         
         Uninstall-OfficeApps -OfficeApps $InstalledOffice
     }
     else {
         Write-Host "Nenhuma instalação do Office foi encontrada." -ForegroundColor Yellow
     }
-    
+
+    $StillInstalled = (Get-AllInstalledOffice).Count -gt 0
+
+    # Para facilitar a reusabilidade, você pode retornar ou gravar esse valor em uma variável que
+    # será usada posteriormente na lógica de instalação.
+    if ($StillInstalled) {
+        Write-Host "Ainda há instalações do Office presentes." -ForegroundColor Red
+    }
+    else {
+        Write-Host "Versão(s) do Office desinstaladas com sucesso." -ForegroundColor Green
+    }
+
+    # Retorna o estado final (true se ainda instalado, false se não)
+    return $StillInstalled
 }
 
 function CLEANTEMP {

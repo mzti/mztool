@@ -1993,7 +1993,8 @@ function MICROSOFT365 {
     
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
-    if (-not (& $MS365)) {             
+    $INSTALLED = UNINSTALLOFFICE
+    if (-not ($INSTALLED)) {             
              
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
         [xml]$XML = @'
@@ -2093,7 +2094,7 @@ function MICROSOFT365 {
     
     else {
         #Script continua.
-        Write-Host 'MICROSOFT 365 JÁ INSTALADO.'    
+        Write-Host "MICROSOFT 365 OU OFFICE JÁ INSTALADO.`nDESINSTALE AS VERSÕES JÁ INSTALADAS PARA CONTINUAR"    
         Start-Sleep -Seconds 2
     }   
 
