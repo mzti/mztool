@@ -237,7 +237,7 @@ function NEWPWSH {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string[]]$FunctionNames,
+        [string[]]$Functions,
         [switch]$Wait,
         [switch]$ReturnProcess,
         [switch]$Hidden
@@ -245,7 +245,7 @@ function NEWPWSH {
     
    
     # Combina as definições das funções (preservando a ordem)
-    $combinedDefinitions = foreach ($fn in $FunctionNames) {
+    $combinedDefinitions = foreach ($fn in $Functions) {
          (Get-Command -Type Function GETMZTOOLMODULE).Definition      
         # Junta o código pré-carregado com a definição da função específica.
          (Get-Command -Type Function $fn).Definition
@@ -329,10 +329,10 @@ function DEPLOYFUNCTION {
 
     foreach ($group in $DEPLOYFUNCTIONHASH) {
         if ($group.ContainsKey("Wait") -and $group.Wait) {
-            NEWPWSH -FunctionNames $group.Functions -Wait
+            NEWPWSH -Functions $group.Functions -Wait
         }
         else {
-            NEWPWSH -FunctionNames $group.Functions
+            NEWPWSH -Functions $group.Functions
         }
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
@@ -793,7 +793,7 @@ $Global:ENVIROMENTVARS = @{
     $_
 }
 
-NEWPWSH -FunctionNames 'CLOCKDATE' -Hidden
+NEWPWSH -Functions 'CLOCKDATE' -Hidden
 
 <#
 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
@@ -1074,8 +1074,8 @@ ______________________________________________________
 |____________________________________________________|
 '
                         $Null = @(                             
-                            NEWPWSH -FunctionNames 'WINGETMODULE' -ReturnProcess
-                            NEWPWSH -FunctionNames 'WINUPDATEMODULE' -ReturnProcess
+                            NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess
+                            NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
          
                         CLEANTEMP
@@ -1105,8 +1105,8 @@ ______________________________________________________
 |____________________________________________________|
 ' 
                         $Null = @(
-                            NEWPWSH -FunctionNames 'WINGETUPGRADE' -ReturnProcess
-                            NEWPWSH -FunctionNames 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
+                            NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess
+                            NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
 
                         CLEANTEMP
@@ -1177,7 +1177,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
  '
-                        NEWPWSH -FunctionNames 'UNINSTALLOFFICE' -Wait
+                        NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
 
                         OFFICE2007
 
@@ -1206,9 +1206,9 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '    
-                        NEWPWSH -FunctionNames 'UNINSTALLOFFICE' -Wait
+                        NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
                                                
-                        NEWPWSH -FunctionNames 'MICROSOFT365' -Wait                        
+                        NEWPWSH -Functions 'MICROSOFT365' -Wait                        
 
                         CLEANTEMP
              
@@ -1263,7 +1263,7 @@ ______________________________________________________
         #Testa a função ANYDESK.
         any {
 
-            NEWPWSH -FunctionNames 'ANYDESK' 
+            NEWPWSH -Functions 'ANYDESK' 
             DISPLAYMENU
 
         }    
@@ -1271,7 +1271,7 @@ ______________________________________________________
         #Testa a função WINGETAPPS.
         w {
             
-            NEWPWSH -FunctionNames 'WINGETAPPS' -Wait
+            NEWPWSH -Functions 'WINGETAPPS' -Wait
             DISPLAYMENU
 
         }
@@ -1279,7 +1279,7 @@ ______________________________________________________
         #Testa a função WINUPDATE.
         u {
 
-            NEWPWSH -FunctionNames 'WINUPDATEMODULE', 'WINUPDATE' -Wait
+            NEWPWSH -Functions 'WINUPDATEMODULE', 'WINUPDATE' -Wait
             DISPLAYMENU
 
         }
@@ -1287,7 +1287,7 @@ ______________________________________________________
         #Testa a função CLOCKDATE.
         h {
 
-            NEWPWSH -FunctionNames 'CLOCKDATE'
+            NEWPWSH -Functions 'CLOCKDATE'
             DISPLAYMENU
 
         }
@@ -1295,7 +1295,7 @@ ______________________________________________________
         #Testa a função PRO.
         p {
 
-            NEWPWSH -FunctionNames 'PRO' 
+            NEWPWSH -Functions 'PRO' 
             DISPLAYMENU
 
         }
@@ -1303,7 +1303,7 @@ ______________________________________________________
         #Testa a função IMGHEALTH.
         sfc {
 
-            NEWPWSH -FunctionNames 'IMGHEALTH', 'CLEANTEMP'             
+            NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP'             
             DISPLAYMENU
 
         }
@@ -1312,7 +1312,7 @@ ______________________________________________________
         db {
 
             DOWNLOADMZTOOL
-            NEWPWSH -FunctionNames 'DRIVERBOOSTER'
+            NEWPWSH -Functions 'DRIVERBOOSTER'
             DISPLAYMENU
 
         }

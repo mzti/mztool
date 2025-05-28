@@ -99,7 +99,7 @@ function NEWPWSH {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string[]]$FunctionNames,
+        [string[]]$Functions,
         [switch]$Wait,
         [switch]$ReturnProcess,
         [switch]$Hidden
@@ -108,7 +108,7 @@ function NEWPWSH {
     $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
 
     # Junta as definições das funções especificadas
-    $funcDefinitions = foreach ($fn in $FunctionNames) {
+    $funcDefinitions = foreach ($fn in $Functions) {
     (Get-Command -Type Function $fn).Definition
     } -join "`n"
 
@@ -207,9 +207,9 @@ function DEPLOYFUNCTION {
 
         # Monta a tabela de parâmetros para passar à função NEWPWSH
         $arguments = @{
-            FunctionNames = $group.Functions
-            Wait          = $WAIT
-            Hidden        = $hiddenParam
+            Functions = $group.Functions
+            Wait      = $WAIT
+            Hidden    = $hiddenParam
         }
 
         # Chama a função passando os parâmetros via splatting
