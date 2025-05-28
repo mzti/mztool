@@ -1884,7 +1884,7 @@ function OFFICE2007 {
             ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
             )
         
-            Write-Host "`nHASH`n$OFFICE2007HASH`n"$($NEWOFFICE2007HASH.Hash)"" -ForegroundColor Green
+            Write-Host "`nHASH`n$OFFICE2007HASH`n$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
                    
             EXPAND -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
