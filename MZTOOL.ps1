@@ -1354,23 +1354,7 @@ function DOWNLOADMZTOOL {
     $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     TOOLDIR
-    function CLOUDSTATUS {
-        param (
-            [STRING]$PATH,
-            [STRING]$CLOUD
-        )
-        <#$URLCLOUD = Get-Variable -Name "$LINK$CLOUD" -ValueOnly
-        $URLCLOUD = Get-Variable -Name ""$PATH"$CLOUD"" -ValueOnly#>
-        $URLCLOUD = $(if (Get-Variable -Name "$PATH$CLOUD" -ErrorAction SilentlyContinue) { Get-Variable -Name "$PATH$CLOUD" -ValueOnly } else { $null })
-        Pause
-        Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
-                Write-Host "ONLINE" -ForegroundColor Green
-            }    
-            else {
-                Write-Host "OFFLINE" -ForegroundColor Red
-            })
     
-    }
     # Exibe o status dos links 
     CLOUDSTATUS -PATH MZTOOL -CLOUD ONEDRIVE
     CLOUDSTATUS -PATH MZTOOL -CLOUD GOOGLEDRIVE   
@@ -1875,27 +1859,7 @@ function OFFICE2007 {
                 New-Item -Path $OFFICE2007FOLDER -ItemType Directory -Force | Out-Null
 
             }        
-            function CLOUDSTATUS {
-                param (
-                    [STRING]$PATH,
-                    [STRING]$CLOUD
-                )
-                $URLCLOUD = Get-Variable -Name "$PATH$CLOUD" -ValueOnly
-                #$URLCLOUD = Get-Variable -Name ""$PATH"$CLOUD"" -ValueOnly
-                #$URLCLOUD = $(if (Get-Variable -Name "$PATH$CLOUD" -ErrorAction SilentlyContinue) { Get-Variable -Name "$PATH$CLOUD" -ValueOnly } else { $null })
-                Pause
-                Write-Host "$URLCLOUD"
-                Pause
-                TESTLINK -Url $URLCLOUD
-                PAUSE
-                Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
-                        Write-Host "ONLINE" -ForegroundColor Green
-                    }    
-                    else {
-                        Write-Host "OFFLINE" -ForegroundColor Red
-                    })
-            
-            }                
+                   
            
             CLOUDSTATUS -PATH OFFICE2007 -CLOUD ONEDRIVE
             CLOUDSTATUS -PATH OFFICE2007 -CLOUD GOOGLEDRIVE

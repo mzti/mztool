@@ -252,10 +252,14 @@ function CLOUDSTATUS {
         [STRING]$PATH,
         [STRING]$CLOUD
     )
-    <#$URLCLOUD = Get-Variable -Name "$LINK$CLOUD" -ValueOnly
-    $URLCLOUD = Get-Variable -Name ""$PATH"$CLOUD"" -ValueOnly#>
-    $URLCLOUD = $(if (Get-Variable -Name "$PATH$CLOUD" -ErrorAction SilentlyContinue) { Get-Variable -Name "$PATH$CLOUD" -ValueOnly } else { $null })
+    $URLCLOUD = Get-Variable -Name "$PATH$CLOUD" -ValueOnly
+    #$URLCLOUD = Get-Variable -Name ""$PATH"$CLOUD"" -ValueOnly
+    #$URLCLOUD = $(if (Get-Variable -Name "$PATH$CLOUD" -ErrorAction SilentlyContinue) { Get-Variable -Name "$PATH$CLOUD" -ValueOnly } else { $null })
     Pause
+    Write-Host "$URLCLOUD"
+    Pause
+    TESTLINK -Url $URLCLOUD
+    PAUSE
     Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
             Write-Host "ONLINE" -ForegroundColor Green
         }    
@@ -263,7 +267,7 @@ function CLOUDSTATUS {
             Write-Host "OFFLINE" -ForegroundColor Red
         })
 
-}
+}     
 
 function DOWNLOADPROGRESS {
     param(
