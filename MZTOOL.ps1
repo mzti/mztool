@@ -1362,7 +1362,7 @@ function DOWNLOADMZTOOL {
         
         $URLCLOUD = Get-Variable -Name "$CLOUD`LINK" -ValueOnly
     
-        Write-Host "                 "$($CLOUD)"     = " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
+        Write-Host "               "$($CLOUD)"       = " -NoNewline; $(if (TESTLINK -Url $URLCLOUD) {
                 Write-Host "ONLINE     " -ForegroundColor Green
             }    
             else {
