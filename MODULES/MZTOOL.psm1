@@ -252,7 +252,7 @@ function CLOUDSTATUS {
         [STRING]$PATH,
         [STRING]$CLOUD
     )
-    $URLCLOUD = Get-Variable -Name "$PATH$CLOUD" -ValueOnly
+    $URLCLOUD = Get-Variable -Name "`$$PATH$CLOUD" -ValueOnly
     #$URLCLOUD = Get-Variable -Name ""$PATH"$CLOUD"" -ValueOnly
     #$URLCLOUD = $(if (Get-Variable -Name "$PATH$CLOUD" -ErrorAction SilentlyContinue) { Get-Variable -Name "$PATH$CLOUD" -ValueOnly } else { $null })
     Pause
