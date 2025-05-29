@@ -1459,7 +1459,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
  '
-                        NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
+                        #NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
 
                         OFFICE2007
 
