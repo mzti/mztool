@@ -148,18 +148,16 @@ function NEWPWSH {
         [switch]$ReturnProcess,
         [switch]$Hidden
     )    
-    
-    # Obtém a definição base e as definições específicas das funções
+      
     $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
     $funcDefinitions = foreach ($fn in $Functions) {
         (Get-Command -Type Function $fn).Definition
     } -join "`n"
-    $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
-
-    # Codifica o comando combinado em Base64 para o parâmetro -EncodedCommand
-    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
     
+    $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
   
+    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+      
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = "powershell.exe"   
     $psi.Arguments = "-EncodedCommand `"$encodedCommand`""
@@ -170,6 +168,7 @@ function NEWPWSH {
         $psi.WindowStyle = 'Hidden'
         $psi.CreateNoWindow = $true
     }
+
     else {
         $psi.CreateNoWindow = $false
     }
