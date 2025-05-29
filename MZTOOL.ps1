@@ -2052,7 +2052,7 @@ function MICROSOFT365 {
 
         else {
             Clear-Host
-            Write-Host'
+            Write-Host '
 ______________________________________________________
 |                                                    |        
 |                      MZTOOL                        |
