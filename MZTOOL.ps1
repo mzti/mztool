@@ -1418,6 +1418,9 @@ ______________________________________________________
         4 {
 
             function DISPLAYMENU4 {
+                param(
+                    [switch]$CHOICE
+                )
             
                 Clear-Host            
                 Write-Host '
@@ -1428,8 +1431,8 @@ ______________________________________________________
 |                 MICROSOFT OFFICE                   |
 |                                                    |
 |                                                    |
-| |1| INSTALAR OFFICE 2007                           | 
-| |2| INSTALAR OFFICE 365                            |
+| |1| INSTALAR OFFICE 365                            | 
+| |2| INSTALAR OFFICE 2007                           |
 | |3| VOLTAR                                         |
 |                                                    |
 |                                                    |
@@ -1437,9 +1440,81 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                $CHOICE = if ($null) { Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA' }
                 switch ($CHOICE) {
+                   
                     1 {
+                        #Verifica se há conexão com internet.
+                        INTERNET
+
+                        Clear-Host
+                        Write-Host '
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| _________________________________________________  | 
+|               MICROSOFT OFFICE 365                 |
+|                                                    |
+|                                                    |
+|                    INSTALANDO                      |
+|                                                    |
+|                                                    |
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|
+'    
+                                        
+                        $365STATUS = NEWPWSH -Functions 'MICROSOFT365' -Wait
+                        if ($365STATUS -eq 2) {
+                            Clear-Host
+                            Write-Host '
+______________________________________________________
+|                                                    |        
+|                      MZTOOL                        |
+| _________________________________________________  |
+|               MICROSOFT OFFICE 365                 |
+|                                                    |
+|       SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
+|                                                    |
+|   |1| TENTAR NOVAMENTE                             |
+|   |2| VOLTAR AO MENU                               |
+|                                                    |
+|                                                    |      
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|  
+'
+                            $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                            switch ($CHOICE) {
+                                1 {
+                                    if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
+                                    DISPLAYMENU4 -CHOICE 1
+                                }
+                                2 {
+                                    DISPLAYMENU                     
+                                }
+                                default {
+                                    ENTRYERROR
+                                } 
+                            }  
+                        }
+
+                        elseif (-eq 3) {
+                            Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
+                            Start-Sleep -Seconds 5
+                            break
+                        }
+
+                        else {
+                            break
+                        }                      
+                      
+                        CLEANTEMP
+             
+                        DISPLAYMENU 
+                    }
+
+                    2 {
                         #Verifica se há conexão com internet.
                         INTERNET
 
@@ -1467,36 +1542,7 @@ ______________________________________________________
 
                         DISPLAYMENU
                     }
-
-                    2 {
-                        #Verifica se há conexão com internet.
-                        INTERNET
-
-                        Clear-Host
-                        Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|               MICROSOFT OFFICE 365                 |
-|                                                    |
-|                                                    |
-|                    INSTALANDO                      |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'    
-                        #NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
-                                               
-                        NEWPWSH -Functions 'MICROSOFT365' -Wait                        
-
-                        CLEANTEMP
-             
-                        DISPLAYMENU 
-                    }
-
+               
                     3 {
 
                         DISPLAYMENU
@@ -1993,7 +2039,7 @@ function MICROSOFT365 {
     
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
-    $INSTALLED = UNINSTALLOFFICE
+    $INSTALLED = NEWPWSH -Function 'UNINSTALLOFFICE' -Wait
     if (-not ($INSTALLED)) {             
              
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
@@ -2051,37 +2097,7 @@ function MICROSOFT365 {
         }
 
         else {
-            Clear-Host
-            Write-Host '
-______________________________________________________
-|                                                    |        
-|                      MZTOOL                        |
-| _________________________________________________  |
-|               MICROSOFT OFFICE 365                 |
-|                                                    |
-|       SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
-|                                                    |
-|   |1| TENTAR NOVAMENTE                             |
-|   |2| VOLTAR AO MENU                               |
-|                                                    |
-|                                                    |      
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|  
-'
-            $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-            switch ($CHOICE) {
-                1 {
-                    if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
-                    DISPLAYMENU4
-                }
-                2 {
-                    DISPLAYMENU
-                }
-                default {
-                    ENTRYERROR
-                }
-            }
+            $365STATUS = "2"            
         }    
     
         #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
@@ -2089,14 +2105,21 @@ ______________________________________________________
         @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
-        if (& $MS365) { Start-Process WINWORD }
+        if (& $MS365) { 
+            
+            Start-Process WINWORD 
+
+            $365STATUS = "1"
+
+        }
     }
     
-    else {
-        Clear-Host
-        Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
-        Start-Sleep -Seconds 5
+    else {        
+        
+        $365STATUS = "3"
     }   
+
+    return $365STATUS
 
 }   
 
