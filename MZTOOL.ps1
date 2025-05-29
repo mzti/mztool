@@ -2100,7 +2100,7 @@ function MICROSOFT365 {
         }
 
         else {
-            $365STATUS = "2"            
+            $365STATUS = 2            
         }    
     
         #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
@@ -2112,14 +2112,14 @@ function MICROSOFT365 {
             
             Start-Process WINWORD 
 
-            $365STATUS = "1"
+            $365STATUS = 1
 
         }
     }
     
     else {        
         
-        $365STATUS = "3"
+        $365STATUS = 3
     }   
 
     return $365STATUS
