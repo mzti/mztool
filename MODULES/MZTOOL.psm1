@@ -178,20 +178,18 @@ function NEWPWSH {
     else {
         $psi.CreateNoWindow = $false
     }
-    
-    # Inicia o processo
+
     $process = [System.Diagnostics.Process]::Start($psi)
-    
-    # Se for necessário obter a saída, esperamos a finalização do processo e lê-la diretamente
+
     if ($Wait) {
-        
-        $process.WaitForExit()              
-      
-    } if ($ReturnProcess) {
-             
-        # Retorna a saída.
-        return $process
-    }  
+        $process.WaitForExit()
+    }
+    
+    if ($ReturnProcess) {
+        $output = $process.StandardOutput.ReadToEnd()
+        return $output
+    }
+    
 }
 
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
