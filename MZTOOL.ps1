@@ -1419,7 +1419,7 @@ ______________________________________________________
 
             function DISPLAYMENU4 {
                 param(
-                    [switch]$CHOICE4
+                    [int]$CHOICE4
                 )
             
                 Clear-Host            
@@ -1440,7 +1440,9 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                $CHOICE4 = if ($null) { Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA' }
+                if (-not $CHOICE4) {
+                    $CHOICE4 = [int](Read-Host 'INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA')
+                }
                 switch ($CHOICE4) {
                    
                     1 {
