@@ -2094,7 +2094,7 @@ function MICROSOFT365 {
     
     else {
         Clear-Host
-        Write-Warning "FOI ENCONTRADA UMA VERSÃO DO MICROSOFT 365 OU OFFICE JÁ INSTALADO.`nDESINSTALE AS VERSÕES JÁ INSTALADAS PARA CONTINUAR"    
+        Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
         Start-Sleep -Seconds 5
     }   
 
@@ -2187,9 +2187,9 @@ function OFFICE2007 {
 
     }
     else {
-        #Script continua.
-        Write-Host 'MICROSOFT OFFICE 2007 JÁ INSTALADO.'    
-        Start-Sleep -Seconds 2
+        Clear-Host
+        Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
+        Start-Sleep -Seconds 5
     }        
    
 }
