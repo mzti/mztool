@@ -165,11 +165,11 @@ function NEWPWSH {
     # Utilize a propriedade "Arguments" para incluir os argumentos ou ArgumentList (se disponível na sua versão)
     $psi.Arguments = "-NoProfile -NonInteractive -EncodedCommand `"$encodedCommand`""
     
-    # Para que seja possível redirecionar a saída, UseShellExecute deve ser $false
+    <## Para que seja possível redirecionar a saída, UseShellExecute deve ser $false
     $psi.UseShellExecute = $false
     $psi.RedirectStandardOutput = $true
     $psi.RedirectStandardError = $true
-
+#>
     # Configura a exibição da janela conforme o switch
     if ($Hidden) {
         $psi.WindowStyle = 'Hidden'
