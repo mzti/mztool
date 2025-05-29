@@ -767,9 +767,6 @@ function UNINSTALLOFFICE {
 
     $StillInstalled = (Get-AllInstalledOffice).Count -gt 0
 
-    # Para facilitar a reusabilidade, você pode retornar ou gravar esse valor em uma variável que
-    # será usada posteriormente na lógica de instalação.
-
     # Retorna o estado final (true se ainda instalado, false se não)
     return $StillInstalled
 }
