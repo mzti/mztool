@@ -2039,12 +2039,14 @@ function MICROSOFT365 {
     #Implementação do Microsoft Office 365.
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
-    
+    Pause
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
+    Pause
     $INSTALLED = NEWPWSH -Function 'UNINSTALLOFFICE' -Wait
+    Pause
     if (-not ($INSTALLED)) {             
-             
+        Pause
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
         [xml]$XML = @'
 <Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
