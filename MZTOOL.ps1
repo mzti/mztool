@@ -2093,9 +2093,9 @@ function MICROSOFT365 {
     }
     
     else {
-        #Script continua.
-        Write-Host "MICROSOFT 365 OU OFFICE JÁ INSTALADO.`nDESINSTALE AS VERSÕES JÁ INSTALADAS PARA CONTINUAR"    
-        Start-Sleep -Seconds 2
+        Clear-Host
+        Write-Warning "FOI ENCONTRADA UMA VERSÃO DO MICROSOFT 365 OU OFFICE JÁ INSTALADO.`nDESINSTALE AS VERSÕES JÁ INSTALADAS PARA CONTINUAR"    
+        Start-Sleep -Seconds 5
     }   
 
 }   
@@ -2108,8 +2108,8 @@ function OFFICE2007 {
 
     #Verifica se o Microsoft Office 2007 já está instalado.
     $OFFICE2007 = { Get-Command "C:\Program Files\Microsoft Office\Office12\WINWORD.EXE" -ErrorAction SilentlyContinue }
-   
-    if (-NOT (& $OFFICE2007)) {                  
+    $INSTALLED = UNINSTALLOFFICE
+    if (-NOT ($INSTALLED)) {                  
        
         $OFFICE2007ONEDRIVE = 'https://onedrive.live.com/download?resid=38337AA4158B3DEB%21974509&authkey=%21AAzWa7EgnsCYXYg'
         $OFFICE2007GOOGLEDRIVE = $OFFICE2007ONEDRIVE
