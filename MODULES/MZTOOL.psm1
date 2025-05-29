@@ -93,7 +93,7 @@ function TOOLDIR {
     $TOOLFOLDER.Attributes = 'Hidden' 
 
 }
-<#
+
 function NEWPWSH {
     [CmdletBinding()]
     param(
@@ -142,8 +142,9 @@ function NEWPWSH {
         return
     }
     
-}#>
+}
 
+<#
 function NEWPWSH {
     [CmdletBinding()]
     param(
@@ -193,6 +194,7 @@ function NEWPWSH {
     }   
     else {}
 }
+#>
 
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
 function DEPLOYFUNCTIONPROGRESS {
