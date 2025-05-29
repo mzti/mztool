@@ -159,18 +159,13 @@ function NEWPWSH {
     # Codifica o comando combinado em Base64 para o parâmetro -EncodedCommand
     $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
     
-    # Configura o ProcessStartInfo
+  
     $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = "powershell.exe"
-    # Utilize a propriedade "Arguments" para incluir os argumentos ou ArgumentList (se disponível na sua versão)
+    $psi.FileName = "powershell.exe"   
     $psi.Arguments = "-NoProfile -NonInteractive -EncodedCommand `"$encodedCommand`""
-    
-    <## Para que seja possível redirecionar a saída, UseShellExecute deve ser $false
-    $psi.UseShellExecute = $false
+    $psi.UseShellExecute = $false  
     $psi.RedirectStandardOutput = $true
-    $psi.RedirectStandardError = $true
-#>
-    # Configura a exibição da janela conforme o switch
+    
     if ($Hidden) {
         $psi.WindowStyle = 'Hidden'
         $psi.CreateNoWindow = $true
@@ -180,7 +175,7 @@ function NEWPWSH {
     }
 
     $process = [System.Diagnostics.Process]::Start($psi)
-
+   
     if ($Wait) {
         $process.WaitForExit()
     }
