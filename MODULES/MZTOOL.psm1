@@ -178,8 +178,10 @@ function NEWPWSH {
     if ($Wait) {
         $process.WaitForExit()
     }
-    $output = $process.StandardOutput.ReadToEnd()
-    return $output    
+    if ($ReturnProcess) {
+        $output = $process.StandardOutput.ReadToEnd()
+        return $output
+    }   
 }
 
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
