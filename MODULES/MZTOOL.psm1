@@ -93,7 +93,7 @@ function TOOLDIR {
     $TOOLFOLDER.Attributes = 'Hidden' 
 
 }
-
+<#
 function NEWPWSH {
     [CmdletBinding()]
     param(
@@ -142,8 +142,8 @@ function NEWPWSH {
         return
     }
     
-}
-<#
+}#>
+
 function NEWPWSH {
     [CmdletBinding()]
     param(
@@ -179,16 +179,21 @@ function NEWPWSH {
     }
 
     $process = [System.Diagnostics.Process]::Start($psi)
-   
-    if ($Wait) {
+    if ($Wait -and $ReturnProcess) {
+        $process.WaitForExit()
+        $output = $process.StandardOutput.ReadToEnd()
+        return $output
+    } 
+    elseif ($Wait) {
         $process.WaitForExit()
     }
-    if ($ReturnProcess) {
+    elseif ($ReturnProcess) {
         $output = $process.StandardOutput.ReadToEnd()
         return $output
     }   
+    else {}
 }
-#>
+
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
 function DEPLOYFUNCTIONPROGRESS {
     param(
