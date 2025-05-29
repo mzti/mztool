@@ -1506,11 +1506,11 @@ ______________________________________________________
                         elseif ($365STATUS -eq 3) {
                             Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
                             Start-Sleep -Seconds 5
-                            break
+                            
                         }
 
                         else {
-                            break
+                            #SCRIPT CONTINUA.
                         }                      
                       
                         CLEANTEMP
@@ -2112,6 +2112,7 @@ function MICROSOFT365 {
         @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
+        
         if (& $MS365) { 
             
             Start-Process WINWORD 
