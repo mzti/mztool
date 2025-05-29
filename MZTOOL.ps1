@@ -1488,7 +1488,7 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '    
-                        NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
+                        #NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
                                                
                         NEWPWSH -Functions 'MICROSOFT365' -Wait                        
 
