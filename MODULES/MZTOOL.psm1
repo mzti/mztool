@@ -188,13 +188,9 @@ function NEWPWSH {
         $process.WaitForExit()              
       
     } if ($ReturnProcess) {
-        
-        $stdout = $process.StandardOutput.ReadToEnd()
-        $stderr = $process.StandardError.ReadToEnd()
-        $output = $stdout + "`n" + $stderr
-        
-        # Retorna a saída combinada (ou, se preferir, apenas stdout)
-        return $output
+             
+        # Retorna a saída.
+        return $process
     }  
 }
 
