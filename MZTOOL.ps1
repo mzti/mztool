@@ -1419,7 +1419,7 @@ ______________________________________________________
 
             function DISPLAYMENU4 {
                 param(
-                    [switch]$CHOICE
+                    [switch]$CHOICE4
                 )
             
                 Clear-Host            
@@ -1440,8 +1440,8 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-                $CHOICE = if ($null) { Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA' }
-                switch ($CHOICE) {
+                $CHOICE4 = if ($null) { Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA' }
+                switch ($CHOICE4) {
                    
                     1 {
                         #Verifica se há conexão com internet.
@@ -1488,7 +1488,7 @@ ______________________________________________________
                             switch ($CHOICE) {
                                 1 {
                                     if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
-                                    DISPLAYMENU4 -CHOICE 1
+                                    DISPLAYMENU4 -CHOICE4 1
                                 }
                                 2 {
                                     DISPLAYMENU                     
