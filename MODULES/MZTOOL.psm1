@@ -93,7 +93,7 @@ function TOOLDIR {
     $TOOLFOLDER.Attributes = 'Hidden' 
 
 }
-
+<#
 function NEWPWSH {
     [CmdletBinding()]
     param(
@@ -138,6 +138,64 @@ function NEWPWSH {
         return
     }
     
+}#>
+function NEWPWSH {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Functions,
+        [switch]$Wait,
+        [switch]$ReturnProcess,
+        [switch]$Hidden
+    )    
+    
+    # Obtém a definição base e as definições específicas das funções
+    $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
+    $funcDefinitions = foreach ($fn in $Functions) {
+        (Get-Command -Type Function $fn).Definition
+    } -join "`n"
+    $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
+
+    # Codifica o comando combinado em Base64 para o parâmetro -EncodedCommand
+    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+    
+    # Configura o ProcessStartInfo
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = "powershell.exe"
+    # Utilize a propriedade "Arguments" para incluir os argumentos ou ArgumentList (se disponível na sua versão)
+    $psi.Arguments = "-NoProfile -NonInteractive -EncodedCommand `"$encodedCommand`""
+    
+    # Para que seja possível redirecionar a saída, UseShellExecute deve ser $false
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+
+    # Configura a exibição da janela conforme o switch
+    if ($Hidden) {
+        $psi.WindowStyle = 'Hidden'
+        $psi.CreateNoWindow = $true
+    }
+    else {
+        $psi.CreateNoWindow = $false
+    }
+    
+    # Inicia o processo
+    $process = [System.Diagnostics.Process]::Start($psi)
+    
+    # Se for necessário obter a saída, esperamos a finalização do processo e lê-la diretamente
+    if ($Wait) {
+        
+        $process.WaitForExit()              
+      
+    } if ($ReturnProcess) {
+        
+        $stdout = $process.StandardOutput.ReadToEnd()
+        $stderr = $process.StandardError.ReadToEnd()
+        $output = $stdout + "`n" + $stderr
+        
+        # Retorna a saída combinada (ou, se preferir, apenas stdout)
+        return $output
+    }  
 }
 
 # Função para exibir a barra de progresso in-place em uma linha fixa.           

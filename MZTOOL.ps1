@@ -1466,7 +1466,7 @@ ______________________________________________________
 |____________________________________________________|
 '    
                                         
-                        $365STATUS = NEWPWSH -Functions 'MICROSOFT365' -Wait
+                        $365STATUS = NEWPWSH -Functions 'MICROSOFT365' -Wait -ReturnProcess
                         if ($365STATUS -eq 2) {
                             Clear-Host
                             Write-Host '
