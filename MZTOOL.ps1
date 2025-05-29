@@ -2045,6 +2045,7 @@ function MICROSOFT365 {
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
     Pause
     $INSTALLED = NEWPWSH -Function 'UNINSTALLOFFICE' -Wait
+    Write-Host "$INSTALLED"
     Pause
     if (-not ($INSTALLED)) {             
         Pause
