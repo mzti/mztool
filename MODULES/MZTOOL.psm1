@@ -769,12 +769,6 @@ function UNINSTALLOFFICE {
 
     # Para facilitar a reusabilidade, você pode retornar ou gravar esse valor em uma variável que
     # será usada posteriormente na lógica de instalação.
-    if ($StillInstalled) {
-        Write-Host "Ainda há instalações do Office presentes." -ForegroundColor Red
-    }
-    else {
-        Write-Host "Versão(s) do Office desinstaladas com sucesso." -ForegroundColor Green
-    }
 
     # Retorna o estado final (true se ainda instalado, false se não)
     return $StillInstalled
