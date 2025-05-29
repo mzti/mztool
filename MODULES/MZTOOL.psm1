@@ -121,6 +121,11 @@ function NEWPWSH {
         [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
         return
     }
+    elseif ($Wait -and $ReturnProcess) {
+        $proc = Start-Process powershell -ArgumentList $arguments -PassThru -Wait
+        Write-Host "$proc"
+        return $proc
+    }
     elseif ($Wait) {
         [void](Start-Process powershell -ArgumentList $arguments -Wait)
         return
