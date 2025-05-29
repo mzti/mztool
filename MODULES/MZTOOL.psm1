@@ -162,7 +162,7 @@ function NEWPWSH {
   
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = "powershell.exe"   
-    $psi.Arguments = "-NoProfile -NonInteractive -EncodedCommand `"$encodedCommand`""
+    $psi.Arguments = "-EncodedCommand `"$encodedCommand`""
     $psi.UseShellExecute = $false  
     $psi.RedirectStandardOutput = $true
     
