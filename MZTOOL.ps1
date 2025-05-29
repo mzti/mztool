@@ -1466,7 +1466,7 @@ ______________________________________________________
 |____________________________________________________|
 '    
                                         
-                        $365STATUS = NEWPWSH -Functions 'MICROSOFT365' -Wait
+                        $365STATUS = NEWPWSH -Functions 'MICROSOFT365' -Wait -ReturnProcess
                         Write-Host "$365STATUS"
                         pause
                         if ($365STATUS -eq "2") {
@@ -2045,7 +2045,7 @@ function MICROSOFT365 {
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
     Pause
-    $INSTALLED = NEWPWSH -Function 'UNINSTALLOFFICE' -Wait
+    $INSTALLED = NEWPWSH -Function 'UNINSTALLOFFICE' -Wait -ReturnProcess
     Write-Host "$INSTALLED"
     Pause
     if (-not ($INSTALLED)) {             
