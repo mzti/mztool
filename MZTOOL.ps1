@@ -2045,7 +2045,7 @@ function MICROSOFT365 {
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
     Pause
-    $INSTALLED = NEWPWSH -Function 'UNINSTALLOFFICE' -Wait -ReturnProcess
+    $INSTALLED = NEWPWSH -Function 'UNINSTALLOFFICE' -Wait
     Write-Host "$INSTALLED"
     Pause
     if (-not ($INSTALLED)) {             
@@ -2105,7 +2105,7 @@ function MICROSOFT365 {
         }
 
         else {
-            $365STATUS = 2            
+            $365STATUS = "2"            
         }    
     
         #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
@@ -2118,14 +2118,14 @@ function MICROSOFT365 {
             
             Start-Process WINWORD 
 
-            $365STATUS = 1
+            $365STATUS = "1"
 
         }
     }
     
     else {        
         
-        $365STATUS = 3
+        $365STATUS = "3"
     }   
 
     return $365STATUS

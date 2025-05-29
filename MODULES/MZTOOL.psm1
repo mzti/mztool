@@ -134,8 +134,7 @@ function NEWPWSH {
         return
     }
     elseif ($ReturnProcess) {
-        $proc = Start-Process powershell -ArgumentList $arguments -PassThru
-        Write-Host "$proc"
+        $proc = Start-Process powershell -ArgumentList $arguments -PassThru       
         return $proc
     }
     else {
