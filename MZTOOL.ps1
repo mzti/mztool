@@ -1714,7 +1714,9 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIPHASH | Where-Object ( $_ -eq $NEWMZTOOLZIPHASH.Hash ) | ForEach-Object {
         Write-Host "`nHASH = " ; Write-Host "`n"$($_)"`n"$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
     }
-              
+
+    RESETCURSOR   
+    
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
@@ -2191,7 +2193,9 @@ function OFFICE2007 {
             )
         
             Write-Host "`nHASH`n$OFFICE2007HASH`n$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
-                   
+           
+            RESETCURSOR      
+           
             EXPAND -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
             Remove-Item $OFFICE2007ZIP -Force -ErrorAction SilentlyContinue
