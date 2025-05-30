@@ -41,7 +41,7 @@ Clear-Host
 #VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
-$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" | Out-Null } 
+$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" } 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
