@@ -1467,10 +1467,18 @@ ______________________________________________________
 '    
                                         
                         $365STATUS = MICROSOFT365        
-                        
+
+                        if ($365STATUS -eq "1") {
+                    
+                            Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
+                            Start-Sleep -Seconds 5
+                    
+                        }
+
                         if ($365STATUS -eq "2") {
-                            Clear-Host
-                            Write-Host '
+                            function DISPLAYMENU4365ERROR {
+                                Clear-Host
+                                Write-Host '
 ______________________________________________________
 |                                                    |        
 |                      MZTOOL                        |
@@ -1487,22 +1495,23 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|  
 '
-                            $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-                            switch ($CHOICE) {
-                                1 {
-                                    $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
-                                    if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
-                                    DISPLAYMENU4 -CHOICE4 1
-                                }
-                                2 {
-                                    DISPLAYMENU                     
-                                }
-                                default {
-                                    ENTRYERROR
-                                } 
-                            }  
+                                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                                switch ($CHOICE) {
+                                    1 {
+                                        $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
+                                        if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
+                                        DISPLAYMENU4 -CHOICE4 1
+                                    }
+                                    2 {
+                                        DISPLAYMENU                     
+                                    }
+                                    default {
+                                        ENTRYERROR
+                                    } 
+                                }  
+                            }
+                            DISPLAYMENU4365ERROR
                         }
-
                         if ($365STATUS -eq "3") {
 
                             Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
@@ -1535,8 +1544,6 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
  '
-                        #NEWPWSH -Functions 'UNINSTALLOFFICE' -Wait
-
                         OFFICE2007
 
                         CLEANTEMP                   
