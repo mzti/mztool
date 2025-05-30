@@ -1711,8 +1711,6 @@ function DOWNLOADMZTOOL {
         ($NEWMZTOOLZIPHASH.Hash -notin @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2"))
     )
     
-    RESETCURSOR
-
     $MZTOOLZIPHASH | Where-Object ( $_ -eq $NEWMZTOOLZIPHASH.Hash ) | ForEach-Object {
         Write-Host "`nHASH = " ; Write-Host "`n"$($_)"`n"$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
     }
