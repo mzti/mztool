@@ -1457,7 +1457,7 @@ ______________________________________________________
 |                                                    |
 |                      MZTOOL                        |
 | _________________________________________________  | 
-|               MICROSOFT OFFICE 365                 |
+|                   MICROSOFT 365                    |
 |                                                    |
 |                                                    |
 |                    INSTALANDO                      |
@@ -1485,19 +1485,36 @@ ______________________________________________________
 |                                                    |        
 |                      MZTOOL                        |
 | _________________________________________________  |
-|               MICROSOFT OFFICE 365                 |
+|                   MICROSOFT 365                    |
 |                                                    |
 |       SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
 |                                                    |
 |   |1| TENTAR NOVAMENTE                             |
-|   |2| VOLTAR AO MENU                               |
-|   |0| ENCERRAR MZTOOL                              |
-|                                                    |      
+|   |2| IGNORAR & CONTINUAR                          |
+|   |3| VOLTAR AO MENU                               |
+|   |0| ENCERRAR MZTOOL                              |      
 |                                                    |
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|  
-'
-                                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+' 
+                                Write-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
+                               
+                                $timeoutEmSegundos = 10
+                                
+                                $cronometro = [System.Diagnostics.Stopwatch]::StartNew()
+                                while (-not [System.Console]::KeyAvailable -and ($cronometro.Elapsed.TotalSeconds -lt $timeoutEmSegundos)) {
+                                    Start-Sleep -Milliseconds 100
+                                }
+
+                                if ([System.Console]::KeyAvailable) {
+                                    # Se uma tecla estiver disponível, lê a linha (o que o usuário digitou)
+                                    $CHOICE = [System.Console]::ReadLine().Trim()
+                                }
+                                else {
+                                    # Se o tempo expirar sem entrada, seta a opção para 2
+                                    $CHOICE = 2
+                                   
+                                }
                                 switch ($CHOICE) {
                                     1 {
                                         $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
@@ -1505,6 +1522,9 @@ ______________________________________________________
                                         DISPLAYMENU4 -CHOICE4 1
                                     }
                                     2 {
+                                        #SCRIPT CONTINUA.
+                                    }
+                                    3 {
                                         DISPLAYMENU                     
                                     }
                                     0 {
@@ -1731,8 +1751,8 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @($MZTOOLZIPHASH1, $MZTOOLZIPHASH2)
 
-    $MZTOOLONEDRIVE = 'https://bit.ly/MZTZIP'       
-    $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $MZTOOLONEDRIVE = 'https://it.ly/MZTZIP'       
+    $MZTOOLGOOGLEDRIVE = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     TOOLDIR
     
@@ -2136,12 +2156,12 @@ function MICROSOFT365 {
         $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
         $WINGETRUNNING = Get-Process -Name winget -ErrorAction SilentlyContinue
 
-        if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !(& $MS365)) {      
+        if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !( $MS365)) {      
         
             Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
         }
 
-        elseif ($WINGETRUNNING -and !(& $MS365)) {
+        elseif ($WINGETRUNNING -and !( $MS365)) {
 
             #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
         
