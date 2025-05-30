@@ -1468,83 +1468,10 @@ ______________________________________________________
 |____________________________________________________|
 '    
                                         
-                        $365STATUS = MICROSOFT365        
-
-                        if ($365STATUS -eq "1") {
-                    
-                            Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
-                            Start-Sleep -Seconds 5
-                    
-                        }
-
-                        if ($365STATUS -eq "2") {
-                            function DISPLAYMENU4365ERROR {
-                                Clear-Host
-                                Write-Host '
-______________________________________________________
-|                                                    |        
-|                      MZTOOL                        |
-| _________________________________________________  |
-|                   MICROSOFT 365                    |
-|                                                    |
-|       SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
-|                                                    |
-|   |1| TENTAR NOVAMENTE                             |
-|   |2| IGNORAR & CONTINUAR                          |
-|   |3| VOLTAR AO MENU                               |
-|   |0| ENCERRAR MZTOOL                              |      
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|  
-' 
-                                Write-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
-                               
-                                $timeoutEmSegundos = 10
-                                
-                                $cronometro = [System.Diagnostics.Stopwatch]::StartNew()
-                                while (-not [System.Console]::KeyAvailable -and ($cronometro.Elapsed.TotalSeconds -lt $timeoutEmSegundos)) {
-                                    Start-Sleep -Milliseconds 100
-                                }
-
-                                if ([System.Console]::KeyAvailable) {
-                                    # Se uma tecla estiver disponível, lê a linha (o que o usuário digitou)
-                                    $CHOICE = [System.Console]::ReadLine().Trim()
-                                }
-                                else {
-                                    # Se o tempo expirar sem entrada, seta a opção para 2
-                                    $CHOICE = 2
-                                   
-                                }
-                                switch ($CHOICE) {
-                                    1 {
-                                        $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
-                                        if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
-                                        DISPLAYMENU4 -CHOICE4 1
-                                    }
-                                    2 {
-                                        #SCRIPT CONTINUA.
-                                    }
-                                    3 {
-                                        DISPLAYMENU                     
-                                    }
-                                    0 {
-                                        EXITMZTOOL
-                                    }
-                                    default {
-                                        ENTRYERROR
-                                    } 
-                                }  
-                            }
-                            DISPLAYMENU4365ERROR
-                        }
-                        
-                        if ($365STATUS -eq "3") {
-
-                            Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
-                            Start-Sleep -Seconds 5
-                            
-                        }                                       
-                      
+                        $365STATUS = MICROSOFT365    
+                       
+                        DISPLAYMENU365STATUS -365STATUS $365STATUS    
+                   
                         CLEANTEMP
              
                         DISPLAYMENU 
@@ -1734,6 +1661,87 @@ ______________________________________________________
             }
         }
     } while ($true)
+}
+
+function DISPLAYMENU365STATUS {
+    param(
+        [switch]$365STATUS 
+    ) 
+
+
+    if ($365STATUS -eq "1") {
+
+        Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
+        Start-Sleep -Seconds 5
+
+    }
+
+    if ($365STATUS -eq "2") {
+        
+        Clear-Host
+        Write-Host '
+______________________________________________________
+|                                                    |        
+|                      MZTOOL                        |
+| _________________________________________________  |
+|                   MICROSOFT 365                    |
+|                                                    |
+|       SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
+|                                                    |
+|   |1| TENTAR NOVAMENTE                             |
+|   |2| IGNORAR & CONTINUAR                          |
+|   |3| VOLTAR AO MENU                               |
+|   |0| ENCERRAR MZTOOL                              |      
+|                                                    |
+|                 MOZART INFORMÁTICA | DANIEL MOZART |
+|____________________________________________________|  
+' 
+        Write-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
+           
+        $timeoutEmSegundos = 10
+            
+        $cronometro = [System.Diagnostics.Stopwatch]::StartNew()
+        while (-not [System.Console]::KeyAvailable -and ($cronometro.Elapsed.TotalSeconds -lt $timeoutEmSegundos)) {
+            Start-Sleep -Milliseconds 100
+        }
+
+        if ([System.Console]::KeyAvailable) {
+            # Se uma tecla estiver disponível, lê a linha (o que o usuário digitou)
+            $CHOICE = [System.Console]::ReadLine().Trim()
+        }
+        else {
+            # Se o tempo expirar sem entrada, seta a opção para 2
+            $CHOICE = 2
+               
+        }
+        switch ($CHOICE) {
+            1 {
+                $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
+                if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
+                DISPLAYMENU4 -CHOICE4 1
+            }
+            2 {
+                #SCRIPT CONTINUA.
+            }
+            3 {
+                DISPLAYMENU                     
+            }
+            0 {
+                EXITMZTOOL
+            }
+            default {
+                ENTRYERROR
+            } 
+        }  
+    }
+  
+    
+    if ($365STATUS -eq "3") {
+
+        Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
+        Start-Sleep -Seconds 5
+        
+    }                                       
 }
 
 #FUNÇÕES---------------------------------------------------------------
@@ -2146,9 +2154,10 @@ function MICROSOFT365 {
   <Display Level="FALSE" AcceptEULA="TRUE" />
 </Configuration> 
 '@           
-        $XML.save("$env:Temp\MICROSOFT365.xml") 
-   
+
         $365XML = "$env:Temp\MICROSOFT365.xml"
+
+        $XML.save("$365XML") 
 
         $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
         $WINGETRUNNING = Get-Process -Name winget -ErrorAction SilentlyContinue
