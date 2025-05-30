@@ -26,7 +26,7 @@ Personalização do Perfil de Usuário (Regedit, XML, APPX): Tema, Ícones da Á
 
 HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, GPUZ.
 
-3 - Atualização automátizada de softwares e drivers através do Winget e Módulo Windows Update.
+3 - Atualização automatizada de softwares e drivers através do Winget e Módulo Windows Update.
 
 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
 
@@ -41,7 +41,7 @@ Clear-Host
 #VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
-$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue } 
+$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue | Out-Null } 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
