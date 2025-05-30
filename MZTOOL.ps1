@@ -1310,7 +1310,7 @@ ______________________________________________________
                     default {
                         ENTRYERROR
                     }
-                    
+
                 }
             }
                 
@@ -1644,15 +1644,14 @@ ______________________________________________________
             ENTRYERROR
         }
     }
-}
 
-#Funções auxiliares do MENU.
-function EXITMZTOOL {
+    #Funções auxiliares do MENU.
+    function EXITMZTOOL {
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"  
+        $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"  
 
-    Clear-Host
-    Write-Host '
+        Clear-Host
+        Write-Host '
 ______________________________________________________
 |                                                    |
 |                      MZTOOL                        |
@@ -1667,27 +1666,27 @@ ______________________________________________________
 |                   DANIEL MOZART                    |
 |____________________________________________________|
 '
-    CLEANTEMP
+        CLEANTEMP
 
-    EXIT 
+        EXIT 
 
-}
+    }
 
-function DISPLAYMENUDOWNLOADERROR {      
+    function DISPLAYMENUDOWNLOADERROR {      
     
-    do {
+        do {
     
-        Clear-Host
-        Write-Host '
+            Clear-Host
+            Write-Host '
 ______________________________________________________
 |                                                    |
 |                       MZTOOL                       |
 | __________________________________________________ | 
 |            FERRAMENTAS DE DIAGNÓSTICOS             | 
 |                                                    |'
-        Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-        Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-        Write-Host '|                                                    |
+            Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
+            Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
+            Write-Host '|                                                    |
 |                                                    |
 | |1| TENTAR NOVAMENTE                               |
 | |2| VOLTAR AO MENU PRINCIPAL                       |
@@ -1696,27 +1695,27 @@ ______________________________________________________
 |                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|'
 
-        $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+            $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
     
-        switch ($CHOICE) {
-            '1' {                        
-                return
-                break
+            switch ($CHOICE) {
+                '1' {                        
+                    return
+                    break
+                }
+                '2' {
+                    DISPLAYMENU
+                    break
+                }
+                '0' {    
+                    EXITMZTOOL       
+                }
+                default {
+                    ENTRYERROR
+                }
             }
-            '2' {
-                DISPLAYMENU
-                break
-            }
-            '0' {    
-                EXITMZTOOL       
-            }
-            default {
-                ENTRYERROR
-            }
-        }
-    } while ($true)
+        } while ($true)
+    }
 }
-
 #FUNÇÕES---------------------------------------------------------------
 
 function DOWNLOADMZTOOL {
