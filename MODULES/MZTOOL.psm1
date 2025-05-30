@@ -424,7 +424,7 @@ function DOWNLOAD {
             
             #Caso os links estejam fora do ar oferece um menu de opções.
             
-            DISPLAYDOWNLOADMENUERROR
+            DISPLAYMENUDOWNLOADERROR
             
         }
     }
