@@ -1668,7 +1668,6 @@ function DISPLAYMENU365STATUS {
         [switch]$365STATUS 
     ) 
 
-
     if ($365STATUS -eq "1") {
 
         Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    

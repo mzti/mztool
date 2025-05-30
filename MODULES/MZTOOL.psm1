@@ -657,14 +657,12 @@ function UNINSTALLOFFICE {
         )
     
         foreach ($app in $OfficeApps) {
-            <#Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
-            Write-Host "App: $($app.DisplayName)" -ForegroundColor Cyan
-            Write-Host "Versão: $($app.DisplayVersion)" -ForegroundColor Cyan
-            Write-Host "IdentifyingNumber: $($app.IdentifyingNumber)" -ForegroundColor Yellow
-            Write-Host "UninstallString: $($app.UninstallString)" -ForegroundColor Yellow#>              
+                    
             If ($app.UninstallString -notmatch "MsiExec.exe") {           
                
-                $uninstallCmd = $app.UninstallString              
+                $uninstallCmd = $app.UninstallString
+                
+                RESETCURSOR
               
                 Write-Warning "INICIANDO DESINSTALAÇÃO - $($app.DisplayName)"
          
@@ -676,15 +674,18 @@ function UNINSTALLOFFICE {
     
     $InstalledOffice = GetAllInstalledOffice
     
-    if ($InstalledOffice.Count -gt 0) {
-        Write-Host "Foram encontradas as seguintes entradas do Office:" -ForegroundColor Cyan
+    if ($InstalledOffice.Count -gt 0) {       
+       
+        Write-Warning "`nINSTALAÇÃO DO OFFICE OU 365 ENCONTRADA:" -ForegroundColor Cyan
         foreach ($app in $InstalledOffice) {
-            Write-Host "$($app.DisplayName) - Versão: $($app.DisplayVersion)" -ForegroundColor Green
+            RESETCURSOR
+            Write-Host "$($app.DisplayName) - VERSÃO: $($app.DisplayVersion)" -ForegroundColor Green
         }         
         UninstallOfficeApps -OfficeApps $InstalledOffice
     }
     else {
-        Write-Host "Nenhuma instalação do Office foi encontrada." -ForegroundColor Yellow
+        RESETCURSOR
+        Write-Warning "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO." -ForegroundColor Yellow
     }
 
     $StillInstalled = (GetAllInstalledOffice).Count -gt 0
