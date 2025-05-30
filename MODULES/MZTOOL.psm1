@@ -695,17 +695,15 @@ function REFRESHUSER {
 }
 
 function UNINSTALLOFFICE {
-    function Get-AllInstalledOffice {
-        # Cria um array para armazenar as entradas encontradas
-        $OfficeApps = @()
-    
-        # Define os caminhos de registro para 64 bits e 32 bits (WOW6432Node)
+    function GetAllInstalledOffice {
+  
+        $OfficeApps = @()    
+     
         $UninstallPaths = @(
             "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
             "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
         )
-    
-        # Procura entradas cujo DisplayName contenha "Office"
+            
         foreach ($path in $UninstallPaths) {
             $apps = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
             Where-Object { 
@@ -716,72 +714,49 @@ function UNINSTALLOFFICE {
             if ($apps) {
                 $OfficeApps += $apps
             }
-        }
-    
+        }    
         return $OfficeApps
-    }
+    }    
     
-    
-    function Uninstall-OfficeApps {
+    function UninstallOfficeApps {
         param(
             [Parameter(Mandatory = $true)]
             [Array]$OfficeApps
         )
     
         foreach ($app in $OfficeApps) {
-            Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
+            <#Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
             Write-Host "App: $($app.DisplayName)" -ForegroundColor Cyan
             Write-Host "Versão: $($app.DisplayVersion)" -ForegroundColor Cyan
             Write-Host "IdentifyingNumber: $($app.IdentifyingNumber)" -ForegroundColor Yellow
-            Write-Host "UninstallString: $($app.UninstallString)" -ForegroundColor Yellow
-    
-            # Tenta usar o IdentifyingNumber, se não existir extrai da UninstallString
-            $guid = $app.IdentifyingNumber
-                   
-            if ($guid) {
-                Write-Host "Tentando desinstalar $($app.DisplayName) via msiexec usando GUID $guid..." -ForegroundColor Green
-                try {
-                    # Desinstala silenciosamente com msiexec (/qn)
-                    Start-Process -FilePath "msiexec.exe" -ArgumentList "/x $guid /qn" -Wait -NoNewWindow
-                }
-                catch {
-                    Write-Warning "Falha ao tentar desinstalar $($app.DisplayName): $_"
-                }
-            }
-            elseif ($app.UninstallString -and $app.UninstallString -notmatch "MsiExec.exe") {               
-                $uninstallCmd = $app.UninstallString                
+            Write-Host "UninstallString: $($app.UninstallString)" -ForegroundColor Yellow#>              
+            If ($app.UninstallString -notmatch "MsiExec.exe") {           
                
-                # Se for um comando do setup.exe do Office, adiciona parâmetros adicionais para desinstalação automática
-                #    if ($uninstallCmd -match "setup.exe") {
-                #        $uninstallCmd = $uninstallCmd + " /quiet /norestart"
-                #   }
-                Write-Warning "GUID não encontrado para $($app.DisplayName). Tentando UnistallString."
+                $uninstallCmd = $app.UninstallString              
+              
+                Write-Warning "INICIANDO DESINSTALAÇÃO - $($app.DisplayName)"
          
                 Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait -NoNewWindow
-            }
-            else {
-                Write-Warning "Desinstalador parcial ignorado. Buscando desinstalador completo."
-            }
+
+            }            
         }
     }
     
-    # Coleta todas as instalações do Office encontradas
-    $InstalledOffice = Get-AllInstalledOffice
+    $InstalledOffice = GetAllInstalledOffice
     
     if ($InstalledOffice.Count -gt 0) {
         Write-Host "Foram encontradas as seguintes entradas do Office:" -ForegroundColor Cyan
         foreach ($app in $InstalledOffice) {
             Write-Host "$($app.DisplayName) - Versão: $($app.DisplayVersion)" -ForegroundColor Green
         }         
-        Uninstall-OfficeApps -OfficeApps $InstalledOffice
+        UninstallOfficeApps -OfficeApps $InstalledOffice
     }
     else {
         Write-Host "Nenhuma instalação do Office foi encontrada." -ForegroundColor Yellow
     }
 
-    $StillInstalled = (Get-AllInstalledOffice).Count -gt 0
+    $StillInstalled = (GetAllInstalledOffice).Count -gt 0
 
-    # Retorna o estado final (true se ainda instalado, false se não)
     return $StillInstalled
 }
 
