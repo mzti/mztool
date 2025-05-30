@@ -4,7 +4,7 @@
 $Global:TITLE = "MZTOOL BETA"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue
-$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
+$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 #endregion
 

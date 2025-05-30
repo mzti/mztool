@@ -40,8 +40,8 @@ Clear-Host
 
 #VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
-$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
-$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue | Out-Null } 
+$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
+$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue } 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
@@ -1017,7 +1017,7 @@ function GETMZTOOLMODULE {
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 
-    & $Global:MZTOOLMODULE 
+    return & $Global:MZTOOLMODULE 
     
 }
 
