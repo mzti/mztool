@@ -1490,6 +1490,7 @@ ______________________________________________________
                             $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                             switch ($CHOICE) {
                                 1 {
+                                    $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
                                     if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
                                     DISPLAYMENU4 -CHOICE4 1
                                 }
