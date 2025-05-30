@@ -1767,7 +1767,7 @@ function DOWNLOADMZTOOL {
         
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
 
-        $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5
+        $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5 -ErrorAction SilentlyContinue
     
         $TRYGETMZTOOLZIP++      
             
@@ -1799,10 +1799,7 @@ function DOWNLOADMZTOOL {
         #Deleta o arquivo MZTOOL.zip.
         Remove-Item $MZTOOLZIP
 
-    }
-    else {            
-        #Script continua.
-    }
+    }   
   
 }
 
