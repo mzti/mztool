@@ -1751,8 +1751,8 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @($MZTOOLZIPHASH1, $MZTOOLZIPHASH2)
 
-    $MZTOOLONEDRIVE = 'https://it.ly/MZTZIP'       
-    $MZTOOLGOOGLEDRIVE = 'https://rive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
+    $MZTOOLONEDRIVE = 'https://bit.ly/MZTZIP'       
+    $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     TOOLDIR
     
@@ -2153,12 +2153,12 @@ function MICROSOFT365 {
         $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
         $WINGETRUNNING = Get-Process -Name winget -ErrorAction SilentlyContinue
 
-        if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !( $MS365)) {      
+        if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !(& $MS365)) {      
         
             Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
         }
 
-        elseif ($WINGETRUNNING -and !( $MS365)) {
+        elseif ($WINGETRUNNING -and !(& $MS365)) {
 
             #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
         
