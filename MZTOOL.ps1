@@ -40,11 +40,11 @@ Clear-Host
 
 #VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
-$Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
-$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" } 
+$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
+$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" | Out-Null } 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
-$Global:PSVER = $PSVersionTable.PSVersion
-$Global:MZPSVER = "5.1.0"
+$Global:PSVER = { $PSVersionTable.PSVersion }
+$Global:MZPSVER = "7.1.0"
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 
 #$ErrorActionPreference = 'SilentlyContinue'
@@ -53,7 +53,7 @@ $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-if ($Global:EXECUTIONPOLICY.Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
+if ((& $Global:EXECUTIONPOLICY).Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 }  
 
@@ -84,9 +84,9 @@ function PSVER {
    
     #Verifica se a versão do PowerShell é suportada.    
 
-    if ($Global:PSVER -lt [version]$Global:MZPSVER ) {
+    if ((& $Global:PSVER) -lt [version]$Global:MZPSVER ) {
         Write-Host "VERSÃO NECESSÁRIA DO POWERSHELL:"$($Global:MZPSVER)" OU SUPERIOR."
-        Write-Host "`n`VERSÃO ATUAL DO POWERSHELL  :"$($Global:PSVER)""
+        Write-Host "`n`VERSÃO ATUAL DO POWERSHELL  :"$(& $Global:PSVER)""
 
         Write-Host "`n`nATUALIZE A SUA VERSÃO DO POWERSHELL PARA CONTINUAR: `nhtps://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi" -ForegroundColor Cyan
         
@@ -165,7 +165,7 @@ function MZTOOLMODULE {
 $Global:TITLE = "MZTOOL BETA"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 $Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" }
-$Global:EXECUTIONPOLICY = Get-ExecutionPolicy -List
+$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 
 #endregion
