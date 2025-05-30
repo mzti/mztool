@@ -1503,16 +1503,12 @@ ______________________________________________________
                             }  
                         }
 
-                        elseif ($365STATUS -eq "3") {
+                        if ($365STATUS -eq "3") {
 
                             Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
                             Start-Sleep -Seconds 5
                             
-                        }
-
-                        else {
-                            #SCRIPT CONTINUA.
-                        }                      
+                        }                                       
                       
                         CLEANTEMP
              
