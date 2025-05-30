@@ -421,79 +421,11 @@ function DOWNLOAD {
         }
 
         else {
-            do {
             
-                #Caso as duas nuvens estejam fora do ar oferece um menu de opções.
-                                              
-                Start-Sleep -Seconds 1
-                function DisplayMenuDownloadError {           
-                    Clear-Host
-                    Write-Host '
-______________________________________________________
-|                                                    |
-|                       MZTOOL                       |
-| __________________________________________________ | 
-|            FERRAMENTAS DE DIAGNÓSTICOS             | 
-|                                                    |'
-                    Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-                    Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-                    Write-Host '|                                                    |
-|                                                    |
-| |1| TENTAR NOVAMENTE                               |
-| |2| VOLTAR AO MENU PRINCIPAL                       |
-| |0| ENCERRAR MZTOOL                                |
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|'
-           
-                    $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
-                    
-                    switch ($choice) {
-                        '1' {                        
-                            return
-                            break
-                        }
-                        '2' {
-                            DISPLAYMENU
-                            break
-                        }
-                        '0' {
-                    
-                            #OPÇÃO 0 - ENCERRAR MZTOOL.
-
-                            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
-
-                            Clear-Host
-                            Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                                                    |
-|                 ENCERRANDO MZTOOL                  |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'
-        
-                            CLEANTEMP                           
-
-                            Start-Sleep -Seconds 2
-                            Exit                            
-                        }
-                        default {
-                            ENTRYERROR
-                        }
-                    }
-                }
-        
-                DisplayMenuDownloadError
-    
-            } while ($true)# Action when all if and elseif conditions are false
+            #Caso os links estejam fora do ar oferece um menu de opções.
+            
+            DISPLAYDOWNLOADMENUERROR
+            
         }
     }
 }

@@ -1288,25 +1288,29 @@ ______________________________________________________
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
              
                 Switch ($CHOICE) {
+
                     1 {
                         DIAGNOSTICS -START
                                                     
                         DISPLAYMENU2
                     }
-                    2 {                       
-                        
+                    
+                    2 {                     
                         DIAGNOSTICS -STOP                                            
 
                         DISPLAYMENU2
                     }
+
                     3 {
                         DIAGNOSTICS -STOP 
 
                         DISPLAYMENU
                     }
+
                     default {
                         ENTRYERROR
                     }
+                    
                 }
             }
                 
@@ -1362,7 +1366,7 @@ ______________________________________________________
          
                         CLEANTEMP
 
-                        DISPLAYMENU
+                        DISPLAYMENU3
             
                     }
         
@@ -1393,13 +1397,11 @@ ______________________________________________________
 
                         CLEANTEMP
                                     
-                        DISPLAYMENU
+                        DISPLAYMENU3
                     }
         
                     3 {
-
                         DISPLAYMENU
-                
                     }
         
                     default {
@@ -1489,10 +1491,10 @@ ______________________________________________________
 |                                                    |
 |   |1| TENTAR NOVAMENTE                             |
 |   |2| VOLTAR AO MENU                               |
-|                                                    |
+|   |0| ENCERRAR MZTOOL                              |
 |                                                    |      
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
+|                                                    |
+|                 MOZART INFORMÁTICA | DANIEL MOZART |
 |____________________________________________________|  
 '
                                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
@@ -1505,6 +1507,9 @@ ______________________________________________________
                                     2 {
                                         DISPLAYMENU                     
                                     }
+                                    0 {
+                                        EXITMZTOOL
+                                    }
                                     default {
                                         ENTRYERROR
                                     } 
@@ -1512,6 +1517,7 @@ ______________________________________________________
                             }
                             DISPLAYMENU4365ERROR
                         }
+                        
                         if ($365STATUS -eq "3") {
 
                             Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
@@ -1552,9 +1558,7 @@ ______________________________________________________
                     }
                
                     3 {
-
                         DISPLAYMENU
-                
                     }
 
                     default {
@@ -1568,32 +1572,11 @@ ______________________________________________________
 
         0 {
             #OPÇÃO 0 - ENCERRAR MZTOOL.
-
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
-          
-
-            Clear-Host
-            Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                                                    |
-|                 ENCERRANDO MZTOOL                  |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'
-            CLEANTEMP
             
-            EXIT          
+            EXITMZTOOL         
             
         }
-
+       
         # COMANDOS DE TESTE OCULTOS DO MENU.
         
         #Testa a função ANYDESK.
@@ -1663,6 +1646,77 @@ ______________________________________________________
     }
 }
 
+#Funções auxiliares do MENU.
+function EXITMZTOOL {
+    
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"  
+
+    Clear-Host
+    Write-Host '
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| _________________________________________________  | 
+|                                                    |
+|                                                    |
+|                                                    |
+|                 ENCERRANDO MZTOOL                  |
+|                                                    |
+|                                                    |
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|
+'
+    CLEANTEMP
+
+    EXIT 
+
+}
+
+function DISPLAYMENUDOWNLOADERROR {      
+    
+    do {
+    
+        Clear-Host
+        Write-Host '
+______________________________________________________
+|                                                    |
+|                       MZTOOL                       |
+| __________________________________________________ | 
+|            FERRAMENTAS DE DIAGNÓSTICOS             | 
+|                                                    |'
+        Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
+        Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
+        Write-Host '|                                                    |
+|                                                    |
+| |1| TENTAR NOVAMENTE                               |
+| |2| VOLTAR AO MENU PRINCIPAL                       |
+| |0| ENCERRAR MZTOOL                                |
+|                                                    |
+|                 MOZART INFORMÁTICA | DANIEL MOZART |
+|____________________________________________________|'
+
+        $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+    
+        switch ($CHOICE) {
+            '1' {                        
+                return
+                break
+            }
+            '2' {
+                DISPLAYMENU
+                break
+            }
+            '0' {    
+                EXITMZTOOL       
+            }
+            default {
+                ENTRYERROR
+            }
+        }
+    } while ($true)
+}
+
 #FUNÇÕES---------------------------------------------------------------
 
 function DOWNLOADMZTOOL {
@@ -1716,7 +1770,7 @@ function DOWNLOADMZTOOL {
     }
 
     RESETCURSOR   
-    
+
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
