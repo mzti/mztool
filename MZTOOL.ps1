@@ -1209,7 +1209,7 @@ ______________________________________________________
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
-                @{ Functions = 'UNINSTALLOFFICE', 'MICROSOFT365'; Wait = $true },
+                @{ Functions = 'MICROSOFT365'; Wait = $true },
                 @{ Functions = 'PINICONS', 'STARTSOFTWARES' }
             )
        
