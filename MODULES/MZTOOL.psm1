@@ -676,7 +676,7 @@ function UNINSTALLOFFICE {
     
     if ($InstalledOffice.Count -gt 0) {       
        
-        Write-Warning "`nINSTALAÇÃO DO OFFICE OU 365 ENCONTRADA:" -ForegroundColor Cyan
+        Write-Warning "`nINSTALAÇÃO DO OFFICE OU 365 ENCONTRADA:"
         foreach ($app in $InstalledOffice) {
             RESETCURSOR
             Write-Host "$($app.DisplayName) - VERSÃO: $($app.DisplayVersion)" -ForegroundColor Green
@@ -685,7 +685,7 @@ function UNINSTALLOFFICE {
     }
     else {
         RESETCURSOR
-        Write-Warning "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO." -ForegroundColor Yellow
+        Write-Warning "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO."
     }
 
     $StillInstalled = (GetAllInstalledOffice).Count -gt 0
