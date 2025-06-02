@@ -118,7 +118,7 @@ function NEWPWSH {
     
     if ($Wait -and $Hidden) {
         # Se ambos, Wait e Hidden, forem true:
-        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
+        [void](Start-Process powershell -ArgumentList $arguments -Wait -WindowStyle Hidden)
         return
     }
     elseif ($Wait -and $ReturnProcess) {
