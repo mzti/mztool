@@ -2297,7 +2297,7 @@ function OFFICE2007 {
         #Implementa o Microsoft Office 2007 com configurações de instalação AdminFile MSP.
         Start-Process "$OFFICE2007FOLDER\Setup.exe" -ArgumentList '/adminfile Silent.msp' -Wait     
         Wait-Job -Name NetFx3 | Out-Null
-        if (& $OFFICE2007) { Start-Process 'winword.exe' }
+        if (& $OFFICE2007) { Start-Process PowerShell -WindowStyle Hidden { Start-Process 'winword.exe' } }
 
     }
     else {
