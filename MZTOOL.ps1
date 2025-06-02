@@ -2411,9 +2411,61 @@ function PERFILTHEME {
     #Mostra e atualiza a Área de Trabalho.
     DESKTOPUPDATE  
 
-    #Define o nível de efeitos visuais para "Ajustar para melhor desempenho".
-    Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type DWord -Value 2 -ErrorAction SilentlyContinue
-        
+    #Personaliza e define efeitos visuais para obter melhor desempenho e manter a boa leitura.
+    $regSettings = @(
+        @{
+            Path       = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects"
+            Properties = @(
+                @{ Name = "VisualFXSetting"; Value = 3; Type = "DWord" }
+            )
+        },
+        @{
+            Path       = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+            Properties = @(
+                @{ Name = "IconsOnly"; Value = 0; Type = "DWord" },
+                @{ Name = "ListviewAlphaSelect"; Value = 0; Type = "DWord" },
+                @{ Name = "ListviewShadow"; Value = 1; Type = "DWord" },
+                @{ Name = "TaskbarAnimations"; Value = 0; Type = "DWord" }
+            )
+        },
+        @{
+            Path       = "HKCU:\Control Panel\Desktop"
+            Properties = @(
+                @{ Name = "UserPreferencesMask"; Value = [byte[]](0x98, 0x32, 0x03, 0x80, 0x10, 0x00, 0x00, 0x00); Type = "Binary" },
+                @{ Name = "DragFullWindows"; Value = "0"; Type = "String" }
+            )
+        },
+        @{
+            Path       = "HKCU:\Control Panel\Desktop\WindowMetrics"
+            Properties = @(
+                @{ Name = "MinAnimate"; Value = "0"; Type = "String" }
+            )
+        },
+        @{
+            Path       = "HKCU:\Software\Microsoft\Windows\DWM"
+            Properties = @(
+                @{ Name = "EnableAeroPeek"; Value = 0; Type = "DWord" }
+            )
+        }
+    )
+
+    foreach ($section in $regSettings) {
+        # Cria a chave se ela não existir
+        if (-not (Test-Path $section.Path)) {
+            New-Item -Path $section.Path -Force | Out-Null
+            Write-Host "Chave criada: $($section.Path)" -ForegroundColor Green
+        }
+        else {
+            Write-Host "Chave existente: $($section.Path)" -ForegroundColor Yellow
+        }
+    
+        # Cria ou atualiza cada propriedade para a chave
+        foreach ($prop in $section.Properties) {
+            New-ItemProperty -Path $section.Path -Name $prop.Name -Value $prop.Value -PropertyType $prop.Type -Force | Out-Null
+            Write-Host "Propriedade '$($prop.Name)' definida como '$($prop.Value)'" -ForegroundColor Cyan
+        }
+    }  
+    
     #Finaliza janela de personalização do Windows.
     if (Get-Process -Name 'systemsettings' -ErrorAction SilentlyContinue) {
                         
