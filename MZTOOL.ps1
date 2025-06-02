@@ -2196,7 +2196,7 @@ function MICROSOFT365 {
         
         if (& $MS365) { 
             
-            Start-Process WINWORD 
+            Start-Process PowerShell -WindowStyle Hidden { Start-Process WINWORD }
 
             $365STATUS = "1"
 
