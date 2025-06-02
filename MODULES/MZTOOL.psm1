@@ -247,9 +247,9 @@ function DEPLOYFUNCTION {
         
         # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
         # Inicializa os valores padrão para os switches
-        $WAIT = $false
+        $Wait = $false
         if ($group.ContainsKey("Wait") -and $group.Wait) {
-            $WAIT = $true
+            $Wait = $true
         }
 
         # Aqui, $HIDDENALL é um parâmetro (SwitchParameter) da função DEPLOYFUNCTION.
@@ -263,7 +263,7 @@ function DEPLOYFUNCTION {
         # Monta a tabela de parâmetros para passar à função NEWPWSH
         $arguments = @{
             Functions = $group.Functions
-            Wait      = $WAIT
+            Wait      = $Wait
             Hidden    = $Hidden
         }
 
