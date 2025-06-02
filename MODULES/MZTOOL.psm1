@@ -255,16 +255,16 @@ function DEPLOYFUNCTION {
         # Aqui, $HIDDENALL é um parâmetro (SwitchParameter) da função DEPLOYFUNCTION.
         # Se ele estiver presente, vamos garantir que na passagem para NEWPWSH
         # seja utilizado o valor $true.
-        $hiddenParam = $false
+        $Hidden = $false
         if ($HIDDENALL) {
-            $hiddenParam = $true
+            $Hidden = $true
         }
 
         # Monta a tabela de parâmetros para passar à função NEWPWSH
         $arguments = @{
             Functions = $group.Functions
             Wait      = $WAIT
-            Hidden    = $hiddenParam
+            Hidden    = $Hidden
         }
 
         # Chama a função passando os parâmetros via splatting
