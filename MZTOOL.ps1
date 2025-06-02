@@ -41,7 +41,7 @@ Clear-Host
 #VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
-$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue } 
+$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
@@ -164,7 +164,7 @@ function MZTOOLMODULE {
 #region Variáveis Globais
 $Global:TITLE = "MZTOOL BETA"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
-$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" }
+$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL"
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 
@@ -225,12 +225,12 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 #region FUNÇÕES DO MÓDULO
 function GETMZTOOLMODULE {     
         
-    if (-not(& $Global:MZTOOLMODULE)) {
+    if (-not($Global:MZTOOLMODULE)) {
         
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 
-    & $Global:MZTOOLMODULE
+    $Global:MZTOOLMODULE
     
 }
 #endregion
@@ -1012,12 +1012,12 @@ function CLOCKDATE {
 
 function GETMZTOOLMODULE {     
         
-    if (-not(& $Global:MZTOOLMODULE)) {
+    if (-not($Global:MZTOOLMODULE)) {
         
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 
-    return & $Global:MZTOOLMODULE 
+    $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
     
 }
 
@@ -1028,7 +1028,7 @@ do {
         
  
     # Verifica se o módulo foi carregado com sucesso.
-    if (& $Global:MZTOOLMODULE) {
+    if ($Global:MZTOOLMODULE) {
 
         $MODULESTATUS = "MÓDULO ON"
 
@@ -1050,7 +1050,7 @@ do {
         
     }    
 
-} while (-not (& $Global:MZTOOLMODULE))
+} while (-not ($Global:MZTOOLMODULE))
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
@@ -1173,7 +1173,7 @@ ______________________________________________________
 |____________________________________________________|
 '
     # Informa se o Módulo está importado.
-    Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if (& $Global:MZTOOLMODULE) { 'Green' } else { 'Red' })
+    Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE) { 'Green' } else { 'Red' })
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
@@ -2465,7 +2465,7 @@ function PERFILTHEME {
             Write-Host "Propriedade '$($prop.Name)' definida como '$($prop.Value)'" -ForegroundColor Cyan
         }
     }  
-    
+
     #Finaliza janela de personalização do Windows.
     if (Get-Process -Name 'systemsettings' -ErrorAction SilentlyContinue) {
                         

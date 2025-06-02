@@ -3,7 +3,7 @@
 #region Variáveis Globais
 $Global:TITLE = "MZTOOL BETA"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
-$Global:MZTOOLMODULE = { Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue }
+$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 #endregion
@@ -63,12 +63,12 @@ if ($global:hwnd -ne [IntPtr]::Zero) {
 #region FUNÇÕES DO MÓDULO
 function GETMZTOOLMODULE {     
         
-    if (-not(& $Global:MZTOOLMODULE)) {
+    if (-not($Global:MZTOOLMODULE)) {
         
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 
-    & $Global:MZTOOLMODULE 
+    $Global:MZTOOLMODULE 
     
 }
 #endregion
