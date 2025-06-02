@@ -2505,44 +2505,54 @@ function PINICONS {
         <taskbar:DesktopApp DesktopApplicationID="{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Microsoft Office\Office12\WINWORD.exe" /> 
       </taskbar:TaskbarPinList>
     </defaultlayout:TaskbarLayout>
- </CustomTaskbarLayoutCollection>
+  </CustomTaskbarLayoutCollection>
 </LayoutModificationTemplate>
 "@
 
+    # Define o caminho do arquivo de layout
     [System.IO.FileInfo]$PATH = "$($env:ProgramData)\provisioning\taskbar_layout.xml"
-    if (!$PATH.Directory.Exists) {
+    if (-not $PATH.Directory.Exists) {
         $PATH.Directory.Create()
     }
 
+    # Cria o arquivo XML com o layout da taskbar
     $TASKBAR | Out-File $PATH.FullName -Encoding utf8
 
-    $settings = [PSCustomObject]@{
-        Path  = "SOFTWARE\Policies\Microsoft\Windows\Explorer"
-        Value = $provisioning.FullName
-        Name  = "StartLayoutFile"
-        Type  = [Microsoft.Win32.RegistryValueKind]::ExpandString
-    },
-    [PSCustomObject]@{
-        Path  = "SOFTWARE\Policies\Microsoft\Windows\Explorer"
-        Value = 1
-        Name  = "LockedStartLayout"
-    } | Group-Object Path
+    # Define as configurações do registro utilizando o caminho correto ($PATH.FullName)
+    $settings = @(
+        [PSCustomObject]@{
+            Path  = "SOFTWARE\Policies\Microsoft\Windows\Explorer"
+            Value = $PATH.FullName
+            Name  = "StartLayoutFile"
+            Type  = [Microsoft.Win32.RegistryValueKind]::ExpandString
+        },
+        [PSCustomObject]@{
+            Path  = "SOFTWARE\Policies\Microsoft\Windows\Explorer"
+            Value = 1
+            Name  = "LockedStartLayout"
+        }
+    ) | Group-Object Path
 
     foreach ($setting in $settings) {
+        # Abre ou cria a chave no registro
         $registry = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($setting.Name, $true)
         if ($null -eq $registry) {
             $registry = [Microsoft.Win32.Registry]::LocalMachine.CreateSubKey($setting.Name, $true)
         }
+        # Define as propriedades para essa chave
         $setting.Group | ForEach-Object {
-            if (!$_.Type) {
-                $registry.SetValue($_.name, $_.value)
+            if (-not $_.Type) {
+                $registry.SetValue($_.Name, $_.Value)
             }
             else {
-                $registry.SetValue($_.name, $_.value, $_.type)
+                $registry.SetValue($_.Name, $_.Value, $_.Type)
             }
         }
         $registry.Dispose()
-    } 
+    }
+
+    Write-Host "Layout da taskbar e configurações foram aplicadas com sucesso!"
+
 
     #Remove o ícone do Microsoft CoPilot da barra de tarefas.
     $settings = [PSCustomObject]@{
