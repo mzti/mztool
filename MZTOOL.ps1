@@ -1781,7 +1781,8 @@ function DOWNLOADMZTOOL {
         if ($TRYGETMZTOOLZIP -ge 3) {
             $MZTOOLONEDRIVE = 'HTTPS://NULL.NULL'           
             $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)   
-            Remove-Item $MZTOOLZIP -ErrorAction SilentlyContinue  
+            Remove-Item $MZTOOLZIP -ErrorAction SilentlyContinue 
+            $TRYGETMZTOOLZIP = 0 
             Pause     
         }
             
