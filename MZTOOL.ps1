@@ -1780,7 +1780,8 @@ function DOWNLOADMZTOOL {
         
         if ($TRYGETMZTOOLZIP -ge 3) {
             $MZTOOLONEDRIVE = $NULL 
-            $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)          
+            $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)   
+            Remove-Item $MZTOOLZIP -ErrorAction SilentlyContinue       
         }
             
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
