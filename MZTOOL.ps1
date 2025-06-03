@@ -1773,9 +1773,7 @@ function DOWNLOADMZTOOL {
     do {
         
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
-       
-        $MZTOOLONEDRIVE = $NULL
-        
+              
         $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5 -ErrorAction SilentlyContinue
     
         $TRYGETMZTOOLZIP++   
