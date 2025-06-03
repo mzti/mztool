@@ -1782,8 +1782,8 @@ function DOWNLOADMZTOOL {
             $MZTOOLONEDRIVE = 'HTTPS://NULL.NULL'           
             $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)   
             Remove-Item $MZTOOLZIP -ErrorAction SilentlyContinue 
-            $TRYGETMZTOOLZIP = 0 
-            Pause     
+            #$TRYGETMZTOOLZIP = 0 
+            #Pause     
         }
             
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
