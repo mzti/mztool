@@ -1773,10 +1773,16 @@ function DOWNLOADMZTOOL {
     do {
         
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
-
+       
+        $MZTOOLONEDRIVE = $NULL
+        
         $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5 -ErrorAction SilentlyContinue
     
-        $TRYGETMZTOOLZIP++      
+        $TRYGETMZTOOLZIP++   
+        
+        if ($TRYGETMZTOOLZIP -ge 3) {
+            $MZTOOLONEDRIVE = $NULL           
+        }
             
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
         if ($TRYGETMZTOOLZIP -ge 5) {
