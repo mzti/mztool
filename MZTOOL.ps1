@@ -1779,7 +1779,8 @@ function DOWNLOADMZTOOL {
         $TRYGETMZTOOLZIP++   
         
         if ($TRYGETMZTOOLZIP -ge 3) {
-            $MZTOOLONEDRIVE = $NULL 
+            $MZTOOLONEDRIVE = $NULL
+            $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy' 
             $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)   
             Remove-Item $MZTOOLZIP -ErrorAction SilentlyContinue  
             Pause     
