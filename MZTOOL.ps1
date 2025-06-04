@@ -1758,17 +1758,17 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @($MZTOOLZIPHASH1, $MZTOOLZIPHASH2)
 
-    $MZTOOLONEDRIVE = 'https://d15d16xpb69uci.cloudfront.net/MZTOOL.zip'       
+    $MZTOOLAWS = 'https://d15d16xpb69uci.cloudfront.net/MZTOOL.zip'      
     $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     TOOLDIR
     
     # Exibe o status dos links 
-    CLOUDSTATUS -URL $MZTOOLONEDRIVE -CLOUD ONEDRIVE
+    CLOUDSTATUS -URL $MZTOOLAWS -CLOUD AWS
     CLOUDSTATUS -URL $MZTOOLGOOGLEDRIVE -CLOUD GOOGLEDRIVE   
     
     # Lista de URLs para teste (OneDrive + Google Drive como fallback)
-    $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)
+    $DRIVEURLS = @($MZTOOLAWS, $MZTOOLGOOGLEDRIVE)
 
     do {
         
@@ -1779,11 +1779,8 @@ function DOWNLOADMZTOOL {
         $TRYGETMZTOOLZIP++   
         
         if ($TRYGETMZTOOLZIP -ge 3) {
-            $MZTOOLONEDRIVE = 'HTTPS://NULL.NULL'           
-            $DRIVEURLS = @($MZTOOLONEDRIVE, $MZTOOLGOOGLEDRIVE)   
-            #Remove-Item $MZTOOLZIP -ErrorAction SilentlyContinue 
-            #$TRYGETMZTOOLZIP = 0 
-            #Pause     
+            $MZTOOLAWS = 'HTTPS://NULL.NULL'           
+            $DRIVEURLS = @($MZTOOLAWS, $MZTOOLGOOGLEDRIVE)              
         }
             
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
