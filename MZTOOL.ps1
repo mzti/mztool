@@ -1747,11 +1747,10 @@ ______________________________________________________
 
 function DOWNLOADMZTOOL {
      
-    #Download do arquivo MZTOOL.zip
+    # Download do arquivo MZTOOL.zip
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DOWNLOADMZTOOL"  
 
-    #Verifica se o link do OneDrive está disponível, se não estiver, verifica se o link do Google Drive está disponível.
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
     $MZTOOLZIPHASH1 = "465B09A547F5FAA30B7CDD1B49126185"
@@ -1763,11 +1762,11 @@ function DOWNLOADMZTOOL {
     
     TOOLDIR
     
-    # Exibe o status dos links 
+    # Exibe o status dos links das Nuvens. 
     CLOUDSTATUS -URL $MZTOOLAWS -CLOUD AWS
     CLOUDSTATUS -URL $MZTOOLGOOGLEDRIVE -CLOUD GOOGLEDRIVE   
     
-    # Lista de URLs para teste (OneDrive + Google Drive como fallback)
+    # Lista de URLs para teste (AWS + Google Drive como fallback).
     $DRIVEURLS = @($MZTOOLAWS, $MZTOOLGOOGLEDRIVE)
 
     do {
