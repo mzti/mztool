@@ -114,12 +114,12 @@ PSVER
 function RESTARTADMIN {   
     param([int]$Restarted)
 
-    if ($global:Restarted -lt 1) { 
+    if ($Restarted -lt 1) { 
         
-        $global:Restarted++
+        $Restarted++
 
         # Concatena o comando original com o parâmetro -Restarted seguido do valor atual
-        $scriptWithParam = "$Global:SCRIPTCODE -Restarted $($global:Restarted)"
+        $scriptWithParam = "$Global:SCRIPTCODE -Restarted $($Restarted)"
         write-host "$scriptWithParam"
         pause
         # Monta os argumentos do novo processo, incluindo a string modificada.
