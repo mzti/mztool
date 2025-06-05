@@ -107,15 +107,15 @@ function PSVER {
 
 PSVER
 
-function RESTARTADMIN {
-    
-    
-    $global:Restarted++
+function RESTARTADMIN {   
+      
 
-    # Concatena o comando original com o parâmetro -Restarted seguido do valor atual
-    $scriptWithParam = "$Global:SCRIPTCODE -Restarted $($global:Restarted)"
+    if ($global:Restarted -lt 1) { 
+        
+        $global:Restarted++
 
-    if ($global:Restarted -lt 2) {   
+        # Concatena o comando original com o parâmetro -Restarted seguido do valor atual
+        $scriptWithParam = "$Global:SCRIPTCODE -Restarted $($global:Restarted)"
 
         # Monta os argumentos do novo processo, incluindo a string modificada.
         $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
