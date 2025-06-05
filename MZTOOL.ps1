@@ -125,7 +125,7 @@ function RESTARTADMIN {
         [switch]$Restarted
     )
 
-    if ($Restarted = $null -or $Restarted -lt 1) { 
+    if ($Restarted = $false -or $Restarted -lt 1) { 
         
         $Restarted++
 
