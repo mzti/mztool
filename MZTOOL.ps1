@@ -123,8 +123,10 @@ function RESTARTADMIN {
         $RESTART.Verb = 'runas'
         # Inicia o novo processo e encerra o atual
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+        pause
         exit
     }
+
     <## Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
