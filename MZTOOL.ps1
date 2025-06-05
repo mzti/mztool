@@ -1,6 +1,3 @@
-param (
-    [switch]$Restarted
-)
 <#
 .SYNOPSIS
     Instalação e personalização automatizada de softwares e o perfil de usuário no ambiente Windows.
@@ -40,8 +37,6 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
 
 Clear-Host
-
-Pause
 
 #VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
@@ -114,7 +109,7 @@ PSVER
 
 function RESTARTADMIN {   
  
-    if ($Restarted -lt 1) { 
+    <# if ($Restarted -lt 1) { 
         
         $Restarted++
 
@@ -130,9 +125,9 @@ function RESTARTADMIN {
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
         pause
         exit
-    }
+    }#>
 
-    <## Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
+    # Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
     $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -147,7 +142,7 @@ function RESTARTADMIN {
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
         EXIT
 
-    }#>
+    }
     
 }
 
