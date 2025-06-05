@@ -85,7 +85,9 @@ function PSVER {
     #Verifica se a versão do PowerShell é suportada.    
 
     if ((& $Global:PSVER) -lt [version]$Global:MZPSVER ) {
+       
         Write-Host "VERSÃO NECESSÁRIA DO POWERSHELL:"$($Global:MZPSVER)" OU SUPERIOR."
+       
         Write-Host "`n`VERSÃO ATUAL DO POWERSHELL  :"$(& $Global:PSVER)""
 
         Write-Host "`n`nATUALIZE A SUA VERSÃO DO POWERSHELL PARA CONTINUAR: `nhtps://github.com/PowerShell/PowerShell/releases/download/v7.5.1/PowerShell-7.5.1-win-x64.msi" -ForegroundColor Cyan
@@ -100,7 +102,7 @@ function PSVER {
        
         EXIT     
     
-    }
+    }    
 }
 
 PSVER
@@ -112,6 +114,22 @@ function RESTARTADMIN {
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
     $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
     
+    # Se a sessão não estiver sendo executada como administrador, tenta reiniciar elevado.
+    if (-not $MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
+        
+        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+        $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
+        $RESTART.Verb = 'runas'
+        [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+        EXIT
+
+    }
+    
+    # Caso a sessão já seja de administrador, continua o script.
+    # Script continua...
+
+    
+    <#
     # Verifica se a sessão está sendo executada como administrador.
     if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
 
@@ -129,6 +147,7 @@ function RESTARTADMIN {
         EXIT
 
     }
+        #>
 }
 
 RESTARTADMIN
