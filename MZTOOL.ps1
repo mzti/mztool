@@ -38,6 +38,10 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 Clear-Host
 
+param([int]$Restarted)
+if ($Restarted) { Write-host "$Restarted" }
+Pause
+
 #VARIÁVEIS GLOBAIS.
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
@@ -108,7 +112,7 @@ function PSVER {
 PSVER
 
 function RESTARTADMIN {   
-      
+    param([int]$Restarted)
 
     if ($global:Restarted -lt 1) { 
         
