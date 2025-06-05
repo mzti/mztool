@@ -38,7 +38,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 Clear-Host
 
-param([int]$Restarted)
+param([swicth]$Restarted)
 if ($Restarted) { Write-host "$Restarted" }
 Pause
 
