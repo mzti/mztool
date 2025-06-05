@@ -137,7 +137,7 @@ function RESTARTADMIN {
         
         # Monta os argumentos do novo processo, incluindo a string modificada.
         $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
-        $RESTART.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"${scriptWithParam}`""
+        $RESTART.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"${$Global:SCRIPTCODE}`""
         $RESTART.Verb = 'runas'
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
         EXIT
