@@ -114,7 +114,7 @@ PSVER
 
 function RESTARTADMIN {   
  
-    if ($Restarted = $false -or $Restarted -lt 1) { 
+    if ($Restarted -lt 1) { 
         
         $Restarted++
 
