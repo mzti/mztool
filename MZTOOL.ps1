@@ -116,7 +116,8 @@ function RESTARTADMIN {
 
         # Concatena o comando original com o parâmetro -Restarted seguido do valor atual
         $scriptWithParam = "$Global:SCRIPTCODE -Restarted $($global:Restarted)"
-
+        write-host "$scriptWithParam"
+        pause
         # Monta os argumentos do novo processo, incluindo a string modificada.
         $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
         $RESTART.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"${scriptWithParam}`""
