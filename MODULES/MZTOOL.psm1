@@ -11,19 +11,21 @@ $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstan
 #region Definições Globais
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 #endregion
+function custom {
+    Start-Sleep 2
 
-#region Customização do Console
-$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-$H = Get-Host
-$Win = $H.UI.RawUI.WindowSize
-$Win.Height = 20
-$Win.Width = 58
-$H.UI.RawUI.Set_WindowSize($Win)
-$H.UI.RawUI.Set_BufferSize($Win)
-#endregion
+    #region Customização do Console
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $H = Get-Host
+    $Win = $H.UI.RawUI.WindowSize
+    $Win.Height = 20
+    $Win.Width = 58
+    $H.UI.RawUI.Set_WindowSize($Win)
+    $H.UI.RawUI.Set_BufferSize($Win)
+    #endregion
 
-#region Importações e API
-Add-Type @"
+    #region Importações e API
+    Add-Type @"
 using System;
 using System.Runtime.InteropServices;
 public class Win32 {
@@ -41,25 +43,27 @@ public class Win32 {
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 }
 "@
-#endregion
+    #endregion
 
-#region Fixar tamanho e remover redimensionamento
-$global:hwnd = (Get-Process -Id $PID).MainWindowHandle
-if ($global:hwnd -ne [IntPtr]::Zero) {
-    $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
-    $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
-    [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
+    #region Fixar tamanho e remover redimensionamento
+    $global:hwnd = (Get-Process -Id $PID).MainWindowHandle
+    if ($global:hwnd -ne [IntPtr]::Zero) {
+        $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
+        $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
+        [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
 
-    # Bloqueia a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
-    $SWP_NOMOVE = 0x0002
-    $SWP_NOSIZE = 0x0001
-    $SWP_NOZORDER = 0x0004
-    $SWP_FRAMECHANGED = 0x0020
-    $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
-    [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
+        # Bloqueia a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
+        $SWP_NOMOVE = 0x0002
+        $SWP_NOSIZE = 0x0001
+        $SWP_NOZORDER = 0x0004
+        $SWP_FRAMECHANGED = 0x0020
+        $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
+        [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
+    }
+    #endregion
+
 }
-#endregion
-
+custom
 #region FUNÇÕES DO MÓDULO
 function GETMZTOOLMODULE {     
         

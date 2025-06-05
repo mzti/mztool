@@ -109,45 +109,39 @@ PSVER
 
 function RESTARTADMIN {
     
-    # Obtém o ID e o Objeto de Segurança do usuário atual.
+    
+    $global:Restarted++
+
+    # Concatena o comando original com o parâmetro -Restarted seguido do valor atual
+    $scriptWithParam = "$Global:SCRIPTCODE -Restarted $($global:Restarted)"
+
+    if ($global:Restarted -lt 2) {   
+
+        # Monta os argumentos do novo processo, incluindo a string modificada.
+        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
+        $RESTART.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"${scriptWithParam}`""
+        $RESTART.Verb = 'runas'
+        # Inicia o novo processo e encerra o atual
+        [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+        exit
+    }
+    <## Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
     $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
     
-    # Se a sessão não estiver sendo executada como administrador, tenta reiniciar elevado.
+    # Se a sessão não estiver sendo executada como administrador, reinicia solicitando UAC ao usuário.
     if (-not $MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
         
-        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-        $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
+        # Monta os argumentos do novo processo, incluindo a string modificada.
+        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
+        $RESTART.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"${scriptWithParam}`""
         $RESTART.Verb = 'runas'
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
         EXIT
 
-    }
+    }#>
     
-    # Caso a sessão já seja de administrador, continua o script.
-    # Script continua...
-
-    
-    <#
-    # Verifica se a sessão está sendo executada como administrador.
-    if ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
-
-        #Script continua.
-          
-    }
-
-    # Se a sessão não estiver sendo executada como administrador, tenta reiniciar o PowerShell com privilégios elevados solicitando UAC.
-    else {  
-
-        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-        $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
-        $RESTART.Verb = 'runas'
-        [System.Diagnostics.Process]::Start($RESTART) | Out-Null
-        EXIT
-
-    }
-        #>
 }
 
 RESTARTADMIN
@@ -183,10 +177,9 @@ function MZTOOLMODULE {
 #region Variáveis Globais
 $Global:TITLE = "MZTOOL BETA"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
-$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL"
-$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List | Out-Null }
+$Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
+$Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
-
 #endregion
 
 #region Definições Globais
@@ -249,7 +242,7 @@ function GETMZTOOLMODULE {
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 
-    $Global:MZTOOLMODULE
+    $Global:MZTOOLMODULE 
     
 }
 #endregion
@@ -299,8 +292,12 @@ function NEWPWSH {
     
     if ($Wait -and $Hidden) {
         # Se ambos, Wait e Hidden, forem true:
-        [void](Start-Process powershell -ArgumentList $arguments -WindowStyle Hidden -Wait)
+        [void](Start-Process powershell -ArgumentList $arguments -Wait -WindowStyle Hidden)
         return
+    }
+    elseif ($Wait -and $ReturnProcess) {
+        $proc = Start-Process powershell -ArgumentList $arguments -PassThru -Wait
+        return $proc
     }
     elseif ($Wait) {
         [void](Start-Process powershell -ArgumentList $arguments -Wait)
@@ -311,7 +308,7 @@ function NEWPWSH {
         return
     }
     elseif ($ReturnProcess) {
-        $proc = Start-Process powershell -ArgumentList $arguments -PassThru
+        $proc = Start-Process powershell -ArgumentList $arguments -PassThru       
         return $proc
     }
     else {
@@ -320,6 +317,58 @@ function NEWPWSH {
     }
     
 }
+
+<#
+function NEWPWSH {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Functions,
+        [switch]$Wait,
+        [switch]$ReturnProcess,
+        [switch]$Hidden
+    )    
+      
+    $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
+    $funcDefinitions = foreach ($fn in $Functions) {
+        (Get-Command -Type Function $fn).Definition
+    } -join "`n"
+    
+    $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
+  
+    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
+      
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = "powershell.exe"   
+    $psi.Arguments = "-EncodedCommand `"$encodedCommand`""
+    $psi.UseShellExecute = $false  
+    $psi.RedirectStandardOutput = $true
+    
+    if ($Hidden) {
+        $psi.WindowStyle = 'Hidden'
+        $psi.CreateNoWindow = $true
+    }
+
+    else {
+        $psi.CreateNoWindow = $false
+    }
+
+    $process = [System.Diagnostics.Process]::Start($psi)
+    if ($Wait -and $ReturnProcess) {
+        $process.WaitForExit()
+        $output = $process.StandardOutput.ReadToEnd()
+        return $output
+    } 
+    elseif ($Wait) {
+        $process.WaitForExit()
+    }
+    elseif ($ReturnProcess) {
+        $output = $process.StandardOutput.ReadToEnd()
+        return $output
+    }   
+    else {}
+}
+#>
 
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
 function DEPLOYFUNCTIONPROGRESS {
@@ -372,24 +421,24 @@ function DEPLOYFUNCTION {
         
         # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
         # Inicializa os valores padrão para os switches
-        $WAIT = $false
+        $Wait = $false
         if ($group.ContainsKey("Wait") -and $group.Wait) {
-            $WAIT = $true
+            $Wait = $true
         }
 
         # Aqui, $HIDDENALL é um parâmetro (SwitchParameter) da função DEPLOYFUNCTION.
         # Se ele estiver presente, vamos garantir que na passagem para NEWPWSH
         # seja utilizado o valor $true.
-        $hiddenParam = $false
+        $Hidden = $false
         if ($HIDDENALL) {
-            $hiddenParam = $true
+            $Hidden = $true
         }
 
         # Monta a tabela de parâmetros para passar à função NEWPWSH
         $arguments = @{
             Functions = $group.Functions
-            Wait      = $WAIT
-            Hidden    = $hiddenParam
+            Wait      = $Wait
+            Hidden    = $Hidden
         }
 
         # Chama a função passando os parâmetros via splatting
@@ -546,79 +595,11 @@ function DOWNLOAD {
         }
 
         else {
-            do {
             
-                #Caso as duas nuvens estejam fora do ar oferece um menu de opções.
-                                              
-                Start-Sleep -Seconds 1
-                function DisplayMenuDownloadError {           
-                    Clear-Host
-                    Write-Host '
-______________________________________________________
-|                                                    |
-|                       MZTOOL                       |
-| __________________________________________________ | 
-|            FERRAMENTAS DE DIAGNÓSTICOS             | 
-|                                                    |'
-                    Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-                    Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-                    Write-Host '|                                                    |
-|                                                    |
-| |1| TENTAR NOVAMENTE                               |
-| |2| VOLTAR AO MENU PRINCIPAL                       |
-| |0| ENCERRAR MZTOOL                                |
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|'
-           
-                    $choice = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
-                    
-                    switch ($choice) {
-                        '1' {                        
-                            return
-                            break
-                        }
-                        '2' {
-                            DISPLAYMENU
-                            break
-                        }
-                        '0' {
-                    
-                            #OPÇÃO 0 - ENCERRAR MZTOOL.
-
-                            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"
-
-                            Clear-Host
-                            Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                                                    |
-|                 ENCERRANDO MZTOOL                  |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'
-        
-                            CLEANTEMP                           
-
-                            Start-Sleep -Seconds 2
-                            Exit                            
-                        }
-                        default {
-                            ENTRYERROR
-                        }
-                    }
-                }
-        
-                DisplayMenuDownloadError
-    
-            } while ($true)# Action when all if and elseif conditions are false
+            #Caso os links estejam fora do ar oferece um menu de opções.
+            
+            DISPLAYMENUDOWNLOADERROR
+            
         }
     }
 }
@@ -820,17 +801,15 @@ function REFRESHUSER {
 }
 
 function UNINSTALLOFFICE {
-    function Get-AllInstalledOffice {
-        # Cria um array para armazenar as entradas encontradas
-        $OfficeApps = @()
-    
-        # Define os caminhos de registro para 64 bits e 32 bits (WOW6432Node)
+    function GetAllInstalledOffice {
+  
+        $OfficeApps = @()    
+     
         $UninstallPaths = @(
             "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
             "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
         )
-    
-        # Procura entradas cujo DisplayName contenha "Office"
+            
         foreach ($path in $UninstallPaths) {
             $apps = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
             Where-Object { 
@@ -841,71 +820,51 @@ function UNINSTALLOFFICE {
             if ($apps) {
                 $OfficeApps += $apps
             }
-        }
-    
+        }    
         return $OfficeApps
-    }
+    }    
     
-    
-    function Uninstall-OfficeApps {
+    function UninstallOfficeApps {
         param(
             [Parameter(Mandatory = $true)]
             [Array]$OfficeApps
         )
     
         foreach ($app in $OfficeApps) {
-            Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
-            Write-Host "App: $($app.DisplayName)" -ForegroundColor Cyan
-            Write-Host "Versão: $($app.DisplayVersion)" -ForegroundColor Cyan
-            Write-Host "IdentifyingNumber: $($app.IdentifyingNumber)" -ForegroundColor Yellow
-            Write-Host "UninstallString: $($app.UninstallString)" -ForegroundColor Yellow
-    
-            # Tenta usar o IdentifyingNumber, se não existir extrai da UninstallString
-            $guid = $app.IdentifyingNumber
-                   
-            if ($guid) {
-                Write-Host "Tentando desinstalar $($app.DisplayName) via msiexec usando GUID $guid..." -ForegroundColor Green
-                try {
-                    # Desinstala silenciosamente com msiexec (/qn)
-                    Start-Process -FilePath "msiexec.exe" -ArgumentList "/x $guid /qn" -Wait -NoNewWindow
-                }
-                catch {
-                    Write-Warning "Falha ao tentar desinstalar $($app.DisplayName): $_"
-                }
-            }
-            elseif ($app.UninstallString -and $app.UninstallString -notmatch "MsiExec.exe") {               
-                $uninstallCmd = $app.UninstallString                
+                    
+            If ($app.UninstallString -notmatch "MsiExec.exe") {           
                
-                # Se for um comando do setup.exe do Office, adiciona parâmetros adicionais para desinstalação automática
-                #    if ($uninstallCmd -match "setup.exe") {
-                #        $uninstallCmd = $uninstallCmd + " /quiet /norestart"
-                #   }
-                Write-Warning "GUID não encontrado para $($app.DisplayName). Tentando UnistallString."
-                #cmd /c $app.UninstallString 
+                $uninstallCmd = $app.UninstallString
+                
+                RESETCURSOR
+              
+                Write-Warning "INICIANDO DESINSTALAÇÃO - $($app.DisplayName)"
+         
                 Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait -NoNewWindow
-            }
-            else {
-                Write-Warning "Desinstalador parcial ignorado. Buscando desinstalador completo."
-            }
+
+            }            
         }
     }
     
-    # Coleta todas as instalações do Office encontradas
-    $InstalledOffice = Get-AllInstalledOffice
+    $InstalledOffice = GetAllInstalledOffice
     
-    if ($InstalledOffice.Count -gt 0) {
-        Write-Host "Foram encontradas as seguintes entradas do Office:" -ForegroundColor Cyan
+    if ($InstalledOffice.Count -gt 0) {       
+       
+        Write-Warning "`nINSTALAÇÃO DO OFFICE OU 365 ENCONTRADA:"
         foreach ($app in $InstalledOffice) {
-            Write-Host "$($app.DisplayName) - Versão: $($app.DisplayVersion)" -ForegroundColor Green
-        }
-    
-        # Se desejar executar a desinstalação, descomente a linha abaixo:
-        Uninstall-OfficeApps -OfficeApps $InstalledOffice
+            RESETCURSOR
+            Write-Host "$($app.DisplayName) - VERSÃO: $($app.DisplayVersion)" -ForegroundColor Green
+        }         
+        UninstallOfficeApps -OfficeApps $InstalledOffice
     }
     else {
-        Write-Host "Nenhuma instalação do Office foi encontrada." -ForegroundColor Yellow
+        RESETCURSOR
+        Write-Warning "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO."
     }
-    
+
+    $StillInstalled = (GetAllInstalledOffice).Count -gt 0
+
+    return $StillInstalled
 }
 
 function CLEANTEMP {
@@ -1023,6 +982,8 @@ function CLOCKDATE {
    
 }  
 #endregion
+
+$Global:GIT = $FALSE
 '@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
