@@ -45,12 +45,8 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 Clear-Host
 
 # Se o parâmetro foi passado na reinicialização, definimos a variável global
-if ($Restarted) {
-    $Restarted = 1
+if ($Restarted) {    
     Write-host "$Restarted"
-}
-else {
-    $Restarted = 0
 }
 
 Pause
