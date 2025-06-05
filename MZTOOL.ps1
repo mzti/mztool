@@ -1,3 +1,7 @@
+
+param (
+    [switch]$Restarted
+)
 <#
 .SYNOPSIS
     Instalação e personalização automatizada de softwares e o perfil de usuário no ambiente Windows.
@@ -37,10 +41,9 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 #MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
 
 
-param (
-    [switch]$Restarted
-)
+
 Clear-Host
+
 # Se o parâmetro foi passado na reinicialização, definimos a variável global
 if ($Restarted) {
     $Restarted = 1
