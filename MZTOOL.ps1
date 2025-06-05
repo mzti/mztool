@@ -1,4 +1,3 @@
-
 param (
     [switch]$Restarted
 )
@@ -40,14 +39,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 
 #MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
 
-
-
 Clear-Host
-
-# Se o parâmetro foi passado na reinicialização, definimos a variável global
-if ($Restarted) {    
-    Write-host "$Restarted"
-}
 
 Pause
 
@@ -121,10 +113,7 @@ function PSVER {
 PSVER
 
 function RESTARTADMIN {   
-    param(
-        [switch]$Restarted
-    )
-
+ 
     if ($Restarted = $false -or $Restarted -lt 1) { 
         
         $Restarted++
