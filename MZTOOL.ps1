@@ -125,7 +125,9 @@ function PSVER {
 PSVER
 
 function RESTARTADMIN {   
-    param([int]$Restarted)
+    param(
+        [switch]$Restarted
+    )
 
     if ($Restarted -lt 1) { 
         
