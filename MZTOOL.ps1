@@ -1710,12 +1710,28 @@ function ENTRYERROR {
     param (
         [string]$FUNCTIONCALLSTACK
     )
-  
+
     #ENTRADA INVÁLIDA.
 
-    RESETCURSOR
-    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-    Start-Sleep -Seconds 1  
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE"  
+
+    Clear-Host
+    Write-Host '
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| _________________________________________________  | 
+|                                                    |
+|                                                    |
+|                                                    |
+|                  OPÇÃO INVÁLIDA.                   |
+| INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA    |
+|                                                    |
+|                                                    |
+|        MOZART INFORMÁTICA | DANIEL MOZART          |
+|____________________________________________________|
+'     
+    Start-Sleep -Seconds 2 
     Write-Host "$FUNCTIONCALLSTACK"
     Pause
     & $FUNCTIONCALLSTACK
