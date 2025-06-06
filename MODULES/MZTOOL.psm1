@@ -802,6 +802,9 @@ function ENTRYERROR {
 }#>
 
 function ENTRYERROR {
+    param (
+        [string]$FUNCTIONCALLSTACK
+    )
   
     #ENTRADA INVÁLIDA.
 

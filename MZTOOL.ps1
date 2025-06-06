@@ -1112,7 +1112,7 @@ $Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | For
 
 #MENU -----------------------------------------------------
 
-$FUNCTIONCALLSTACK = function DISPLAYMENU {
+function DISPLAYMENU {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE"         
     
@@ -1380,7 +1380,7 @@ ______________________________________________________
 
         4 {
 
-            $FUNCTIONCALLSTACK = function DISPLAYMENU4 {
+            function DISPLAYMENU4 {
                 param(
                     [int]$CHOICE4
                 )
@@ -1470,7 +1470,8 @@ ______________________________________________________
                     }
 
                     default {
-                        ENTRYERROR
+                        $FUNCTIONCALLSTACK = $MyInvocation.MyCommand.Name
+                        ENTRYERROR -FUNCTIONCALLSTACK $FUNCTIONCALLSTACK
                     }
                 }
 
