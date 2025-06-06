@@ -1679,7 +1679,7 @@ ______________________________________________________
             1 {
                 $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
                 if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
-                DISPLAYMENU4 -CHOICE4 1
+                DISPLAYMENU4 -CHOICE4 "1"
             }
             2 {
                 #SCRIPT CONTINUA.
