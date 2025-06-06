@@ -1730,8 +1730,11 @@ ______________________________________________________
 |                                                    |
 |        MOZART INFORMÁTICA | DANIEL MOZART          |
 |____________________________________________________|
-'     
-    $FUNCTIONCALLSTACK = $MyInvocation.MyCommand.Name                        
+'    
+    $callStack = Get-PSCallStack
+    $callerFrame = $callStack[1]
+    $FUNCTIONCALLSTACK = $callerFrame.Command
+                             
     Start-Sleep -Seconds 2 
     Write-Host "$FUNCTIONCALLSTACK"
     Pause
