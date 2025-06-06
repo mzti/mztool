@@ -802,32 +802,14 @@ function ENTRYERROR {
 }#>
 
 function ENTRYERROR {
-    # Obtém a pilha de chamadas
-    $callStack = Get-PSCallStack
+  
+    #ENTRADA INVÁLIDA.
 
-    # Filtra os frames que tenham o nome da função contendo "DISPLAYMENU"
-    $displayMenuFrames = $callStack | Where-Object { $_.Command -match 'DISPLAYMENU' }
+    RESETCURSOR
+    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    Start-Sleep -Seconds 1  
+    & $FUNCTIONCALLSTACK
 
-    if ($displayMenuFrames) {
-        # Seleciona o último frame que corresponde ao padrão
-        $lastFrame = $displayMenuFrames | Select-Object -Last 1
-        $functionName = $lastFrame.Command
-        
-        Write-Host "Retornando para o menu '$functionName'." -ForegroundColor Cyan
-        
-        try {
-            # Chama a função por seu nome
-            & $functionName
-        }
-        catch {
-            Write-Host "Erro ao tentar invocar a função '$functionName': $_" -ForegroundColor Red
-            Pause
-        }
-    }
-    else {
-        Write-Host "Nenhuma função DISPLAYMENU encontrada na pilha de chamadas." -ForegroundColor Yellow
-        Pause
-    }
 }
 
 
