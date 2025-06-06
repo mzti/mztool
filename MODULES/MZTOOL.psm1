@@ -814,6 +814,7 @@ function ENTRYERROR {
     Write-Host "$FUNCTIONCALLSTACK"
     Pause
     & $FUNCTIONCALLSTACK
+    Pause
 
 }
 
