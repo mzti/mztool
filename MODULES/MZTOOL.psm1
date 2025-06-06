@@ -800,7 +800,7 @@ function ENTRYERROR {
         pause
     }
 }#>
-
+<#
 function ENTRYERROR {
     param (
         [string]$FUNCTIONCALLSTACK
@@ -817,7 +817,7 @@ function ENTRYERROR {
     Pause
 
 }
-
+#>
 
 function CLOCKDATE {
 

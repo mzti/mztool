@@ -1701,7 +1701,24 @@ ______________________________________________________
         Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
         Start-Sleep -Seconds 5
         
-    }                                       
+    } 
+    
+    function ENTRYERROR {
+        param (
+            [string]$FUNCTIONCALLSTACK
+        )
+      
+        #ENTRADA INVÁLIDA.
+    
+        RESETCURSOR
+        Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+        Start-Sleep -Seconds 1  
+        Write-Host "$FUNCTIONCALLSTACK"
+        Pause
+        & $FUNCTIONCALLSTACK
+        Pause
+    
+    }
 }
 
 #FUNÇÕES---------------------------------------------------------------
