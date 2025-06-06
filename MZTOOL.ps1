@@ -1703,22 +1703,24 @@ ______________________________________________________
         
     } 
     
-    function ENTRYERROR {
-        param (
-            [string]$FUNCTIONCALLSTACK
-        )
-      
-        #ENTRADA INVÁLIDA.
-    
-        RESETCURSOR
-        Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-        Start-Sleep -Seconds 1  
-        Write-Host "$FUNCTIONCALLSTACK"
-        Pause
-        & $FUNCTIONCALLSTACK
-        Pause
-    
-    }
+
+}
+
+function ENTRYERROR {
+    param (
+        [string]$FUNCTIONCALLSTACK
+    )
+  
+    #ENTRADA INVÁLIDA.
+
+    RESETCURSOR
+    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    Start-Sleep -Seconds 1  
+    Write-Host "$FUNCTIONCALLSTACK"
+    Pause
+    & $FUNCTIONCALLSTACK
+    Pause
+
 }
 
 #FUNÇÕES---------------------------------------------------------------
