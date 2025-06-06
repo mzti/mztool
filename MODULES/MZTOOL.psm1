@@ -802,28 +802,34 @@ function ENTRYERROR {
 }#>
 
 function ENTRYERROR {
-    
-    # Entrada inválida
-    RESETCURSOR
-    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-    Start-Sleep -Seconds 1
-    <#
-    if ($MenuCallback) {
+    # Obtém a pilha de chamadas
+    $callStack = Get-PSCallStack
+
+    # Filtra os frames que tenham o nome da função contendo "DISPLAYMENU"
+    $displayMenuFrames = $callStack | Where-Object { $_.Command -match 'DISPLAYMENU' }
+
+    if ($displayMenuFrames) {
+        # Seleciona o último frame que corresponde ao padrão
+        $lastFrame = $displayMenuFrames | Select-Object -Last 1
+        $functionName = $lastFrame.Command
+        
+        Write-Host "Retornando para o menu '$functionName'." -ForegroundColor Cyan
+        
         try {
-            Start-Sleep -Seconds 1  # Se necessário, ajuste ou remova
-            & $MenuCallback
+            # Chama a função por seu nome
+            & $functionName
         }
         catch {
-            Write-Host "Erro ao invocar o menu: $_" -ForegroundColor Red
-            pause
+            Write-Host "Erro ao tentar invocar a função '$functionName': $_" -ForegroundColor Red
+            Pause
         }
     }
     else {
-        Write-Host "Nenhum menu fornecido para retornar. Encerrando." -ForegroundColor Yellow
-        pause
+        Write-Host "Nenhuma função DISPLAYMENU encontrada na pilha de chamadas." -ForegroundColor Yellow
+        Pause
     }
-    #>
 }
+
 
 function CLOCKDATE {
 
