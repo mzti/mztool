@@ -1725,7 +1725,7 @@ ______________________________________________________
 |                                                    |
 |                                                    |
 |                  OPÇÃO INVÁLIDA.                   |
-| INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA    |
+|  INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA   |
 |                                                    |
 |                                                    |
 |        MOZART INFORMÁTICA | DANIEL MOZART          |
