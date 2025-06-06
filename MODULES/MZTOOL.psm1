@@ -811,6 +811,8 @@ function ENTRYERROR {
     RESETCURSOR
     Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
     Start-Sleep -Seconds 1  
+    Write-Host "$FUNCTIONCALLSTACK"
+    Pause
     & $FUNCTIONCALLSTACK
 
 }

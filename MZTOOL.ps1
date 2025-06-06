@@ -1470,11 +1470,8 @@ ______________________________________________________
                     }
 
                     default {
-                        $FUNCTIONCALLSTACK = $MyInvocation.MyCommand.Name
-                        Write-Host "$FUNCTIONCALLSTACK"
-                        Pause
-                        & $FUNCTIONCALLSTACK
-                        # ENTRYERROR -FUNCTIONCALLSTACK $FUNCTIONCALLSTACK
+                        $FUNCTIONCALLSTACK = $MyInvocation.MyCommand.Name                        
+                        ENTRYERROR -FUNCTIONCALLSTACK $FUNCTIONCALLSTACK
                     }
                 }
 
