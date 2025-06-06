@@ -116,14 +116,11 @@ function RESTARTADMIN {
     
     # Se a sessão não estiver sendo executada como administrador, reinicia solicitando UAC ao usuário.
     if (-not $MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
-        
-        # Monta os argumentos do novo processo, incluindo a string modificada.
-        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
-        $RESTART.Arguments = "-Command `"${$Global:SCRIPTCODE}`""
+        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+        $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
         $RESTART.Verb = 'runas'
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
         EXIT
-
     }
     
 }
