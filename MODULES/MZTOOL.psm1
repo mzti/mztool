@@ -775,6 +775,7 @@ function RESETCURSOR {
     $rawUI.CursorPosition = $cursorPos
 }
 
+<#
 function ENTRYERROR {
     
     #ENTRADA INVÁLIDA.
@@ -798,6 +799,30 @@ function ENTRYERROR {
         Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
         pause
     }
+}#>
+
+function ENTRYERROR {
+    
+    # Entrada inválida
+    RESETCURSOR
+    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    Start-Sleep -Seconds 1
+    <#
+    if ($MenuCallback) {
+        try {
+            Start-Sleep -Seconds 1  # Se necessário, ajuste ou remova
+            & $MenuCallback
+        }
+        catch {
+            Write-Host "Erro ao invocar o menu: $_" -ForegroundColor Red
+            pause
+        }
+    }
+    else {
+        Write-Host "Nenhum menu fornecido para retornar. Encerrando." -ForegroundColor Yellow
+        pause
+    }
+    #>
 }
 
 function CLOCKDATE {
