@@ -1731,6 +1731,7 @@ ______________________________________________________
 |        MOZART INFORMÁTICA | DANIEL MOZART          |
 |____________________________________________________|
 '     
+    $FUNCTIONCALLSTACK = $MyInvocation.MyCommand.Name                        
     Start-Sleep -Seconds 2 
     Write-Host "$FUNCTIONCALLSTACK"
     Pause
