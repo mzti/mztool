@@ -1470,8 +1470,8 @@ ______________________________________________________
                     }
 
                     default {
-                        $FUNCTIONCALLSTACK = $MyInvocation.MyCommand.Name                        
-                        ENTRYERROR -FUNCTIONCALLSTACK $FUNCTIONCALLSTACK
+                                             
+                        ENTRYERROR
                     }
                 }
 
@@ -1555,31 +1555,6 @@ ______________________________________________________
     }
 }
 #Funções auxiliares do MENU.
-function EXITMZTOOL {
-    
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"  
-
-    Clear-Host
-    Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                                                    |
-|                 ENCERRANDO MZTOOL                  |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
-'
-    CLEANTEMP
-
-    EXIT 
-
-}
 
 function DISPLAYMENUDOWNLOADERROR {      
     
@@ -1637,7 +1612,7 @@ function DISPLAYMENU365STATUS {
 
     }
 
-    if ($365STATUS -eq "2") {
+    if ($365STATUS -eq "2" -or -not($365STATUS)) {
         
         Clear-Host
         Write-Host '
@@ -1707,10 +1682,7 @@ ______________________________________________________
 }
 
 function ENTRYERROR {
-    param (
-        [string]$FUNCTIONCALLSTACK
-    )
-
+   
     #ENTRADA INVÁLIDA.
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE"  
@@ -1731,15 +1703,46 @@ ______________________________________________________
 |        MOZART INFORMÁTICA | DANIEL MOZART          |
 |____________________________________________________|
 '    
-    $callStack = Get-PSCallStack
-    $callerFrame = $callStack[1]
-    $FUNCTIONCALLSTACK = $callerFrame.Command
-                             
-    Start-Sleep -Seconds 2 
-    Write-Host "$FUNCTIONCALLSTACK"
-    Pause
-    & $FUNCTIONCALLSTACK
-    Pause
+    Start-Sleep -Seconds 2
+
+    $CALLSTACK = Get-PSCallStack
+
+    if ($CALLSTACK.Count -gt 1) {
+        $CALLERFRAME = $CALLSTACK[1]
+        $FUNCTIONCALLSTACK = $CALLERFRAME.Command
+    }
+
+    else {        
+        $FUNCTIONCALLSTACK = "DISPLAYMENU"
+    }
+
+    & $FUNCTIONCALLSTACK  
+
+}
+
+function EXITMZTOOL {
+    
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> EXIT"  
+
+    Clear-Host
+    Write-Host '
+______________________________________________________
+|                                                    |
+|                      MZTOOL                        |
+| _________________________________________________  | 
+|                                                    |
+|                                                    |
+|                                                    |
+|                 ENCERRANDO MZTOOL                  |
+|                                                    |
+|                                                    |
+|                 MOZART INFORMÁTICA                 |
+|                   DANIEL MOZART                    |
+|____________________________________________________|
+'
+    CLEANTEMP
+
+    EXIT 
 
 }
 
