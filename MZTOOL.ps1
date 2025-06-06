@@ -1382,7 +1382,7 @@ ______________________________________________________
 
             function DISPLAYMENU4 {
                 param(
-                    [int]$CHOICE4
+                    [string]$CHOICE4
                 )
             
                 Clear-Host            
@@ -1404,7 +1404,7 @@ ______________________________________________________
 |____________________________________________________|
 '
                 if (-not $CHOICE4) {
-                    $CHOICE4 = [int](Read-Host 'INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA')
+                    $CHOICE4 = (Read-Host 'INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA')
                 }
                 switch ($CHOICE4) {
                    
@@ -1471,7 +1471,10 @@ ______________________________________________________
 
                     default {
                         $FUNCTIONCALLSTACK = $MyInvocation.MyCommand.Name
-                        ENTRYERROR -FUNCTIONCALLSTACK $FUNCTIONCALLSTACK
+                        Write-Host "$FUNCTIONCALLSTACK"
+                        Pause
+                        & $FUNCTIONCALLSTACK
+                        # ENTRYERROR -FUNCTIONCALLSTACK $FUNCTIONCALLSTACK
                     }
                 }
 
