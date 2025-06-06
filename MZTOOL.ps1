@@ -107,26 +107,8 @@ function PSVER {
 
 PSVER
 
-function RESTARTADMIN {   
+function RESTARTADMIN {    
  
-    <# if ($Restarted -lt 1) { 
-        
-        $Restarted++
-
-        # Concatena o comando original com o parâmetro -Restarted seguido do valor atual
-        $scriptWithParam = "$Global:SCRIPTCODE -Restarted $($Restarted)"
-        write-host "$scriptWithParam"
-        pause
-        # Monta os argumentos do novo processo, incluindo a string modificada.
-        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
-        $RESTART.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"${scriptWithParam}`""
-        $RESTART.Verb = 'runas'
-        # Inicia o novo processo e encerra o atual
-        [System.Diagnostics.Process]::Start($RESTART) | Out-Null
-        pause
-        exit
-    }#>
-
     # Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
@@ -137,7 +119,7 @@ function RESTARTADMIN {
         
         # Monta os argumentos do novo processo, incluindo a string modificada.
         $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell.exe'
-        $RESTART.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"${$Global:SCRIPTCODE}`""
+        $RESTART.Arguments = "-Command `"${$Global:SCRIPTCODE}`""
         $RESTART.Verb = 'runas'
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
         EXIT
