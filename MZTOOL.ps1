@@ -1189,8 +1189,8 @@ do {
                         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
                                            
                         # Cria a linha de definição da variável (com o símbolo $ escapado).
-                        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"        
-                             
+                        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"
+  
                         # Verifica se a variável já existe no arquivo de perfil.
                         if (Select-String -Path $PROFILE -Pattern "`$$($_.Key) =" -Quiet) {            
                             $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
@@ -1199,9 +1199,11 @@ do {
                       
                         # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
                         else {
-                            Add-Content -Path $PROFILE -Value $SETENVPROFILE
+                            Add-Content -Path $PROFILE -Value $SETENVPROFILE -Encoding UTF8
                         }
                     }
+                    $FULLPROFILE = "`n`n" + $MODULECONTENT
+                    Add-Content -Path $PROFILE -Value $FULLPROFILE -Encoding UTF8
                 }
                 if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
