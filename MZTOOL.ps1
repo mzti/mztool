@@ -1964,8 +1964,8 @@ function DOWNLOADMZTOOL {
         ($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH)
     )
     
-    $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH } | ForEach-Object {
-        Write-Host "`nHASH MD5"`n"$($_)`n$($NEWMZTOOLZIPHASH)" -NoNewline -ForegroundColor Green
+    $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
+        Write-Host "`nHASH MD5"`n"$($_)`n$($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
     }      
 
     Start-Sleep -Seconds 3
