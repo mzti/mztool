@@ -47,6 +47,7 @@ $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 
+
 #$ErrorActionPreference = 'SilentlyContinue'
 
 $Host.UI.RawUI.WindowTitle = "$Global:TITLE"
@@ -2084,7 +2085,8 @@ function WINGETUPGRADE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETUPGRADE"
 
-    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue) -or
+        (& $Global:GETWINGETVER) -lt $Global:WINGETVER) {
         WINGETMODULE
     }
 
@@ -2103,10 +2105,9 @@ function WINUPDATE {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATE"   
 
-    if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) { 
-            
-        WINUPDATEMODULE
-        
+    if (-not (Get-Module -ListAvailable PSWindowsUpdate)) {
+     
+        WINUPDATEMODULE 
     }
 
     else {
