@@ -166,7 +166,7 @@ function RESTARTADMIN {
     if (-not ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) -or ($Global:RESTART -lt 2)) {
      
         $RESTARTPWSH = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-        $RESTARTPWSH.Arguments = "-Command `"${global:SCRIPTCODE}`""
+        $RESTARTPWSH.Arguments = "-Command `"${$Global:SCRIPTCODE}`""
         $RESTARTPWSH.Verb = 'runas'
         [System.Diagnostics.Process]::Start($RESTARTPWSH) | Out-Null         
         EXIT
