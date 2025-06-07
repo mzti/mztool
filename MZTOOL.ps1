@@ -131,9 +131,9 @@ function RESTARTADMIN {
     $MZTOOLAPPDATA = "$env:APPDATA\MZTOOL"
 
     if (-not (Test-Path $MZTOOLAPPDATA)) {
-        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force
-          
+        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force          
     }
+
     # Define o caminho do arquivo no diretório AppData\Roaming
     $RESTARTFILE = Join-Path $MZTOOLAPPDATA "RESTARTCOUNT.txt"
 
@@ -157,9 +157,7 @@ function RESTARTADMIN {
     $Global:RESTART++
 
     # Atualiza (ou cria) o arquivo com a nova contagem
-    Set-Content -Path $RESTARTFILE -Value $Global:RESTART -Encoding UTF8
-
-    # Exibe uma mensagem indicando quantas vezes o script foi reinici  
+    Set-Content -Path $RESTARTFILE -Value $Global:RESTART -Encoding UTF8  
     
     # Se a sessão não estiver sendo executada como administrador, reinicia solicitando UAC ao usuário.
     if (-not ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) -or ($Global:RESTART -lt 2)) {
@@ -171,9 +169,9 @@ function RESTARTADMIN {
     }
     
 }
-
+PAUSE
 RESTARTADMIN
-
+PAUSE
 function MZTOOLMODULE {
 
     # Define o nome do módulo
