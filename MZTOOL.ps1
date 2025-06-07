@@ -1174,7 +1174,7 @@ do {
             function GETPROFILE {  
                
                 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
-                $Global:ENVIROMENTVARS | ForEach-Object {
+                $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {
                     if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
               
                         # Cria o arquivo de perfil do PowerShell se não existir.
