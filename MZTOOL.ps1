@@ -1229,7 +1229,8 @@ do {
         
     }    
 
-} while (-not ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) -or -not ($Global:PROFILELOADED))
+} while (-not (($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) -or $Global:PROFILELOADED)) 
+   
 
 $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {      
     
