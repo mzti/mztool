@@ -118,9 +118,11 @@ function PSVER {
 PSVER
 
 function RESTARTADMIN {    
-    param([switch]$RESTART)
+    <#  param(
+        [switch]$RESTART
+        )
 
-    if ($RESTART = 0) { $Global:RESTART = 0 }
+    if ($RESTART = 0) { $Global:RESTART = 0 }#>
  
     # Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -167,8 +169,10 @@ function RESTARTADMIN {
         [System.Diagnostics.Process]::Start($RESTART) | Out-Null
         EXIT
     }
+    else { Remove-Item $RESTARTFILE -Force -ErrorAction SilentlyContinue }
     
 }
+Write-Host "$($Global:SCRIPTCODE)"
 PAUSE
 RESTARTADMIN
 PAUSE
