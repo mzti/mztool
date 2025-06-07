@@ -1202,10 +1202,11 @@ do {
                         else {
                             Add-Content -Path $PROFILE -Value $SETENVPROFILE -Encoding UTF8
                         }
-                    }
-                    $FULLPROFILE = "`n`n" + $Global:MODULECONTENT
-                    Add-Content -Path $PROFILE -Value $FULLPROFILE -Encoding UTF8
+                    }                    
                 }
+               
+                Add-Content -Path $PROFILE -Value $Global:MODULECONTENT -Encoding UTF8
+                    
                 if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
                 }
