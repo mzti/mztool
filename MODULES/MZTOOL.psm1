@@ -9,6 +9,8 @@ $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstan
 $Global:WINGETVER = "v1.10.390"
 $Global:GETWINGETVER = { Winget --version 2>&1 }
 $Global:MZTOOLAPPDATA = $MZTOOLAPPDATA
+$Global:MZTOOLMODULETRUE = $TRUE
+$Global:GIT = $TRUE
 
 #endregion
 
@@ -767,7 +769,7 @@ function CLEANTEMP {
     }
 
     if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
-        
+
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
     }
    
@@ -919,5 +921,3 @@ function WINGETMODULE {
 
 #endregion
 
-
-$Global:GIT = $TRUE

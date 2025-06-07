@@ -1113,7 +1113,7 @@ function WINGETMODULE {
 }
 
 #endregion
-
+$Global:MZTOOLMODULETRUE = $TRUE
 $Global:GIT = $FALSE
 '@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
@@ -1123,7 +1123,7 @@ $Global:GIT = $FALSE
 
 function GETMZTOOLMODULE {     
         
-    if (-not($Global:MZTOOLMODULE)) {
+    if (-not($Global:MZTOOLMODULE) -and -not($Global:MZTOOLMODULETRUE)) {
         
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
@@ -1138,7 +1138,7 @@ do {
     GETMZTOOLMODULE         
  
     # Verifica se o módulo foi carregado com sucesso.
-    if ($Global:MZTOOLMODULE) {
+    if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
 
         $MODULESTATUS = "MÓDULO ON"
 
