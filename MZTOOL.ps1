@@ -1216,7 +1216,7 @@ do {
             GETPROFILE
 
             Write-Host "Tentativas de carregamento do módulo PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
-            
+            Start-Sleep -Seconds 3
             EXIT
         }
 
