@@ -1275,10 +1275,14 @@ ________________________________________________________
 |______________________________________________________|
 '
     # Informa se o Módulo ou o Perfil Powershell está importado.
-    if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
+    if ($Global:PROFILELOADED) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
+
+    elseif ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 
+
         Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
+    
     }
-    elseif ($Global:PROFILELOADED) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green } 
+
     else { Write-Host "MÓDULO E PERFIL POWERSHELL OFFLINE" -ForegroundColor Red }
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
