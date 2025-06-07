@@ -162,24 +162,29 @@ $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
+$Global:WINGETVER = "v1.10.390"
+$Global:GETWINGETVER = { Winget --version 2>&1 }
+
 #endregion
 
 #region Definições Globais
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 #endregion
+function custom {
+    Start-Sleep 2
 
-#region Customização do Console
-$Host.UI.RawUI.BackgroundColor = 'DarkBlue'
-$H = Get-Host
-$Win = $H.UI.RawUI.WindowSize
-$Win.Height = 20
-$Win.Width = 58
-$H.UI.RawUI.Set_WindowSize($Win)
-$H.UI.RawUI.Set_BufferSize($Win)
-#endregion
+    #region Customização do Console
+    $Host.UI.RawUI.BackgroundColor = 'DarkBlue'
+    $H = Get-Host
+    $Win = $H.UI.RawUI.WindowSize
+    $Win.Height = 20
+    $Win.Width = 58
+    $H.UI.RawUI.Set_WindowSize($Win)
+    $H.UI.RawUI.Set_BufferSize($Win)
+    #endregion
 
-#region Importações e API
-Add-Type @"
+    #region Importações e API
+    Add-Type @"
 using System;
 using System.Runtime.InteropServices;
 public class Win32 {
@@ -197,25 +202,27 @@ public class Win32 {
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 }
 "@
-#endregion
+    #endregion
 
-#region Fixar tamanho e remover redimensionamento
-$global:hwnd = (Get-Process -Id $PID).MainWindowHandle
-if ($global:hwnd -ne [IntPtr]::Zero) {
-    $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
-    $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
-    [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
+    #region Fixar tamanho e remover redimensionamento
+    $global:hwnd = (Get-Process -Id $PID).MainWindowHandle
+    if ($global:hwnd -ne [IntPtr]::Zero) {
+        $style = [Win32]::GetWindowLong($global:hwnd, [Win32]::GWL_STYLE)
+        $newStyle = $style -band (-bnot ([Win32]::WS_SIZEBOX -bor [Win32]::WS_MAXIMIZEBOX))
+        [Win32]::SetWindowLong($global:hwnd, [Win32]::GWL_STYLE, $newStyle)
 
-    # Bloqueia a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
-    $SWP_NOMOVE = 0x0002
-    $SWP_NOSIZE = 0x0001
-    $SWP_NOZORDER = 0x0004
-    $SWP_FRAMECHANGED = 0x0020
-    $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
-    [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
+        # Bloqueia a alteração do tamanho pelo mouse, sem reposicionar ou redimensionar a janela
+        $SWP_NOMOVE = 0x0002
+        $SWP_NOSIZE = 0x0001
+        $SWP_NOZORDER = 0x0004
+        $SWP_FRAMECHANGED = 0x0020
+        $flags = $SWP_NOMOVE -bor $SWP_NOSIZE -bor $SWP_NOZORDER -bor $SWP_FRAMECHANGED
+        [Win32]::SetWindowPos($global:hwnd, [IntPtr]::Zero, 0, 0, 0, 0, $flags)
+    }
+    #endregion
+
 }
-#endregion
-
+custom
 #region FUNÇÕES DO MÓDULO
 function GETMZTOOLMODULE {     
         
@@ -927,6 +934,7 @@ function RESETCURSOR {
     $rawUI.CursorPosition = $cursorPos
 }
 
+<#
 function ENTRYERROR {
     
     #ENTRADA INVÁLIDA.
@@ -950,7 +958,25 @@ function ENTRYERROR {
         Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
         pause
     }
+}#>
+<#
+function ENTRYERROR {
+    param (
+        [string]$FUNCTIONCALLSTACK
+    )
+  
+    #ENTRADA INVÁLIDA.
+
+    RESETCURSOR
+    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+    Start-Sleep -Seconds 1  
+    Write-Host "$FUNCTIONCALLSTACK"
+    Pause
+    & $FUNCTIONCALLSTACK
+    Pause
+
 }
+#>
 
 function CLOCKDATE {
 
@@ -963,6 +989,80 @@ function CLOCKDATE {
     w32tm /resync /force
    
 }  
+#endregion
+
+#region FUNÇÕES REDUNDANTES
+function WINUPDATEMODULE {
+    
+    #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
+    
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
+    
+    #Pacote NuGet.
+    Install-PackageProvider -Name NuGet -Force |  Clear-Host   
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted  |  Clear-Host
+    
+    #Módulo WINDOWS UPDATE.
+    Install-Module PSWindowsUpdate -AllowClobber -Force |  Clear-Host
+    Import-Module PSWindowsUpdate -Force |  Clear-Host        
+                
+}
+
+function WINGETMODULE {
+    
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
+   
+    #Implementa e ou atualiza o WINGET.
+     
+    #Verifica se a versão do Windows é a 11.
+    if ($Global:WINVER -Match 'Windows 11') {
+                     
+        #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.WindowsTerminal --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.NuGet --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        
+    }
+
+    #Verifica se a versão do Windows é a 10.
+    elseif ($Global:WINVER -Match 'Windows 10') {
+                     
+        #Instala o pacote NuGet.
+        Install-PackageProvider -Name NuGet -Force |  Clear-Host
+        
+        #Reinstala, redefine as fontes e atualiza o WINGET.
+        Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery -ErrorAction SilentlyContinue |  Clear-Host
+        Repair-WinGetPackageManager |  Clear-Host
+        Winget Source Remove --Name winget |  Clear-Host
+        Winget Source Remove --Name msstore |  Clear-Host
+        Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue |  Clear-Host
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Start-Sleep 1
+        Winget Source Reset --Force |  Clear-Host     
+        Winget Source Update |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue  |  Clear-Host
+        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.WindowsTerminal --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.NuGet --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+    }
+
+    else {
+        Write-Host 'VERSÃO DO WINDOWS NÃO COMPATÍVEL COM WINGET.'
+        Start-Sleep -Seconds 5
+    }  
+
+}
+
 #endregion
 
 $Global:GIT = $FALSE
@@ -1303,7 +1403,7 @@ _______________________________________________________
 | |1| IMPLEMENTAR MÓDULOS WINGET E WINDOWS UPDATE     |
 | |2| IMPLEMENTAR ATUALIZAÇÕES                        |
 | |3| VOLTAR                                          |
-|                                                     |
+| |0| SAIR                                            |
 |                                                     |
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
@@ -1376,6 +1476,10 @@ _______________________________________________________
                     3 {
                         DISPLAYMENU
                     }
+
+                    0 { 
+                        EXITMZTOOL
+                    }
         
                     default {
                         ENTRYERROR
@@ -1409,7 +1513,7 @@ _______________________________________________________
 | |1| INSTALAR OFFICE 365                             | 
 | |2| INSTALAR OFFICE 2007                            |
 | |3| VOLTAR                                          |
-|                                                     |
+| |0| SAIR                                            |
 |                                                     |
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
@@ -1480,6 +1584,10 @@ _______________________________________________________
                
                     3 {
                         DISPLAYMENU
+                    }
+
+                    0 { 
+                        EXITMZTOOL
                     }
 
                     default {
