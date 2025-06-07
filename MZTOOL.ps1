@@ -1868,7 +1868,7 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '    
-    Start-Sleep -Seconds 2
+    Start-Sleep -Seconds 1
 
     $CALLSTACK = Get-PSCallStack
 
