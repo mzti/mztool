@@ -8,6 +8,7 @@ $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyConti
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:WINGETVER = "v1.10.390"
 $Global:GETWINGETVER = { Winget --version 2>&1 }
+$Global:MZTOOLAPPDATA = $MZTOOLAPPDATA
 
 #endregion
 
@@ -763,6 +764,11 @@ function CLEANTEMP {
     if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
         REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
+    }
+
+    if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
+        
+        REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
     }
    
     Start-Sleep -Seconds 2
