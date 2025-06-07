@@ -1224,7 +1224,7 @@ do {
         
     }    
 
-} while (-not ($Global:MZTOOLMODULE))
+} while (-not ($Global:MZTOOLMODULE) -and -not($Global:MZTOOLMODULETRUE))
 
 $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {      
     
@@ -1268,7 +1268,7 @@ ________________________________________________________
     if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
         Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
     }
-    elseif ($Global:PROFILELOADED) { "- GIT VERSION" } -ForegroundColor Green
+    elseif ($Global:PROFILELOADED) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green } 
     else { Write-Host "MÓDULO E PERFIL POWERSHELL OFFLINE" -ForegroundColor Red }
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
