@@ -200,9 +200,9 @@ function MZTOOLMODULE {
     if (Test-Path -Path $MODULEPATH) {
         Remove-Item -Path $MODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
+    try { Invoke-RestMethod https://aw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
     catch {
-        $MODULECONTENT = @'
+        $ODULECONTENT = @'
 #MÓDULO MZTOOL
 
 #region Variáveis Globais
@@ -1168,8 +1168,10 @@ do {
                     }
                 }
             }
-            function GETPROFILE {  
 
+            function GETPROFILE {  
+               
+                # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
                 $Global:ENVIROMENTVARS | ForEach-Object {
                     if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
               
@@ -1233,15 +1235,9 @@ $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {
             [Environment]::SetEnvironmentVariable($_.Key, "$($PWSHKEY)$($_.Value)", $SCOPE)
         }
     }
-    $_
 }
 
 NEWPWSH -Functions 'CLOCKDATE' -Hidden
-
-
-# Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
-pause
-
 
 #MENU -----------------------------------------------------
 
