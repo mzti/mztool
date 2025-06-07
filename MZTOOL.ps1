@@ -1965,8 +1965,8 @@ function DOWNLOADMZTOOL {
     )
     
     $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
-        Write-Host "`nHASH MD5"`n"$($_)`n$($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
-    }      
+        Write-Host "`nORIGIN HASH $($_)`nACTUAL HASH $($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
+    }     
 
     Start-Sleep -Seconds 3
 
@@ -2457,7 +2457,7 @@ function OFFICE2007 {
             ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
             )
         
-            Write-Host "`nHASH`n$OFFICE2007HASH`n$($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
+            Write-Host "`nORIGIN HASH $OFFICE2007HASH`nACTUAL HASH $($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
            
             RESETCURSOR      
            
