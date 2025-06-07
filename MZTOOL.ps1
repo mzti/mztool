@@ -1963,7 +1963,9 @@ function DOWNLOADMZTOOL {
         (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
         ($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH)
     )
-    
+
+    RESETCURSOR 
+
     $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
         Write-Host "`nORIGIN HASH $($_)`nACTUAL HASH $($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
     }     
@@ -2456,10 +2458,14 @@ function OFFICE2007 {
             (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
             ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
             )
-        
+
+            RESETCURSOR
+
             Write-Host "`nORIGIN HASH $OFFICE2007HASH`nACTUAL HASH $($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
-           
-            RESETCURSOR      
+            
+            Start-Sleep -Seconds 3
+
+            RESETCURSOR     
            
             EXPAND -Path $OFFICE2007ZIP -DestinationPath $OFFICE2007FOLDER -Force -Quiet
 
