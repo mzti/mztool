@@ -1125,7 +1125,7 @@ $Global:GIT = $FALSE
 
 function GETMZTOOLMODULE {     
         
-    if (-not($Global:MZTOOLMODULE) -and -not($Global:MZTOOLMODULETRUE)) {
+    if (-not ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE)) {
         
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
@@ -1224,7 +1224,7 @@ do {
         
     }    
 
-} while (-not ($Global:MZTOOLMODULE) -and -not ($Global:MZTOOLMODULETRUE))
+} while (-not ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE))
 
 $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {      
     
