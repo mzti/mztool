@@ -1124,10 +1124,10 @@ ________________________________________________________
 | ________________________BETA________________________ | 
 |                                                      | 
 |                                                      |
-| |1| INSTALAÇÃO COMPLETA                              |
+| |1| IMPLEMENTAÇÃO COMPLETA                           |
 | |2| DIAGNÓSTICO DE HARDWARE E SISTEMA                |
-| |3| INSTALAR WINGET & WINDOWS UPDATE                 |
-| |4| INSTALAR OFFICE                                  |
+| |3| IMPLEMENTAR WINGET & WINDOWS UPDATE              |
+| |4| IMPLEMENTAR OFFICE                               |
 | |0| SAIR                                             |
 |                                                      |
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
@@ -1155,7 +1155,7 @@ _______________________________________________________
 |                       MZTOOL                        |
 | ___________________________________________________ |
 |                                                     |
-|                 INSTALAÇÃO COMPLETA                 |
+|                                                     |
 |                                                     |
 |                                                     |
 |                    IMPLEMENTANDO                    |
@@ -1185,7 +1185,7 @@ _______________________________________________________
 |                       MZTOOL                        |
 | __________________________________________________  | 
 |                                                     |
-|                INSTALAÇÃO CONCLUÍDA                 |
+|               IMPLEMENTAÇÃO CONCLUÍDA               |
 |                                                     |
 |                                                     |
 |  O WINDOWS SERÁ ATUALIZADO AGORA EM SEGUNDO PLANO   |
@@ -1292,19 +1292,20 @@ _______________________________________________________
     
                 Clear-Host        
                 Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|             WINGET & WINDOWS UPDATE                |
-|                                                    |
-| |1| ISTALAR MÓDULOS WINGET E WINDOWS UPDATE        |
-| |2| INSTALAR ATUALIZAÇÕES (MÓDULOS JÁ INSTALADOS)  |
-| |3| VOLTAR                                         |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|              WINGET & WINDOWS UPDATE                |
+|                                                     |
+| |1| IMPLEMENTAR MÓDULOS WINGET E WINDOWS UPDATE     |
+| |2| IMPLEMENTAR ATUALIZAÇÕES                        |
+| |3| VOLTAR                                          |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
                 Switch ($CHOICE) {
@@ -1314,19 +1315,20 @@ ______________________________________________________
 
                         Clear-Host
                         Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|             WINGET & WINDOWS UPDATE                |
-|                                                    |
-|                                                    |
-|           INSTALAÇÃO DE MÓDULOS INICIADA           |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  |
+|                                                     | 
+|               WINGET & WINDOWS UPDATE               |
+|                                                     |
+|                                                     |
+|                IMPLEMENTANDO MÓDULOS                |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '
                         $Null = @(                             
                             NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess
@@ -1345,19 +1347,20 @@ ______________________________________________________
 
                         Clear-Host
                         Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|             WINGET & WINDOWS UPDATE                |
-|                                                    |
-|                                                    |
-|        INSTALAÇÃO DE ATUALIZAÇÕES INICIADA         |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  |
+|                                                     | 
+|               WINGET & WINDOWS UPDATE               |
+|                                                     |
+|                                                     |
+|              IMPLEMENTANDO ATUALIZAÇÕES             |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 ' 
                         $Null = @(
                             NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess
@@ -2081,6 +2084,10 @@ function WINGETUPGRADE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINGETUPGRADE"
 
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+        WINGETMODULE
+    }
+
     1..2 | ForEach-Object {
             
         Winget Upgrade --All --Accept-Source-Agreements --Accept-Package-Agreements 
@@ -2094,10 +2101,20 @@ function WINUPDATE {
 
     #Busca, realiza o download e implementa novas atualizações do Windows e de Drivers de Dispositivos através do Módulo PSWindowsUpdate e do canal de atualizações MicrosoftUpdate.
 
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATE"
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATE"   
 
-    Import-Module PSWindowsUpdate -Force 
+    if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) { 
+            
+        WINUPDATEMODULE
+        
+    }
 
+    else {
+
+        Import-Module PSWindowsUpdate -Force -ErrorAction SilentlyContinue   
+                        
+    }
+   
     Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
        
 }

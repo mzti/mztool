@@ -832,4 +832,79 @@ function CLOCKDATE {
 }  
 #endregion
 
+#region FUNÇÕES REDUNDANTES
+function WINUPDATEMODULE {
+    
+    #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
+    
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
+    
+    #Pacote NuGet.
+    Install-PackageProvider -Name NuGet -Force |  Clear-Host   
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted  |  Clear-Host
+    
+    #Módulo WINDOWS UPDATE.
+    Install-Module PSWindowsUpdate -AllowClobber -Force |  Clear-Host
+    Import-Module PSWindowsUpdate -Force |  Clear-Host        
+                
+}
+
+function WINGETMODULE {
+    
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
+   
+    #Implementa e ou atualiza o WINGET.
+     
+    #Verifica se a versão do Windows é a 11.
+    if ($Global:WINVER -Match 'Windows 11') {
+                     
+        #Reinstala, redefine as fontes e atualiza o Módulo WINGET.
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.WindowsTerminal --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.NuGet --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        
+    }
+
+    #Verifica se a versão do Windows é a 10.
+    elseif ($Global:WINVER -Match 'Windows 10') {
+                     
+        #Instala o pacote NuGet.
+        Install-PackageProvider -Name NuGet -Force |  Clear-Host
+        
+        #Reinstala, redefine as fontes e atualiza o WINGET.
+        Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery -ErrorAction SilentlyContinue |  Clear-Host
+        Repair-WinGetPackageManager |  Clear-Host
+        Winget Source Remove --Name winget |  Clear-Host
+        Winget Source Remove --Name msstore |  Clear-Host
+        Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue |  Clear-Host
+        Start-BitsTransfer -Source 'https://cdn.winget.microsoft.com/cache/source.msix' -Destination "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\source.msix" -ErrorAction SilentlyContinue |  Clear-Host
+        Start-Sleep 1
+        Winget Source Reset --Force |  Clear-Host     
+        Winget Source Update |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.8 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.UI.Xaml.2.7 --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Start-BitsTransfer -Source 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'-Destination "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue |  Clear-Host
+        Add-AppPackage -Path "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -ErrorAction SilentlyContinue  |  Clear-Host
+        Winget Upgrade Microsoft.AppInstaller --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.WindowsTerminal --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+        Winget Install Microsoft.NuGet --Accept-Source-Agreements --Accept-Package-Agreements |  Clear-Host
+    }
+
+    else {
+        Write-Host 'VERSÃO DO WINDOWS NÃO COMPATÍVEL COM WINGET.'
+        Start-Sleep -Seconds 5
+    }  
+
+}
+
+#endregion
+
+
 $Global:GIT = $TRUE
