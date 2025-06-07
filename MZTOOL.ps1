@@ -47,6 +47,15 @@ $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 
+$Global:ENVIROMENTVARS = @{
+    'TOOL'                 = "C:\MZTOOL"
+    'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
+    'Global:TITLE'         = $Global:TITLE 
+    'Global:WINVER'        = $Global:WINVER  
+    'Global:PROFILELOADED' = "`$True"         
+    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
+    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"     
+}
 
 #$ErrorActionPreference = 'SilentlyContinue'
 
@@ -109,14 +118,51 @@ function PSVER {
 PSVER
 
 function RESTARTADMIN {    
+    param([switch]$RESTART)
+
+    if ($RESTART = 0) { $Global:RESTART = 0 }
  
     # Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
     $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+  
+    
+    $MZTOOLAPPDATA = "$env:APPDATA\MZTOOL"
+
+    if (-not (Test-Path $MZTOOLAPPDATA)) {
+        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force
+          
+    }
+    # Define o caminho do arquivo no diretório AppData\Roaming
+    $RESTARTFILE = Join-Path $MZTOOLAPPDATA "RESTARTCOUNT.txt"
+
+    # Verifica se o arquivo existe
+    if (Test-Path $RESTARTFILE) {
+        try {
+            # Tenta ler e converter o conteúdo para inteiro
+            $Global:RESTART = [int](Get-Content $RESTARTFILE)
+        }
+        catch {
+            # Se a conversão falhar, utiliza 0 como padrão
+            $Global:RESTART = 0
+        }
+    }
+    else {
+        # Se o arquivo não existir, inicia do valor 0
+        $Global:RESTART = 0
+    }
+
+    # Incrementa a contagem (ex: se for a primeira reinicialização 0 + 1 = 1)
+    $Global:RESTART++
+
+    # Atualiza (ou cria) o arquivo com a nova contagem
+    Set-Content -Path $RESTARTFILE -Value $Global:RESTARTt -Encoding UTF8
+
+    # Exibe uma mensagem indicando quantas vezes o script foi reinici  
     
     # Se a sessão não estiver sendo executada como administrador, reinicia solicitando UAC ao usuário.
-    if (-not $MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) {
+    if (-not ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) -or ($Global:RESTART -lt 2)) {
         $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
         $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
         $RESTART.Verb = 'runas'
@@ -1086,8 +1132,7 @@ function GETMZTOOLMODULE {
 do {   
     # Importa o módulo MZTOOL para a sessão atual.
     MZTOOLMODULE 
-    GETMZTOOLMODULE 
-        
+    GETMZTOOLMODULE         
  
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE) {
@@ -1105,6 +1150,68 @@ do {
 
             Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
             Start-Sleep -Seconds 5
+            function GETPROFILE {  
+
+                $Global:ENVIROMENTVARS | ForEach-Object {
+                    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
+              
+                        # Cria o arquivo de perfil do PowerShell se não existir.
+                        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
+                                           
+                        # Cria a linha de definição da variável (com o símbolo $ escapado).
+                        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"        
+                             
+                        # Verifica se a variável já existe no arquivo de perfil.
+                        if (Select-String -Path $PROFILE -Pattern "`$$($_.Key) =" -Quiet) {            
+                            $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
+                            $PROFILEBKP + $SETENVPROFILE | Set-Content -Path $PROFILE           
+                        } 
+                      
+                        # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
+                        else {
+                            Add-Content -Path $PROFILE -Value $SETENVPROFILE
+                        }
+                    }
+                }
+                if ($Global:PROFILELOADED -eq $True) {
+                    Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
+                }
+                else {
+                    . $PROFILE
+                    Start-Sleep -Seconds 2        
+                    if ($Global:PROFILELOADED -eq $True) {
+                        Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
+                    }
+                    else { 
+                        
+                        Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red 
+                    }
+                    Start-Sleep -Seconds 2
+                    EXECPOLICYPROFILE
+                }
+            }                  
+             
+            function EXECPOLICYPROFILE {
+             
+                Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+                    if ($_.ExecutionPolicy -eq "Undefined") {
+                        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
+                        Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
+                               
+                        RESTARTADMIN -Restart 0
+                    } 
+             
+                    else {
+                        Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
+                    }
+                }
+            }
+
+            GETPROFILE
+
+            Write-Host "Tentativas de carregamento do módulo PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
+            
+
             EXIT
         }
 
@@ -1114,16 +1221,7 @@ do {
 
 } while (-not ($Global:MZTOOLMODULE))
 
-$Global:ENVIROMENTVARS = @{
-    'TOOL'                 = "C:\MZTOOL"
-    'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
-    'Global:TITLE'         = $Global:TITLE 
-    'Global:WINVER'        = $Global:WINVER  
-    'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
-    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"
-     
-}.GetEnumerator() | ForEach-Object {      
+$Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {      
     
     if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
        
@@ -1139,77 +1237,10 @@ $Global:ENVIROMENTVARS = @{
 
 NEWPWSH -Functions 'CLOCKDATE' -Hidden
 
-<#
+
 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
-function GETPROFILE {  
 
-   $Global:ENVIROMENTVARS | ForEach-Object {
-if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
- 
-        # Cria o arquivo de perfil do PowerShell se não existir.
-        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
-                              
-        # Cria a linha de definição da variável (com o símbolo $ escapado).
-        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"        
-                
-        # Verifica se a variável já existe no arquivo de perfil.
-        if (Select-String -Path $PROFILE -Pattern "`$$($_.Key) =" -Quiet) {            
-            $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
-            $PROFILEBKP + $SETENVPROFILE | Set-Content -Path $PROFILE           
-        } 
-         
-        # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
-        else {
-            Add-Content -Path $PROFILE -Value $SETENVPROFILE
-        }
-    }
-}
-    if ($Global:PROFILELOADED -eq $True) {
-        Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
-    }
-    else {
-        . $PROFILE
-        Start-Sleep -Seconds 2        
-        if ($Global:PROFILELOADED -eq $True) {
-            Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
-        }
-        else { Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red }
-        Start-Sleep -Seconds 2
-    }
-}
-       
-GETPROFILE
-#>
 
-<#
-    Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
-        if ($_.ExecutionPolicy -eq "Undefined") {
-            Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
-            Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray           
-            RESTARTADMIN
-        } 
-
-        else {
-            Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
-        }
-    }
-
-# Define as variáveis de ambiente no escopo do sistema (Machine) para MZTOOL e MZBETA.
-$Global:ENVIROMENTVARS | Where-Object { $_.Key -in @('MZTOOL', 'MZBETA') } | ForEach-Object { 
-    
-    [Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Machine') 
-    
-    $loadedValue = [Environment]::GetEnvironmentVariable($_.Key, 'Machine')
-    
-    if ($loadedValue -eq $_.Value) {
-        Write-Host "VARIÁVEL "$_.Key" CARREGADA NO SCOPO MACHINE." -ForegroundColor Green
-    }
-   
-    else {
-        Write-Host "FALHA AO CARREGAR "$_.Key" NO ESCOPO MACHINE." -ForegroundColor Red
-    }
-}
-#>
 
 #MENU -----------------------------------------------------
 
@@ -1432,8 +1463,8 @@ _______________________________________________________
 |_____________________________________________________|
 '
                         $Null = @(                             
-                            NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess -Hidden
-                            NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess -Hidden
+                            NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess #-Hidden
+                            NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
          
                         CLEANTEMP
@@ -1464,8 +1495,8 @@ _______________________________________________________
 |_____________________________________________________|
 ' 
                         $Null = @(
-                            NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess
-                            NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess
+                            NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess #-Hidden
+                            NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
 
                         CLEANTEMP
