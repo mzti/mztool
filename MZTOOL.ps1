@@ -1158,6 +1158,7 @@ do {
             function EXECPOLICYPROFILE {
              
                 Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+                   
                     if ($_.ExecutionPolicy -eq "Undefined") {
                         Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
                         Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
@@ -1166,10 +1167,11 @@ do {
                     } 
              
                     else {
+
                         Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
 
                         if (-not ($Global:PROFILELOADED)) {                       
-                            Write-Host "Tentativas de carregamento do módulo PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
+                            Write-Host "Tentativas de carregamento do MÓDULO e PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
                             Start-Sleep -Seconds 3
                             EXIT 
                         }
@@ -1201,13 +1203,13 @@ do {
                         }
                     }
                 }
-                if ($Global:PROFILELOADED -eq $True) {
+                if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
                 }
                 else {
                     . $PROFILE
                     Start-Sleep -Seconds 2        
-                    if ($Global:PROFILELOADED -eq $True) {
+                    if ($Global:PROFILELOADED) {
                         Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green
                     }
                     else { 
