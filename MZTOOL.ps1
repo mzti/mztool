@@ -1113,8 +1113,10 @@ function WINGETMODULE {
 }
 
 #endregion
+#region TRUE
 $Global:MZTOOLMODULETRUE = $TRUE
 $Global:GIT = $FALSE
+#endregion
 '@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
@@ -1262,8 +1264,12 @@ ________________________________________________________
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
 |______________________________________________________|
 '
-    # Informa se o Módulo está importado.
-    Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE) { 'Green' } else { 'Red' })
+    # Informa se o Módulo ou o Perfil Powershell está importado.
+    if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
+        Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
+    }
+    elseif ($Global:PROFILELOADED) { "- GIT VERSION" } -ForegroundColor Green
+    else { Write-Host "MÓDULO E PERFIL POWERSHELL OFFLINE" -ForegroundColor Red }
 
     # Solicita ao usuário que insira o número correspondente à opção desejada.
     $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"

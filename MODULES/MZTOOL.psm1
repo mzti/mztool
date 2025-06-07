@@ -9,8 +9,7 @@ $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstan
 $Global:WINGETVER = "v1.10.390"
 $Global:GETWINGETVER = { Winget --version 2>&1 }
 $Global:MZTOOLAPPDATA = $MZTOOLAPPDATA
-$Global:MZTOOLMODULETRUE = $TRUE
-$Global:GIT = $TRUE
+
 
 #endregion
 
@@ -921,3 +920,7 @@ function WINGETMODULE {
 
 #endregion
 
+#region TRUE
+$Global:MZTOOLMODULETRUE = $TRUE
+$Global:GIT = $TRUE
+#endregion
