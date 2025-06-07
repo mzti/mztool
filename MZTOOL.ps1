@@ -202,7 +202,7 @@ function MZTOOLMODULE {
     }
     try { Invoke-RestMethod https://aw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
     catch {
-        $ODULECONTENT = @'
+        $MODULECONTENT = @'
 #MÓDULO MZTOOL
 
 #region Variáveis Globais
@@ -1119,7 +1119,7 @@ $Global:GIT = $FALSE
 #endregion
 '@         
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
-        Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
+        #Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
     }  
 }
 
