@@ -117,8 +117,13 @@ function PSVER {
 
 PSVER
 
-function RESTARTADMIN {      
+function RESTARTADMIN {  
+    param (
+        [int]$RESTART
+    )    
  
+    if ($RESTART = 0) { $Global:RESTART = 0 }
+    
     # Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
@@ -1154,7 +1159,7 @@ do {
                         Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
                         Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
                                
-                        RESTARTADMIN 
+                        RESTARTADMIN -RESTART 0
                     } 
              
                     else {
