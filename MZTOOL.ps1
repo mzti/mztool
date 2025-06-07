@@ -1202,17 +1202,17 @@ do {
                     }
                 }
                 if ($Global:PROFILELOADED -eq $True) {
-                    Write-Host "`nO perfil de usuário foi carregado." -ForegroundColor Green
+                    Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
                 }
                 else {
                     . $PROFILE
                     Start-Sleep -Seconds 2        
                     if ($Global:PROFILELOADED -eq $True) {
-                        Write-Host "O perfil de usuário foi carregado." -NoNewline -ForegroundColor Green
+                        Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green
                     }
                     else { 
                         
-                        Write-Host "FALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red 
+                        Write-Host "`nFALHA NO PERFIL DE USUÁRIO POWERSHELL."-NoNewline -ForegroundColor Red 
                     }
                     Start-Sleep -Seconds 2
                     EXECPOLICYPROFILE
