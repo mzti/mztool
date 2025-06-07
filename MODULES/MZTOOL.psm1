@@ -72,12 +72,12 @@ custom
 #region FUNÇÕES DO MÓDULO
 function GETMZTOOLMODULE {     
         
-    if (-not($Global:MZTOOLMODULE)) {
+    if (-not ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE)) {
         
         Import-Module MZTOOL -Force -ErrorAction SilentlyContinue 
     }
 
-    $Global:MZTOOLMODULE 
+    $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
     
 }
 #endregion
