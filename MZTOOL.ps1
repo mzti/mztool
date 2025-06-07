@@ -1117,10 +1117,10 @@ function MZTOOLMODULE {
     if (Test-Path -Path $MODULEPATH) {
         Remove-Item -Path $MODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-    try { Invoke-RestMethod https://aw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
+    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
-        #Set-Content -Path $MODULEPATH -Value $MODULECONTENT -Force
+        Set-Content -Path $MODULEPATH -Value $Global:MODULECONTENT -Force
     }  
 }
 
