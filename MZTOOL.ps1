@@ -1852,7 +1852,7 @@ _______________________________________________________
 |                                                     |
 |                                                     |
 |                                                     |
-|' Write-Host '                   OPÇÃO INVÁLIDA                    '-NoNewline -ForegroundColor Yellow; Write-Host '|  
+|'-NoNewline; Write-Host '                   OPÇÃO INVÁLIDA                    '-NoNewline -ForegroundColor Yellow; Write-Host '|  
 |                                                     |
 |                                                     |
 |                                                     |
