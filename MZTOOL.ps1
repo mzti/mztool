@@ -117,12 +117,7 @@ function PSVER {
 
 PSVER
 
-function RESTARTADMIN {    
-    <#  param(
-        [switch]$RESTART
-        )
-
-    if ($RESTART = 0) { $Global:RESTART = 0 }#>
+function RESTARTADMIN {      
  
     # Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
