@@ -157,7 +157,7 @@ function RESTARTADMIN {
     $Global:RESTART++
 
     # Atualiza (ou cria) o arquivo com a nova contagem
-    Set-Content -Path $RESTARTFILE -Value $Global:RESTARTt -Encoding UTF8
+    Set-Content -Path $RESTARTFILE -Value $Global:RESTART -Encoding UTF8
 
     # Exibe uma mensagem indicando quantas vezes o script foi reinici  
     
@@ -1148,8 +1148,23 @@ do {
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
         if ($TRYGETMODULE -ge 5) {
 
-            Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
+            Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. TENTANDO PROFILE POWERSHELL" -ForegroundColor Red
             Start-Sleep -Seconds 5
+            function EXECPOLICYPROFILE {
+             
+                Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
+                    if ($_.ExecutionPolicy -eq "Undefined") {
+                        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
+                        Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
+                               
+                        RESTARTADMIN -Restart 0
+                    } 
+             
+                    else {
+                        Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
+                    }
+                }
+            }
             function GETPROFILE {  
 
                 $Global:ENVIROMENTVARS | ForEach-Object {
@@ -1189,24 +1204,8 @@ do {
                     Start-Sleep -Seconds 2
                     EXECPOLICYPROFILE
                 }
-            }                  
-             
-            function EXECPOLICYPROFILE {
-             
-                Get-ExecutionPolicy -List | Where-Object { $_.Scope -in @('LocalMachine', 'CurrentUser') } | ForEach-Object {
-                    if ($_.ExecutionPolicy -eq "Undefined") {
-                        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
-                        Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
-                               
-                        RESTARTADMIN -Restart 0
-                    } 
-             
-                    else {
-                        Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
-                    }
-                }
-            }
-
+            }                
+                  
             GETPROFILE
 
             Write-Host "Tentativas de carregamento do módulo PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
