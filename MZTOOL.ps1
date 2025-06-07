@@ -1213,7 +1213,6 @@ do {
 
             Write-Host "Tentativas de carregamento do módulo PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
             
-
             EXIT
         }
 
@@ -1241,7 +1240,7 @@ NEWPWSH -Functions 'CLOCKDATE' -Hidden
 
 
 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
-
+pause
 
 
 #MENU -----------------------------------------------------
