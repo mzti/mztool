@@ -1167,6 +1167,12 @@ do {
              
                     else {
                         Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
+
+                        if (-not ($Global:PROFILELOADED)) {                       
+                            Write-Host "Tentativas de carregamento do módulo PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
+                            Start-Sleep -Seconds 3
+                            EXIT 
+                        }
                     }
                 }
             }
@@ -1214,10 +1220,7 @@ do {
             }                
                   
             GETPROFILE
-
-            Write-Host "Tentativas de carregamento do módulo PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
-            Start-Sleep -Seconds 3
-            EXIT
+            
         }
 
         Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow
