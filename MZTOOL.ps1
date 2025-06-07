@@ -1159,7 +1159,7 @@ do {
                         Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope $_.Scope -Force -ErrorAction SilentlyContinue 2>$null
                         Write-host "REDEFININDO POLITICA DE EXECUÇÃO TEMPORARIAMENTE." -ForegroundColor Gray  
                                
-                        RESTARTADMIN -Restart 0
+                        RESTARTADMIN 
                     } 
              
                     else {
