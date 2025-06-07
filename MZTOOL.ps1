@@ -121,15 +121,16 @@ function RESTARTADMIN {
     param (
         [int]$RESTART
     )    
- 
-    if ($RESTART = 0) { $Global:RESTART = 0 }
-    
+
+    if ($PSBoundParameters.ContainsKey('Restart')) {
+        $Global:RESTART = $RESTART
+    }
+
     # Obtém o ID e o Objeto de Segurança do usuário na sessão atual.
     $MYWINDOWSID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
     $MYWINDOWSPRINCIPAL = New-Object System.Security.Principal.WindowsPrincipal($MYWINDOWSID)
     $ADMINROLE = ([System.Security.Principal.WindowsBuiltInRole]::Administrator)
-  
-    
+   
     $MZTOOLAPPDATA = "$env:APPDATA\MZTOOL"
 
     if (-not (Test-Path $MZTOOLAPPDATA)) {
@@ -138,7 +139,7 @@ function RESTARTADMIN {
 
     # Define o caminho do arquivo no diretório AppData\Roaming
     $RESTARTFILE = Join-Path $MZTOOLAPPDATA "RESTARTCOUNT.txt"
-
+    
     # Verifica se o arquivo existe
     if (Test-Path $RESTARTFILE) {
         try {
@@ -159,23 +160,23 @@ function RESTARTADMIN {
     $Global:RESTART++
 
     # Atualiza (ou cria) o arquivo com a nova contagem
-    Set-Content -Path $RESTARTFILE -Value $Global:RESTART -Encoding UTF8  
-    
+    Set-Content -Path $RESTARTFILE -Value $Global:RESTART -Encoding UTF8    
+
     # Se a sessão não estiver sendo executada como administrador, reinicia solicitando UAC ao usuário.
     if (-not ($MYWINDOWSPRINCIPAL.IsInRole($ADMINROLE)) -or ($Global:RESTART -lt 2)) {
-        $RESTART = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
-        $RESTART.Arguments = "-Command `"${global:SCRIPTCODE}`""
-        $RESTART.Verb = 'runas'
-        [System.Diagnostics.Process]::Start($RESTART) | Out-Null
+     
+        $RESTARTPWSH = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell'
+        $RESTARTPWSH.Arguments = "-Command `"${global:SCRIPTCODE}`""
+        $RESTARTPWSH.Verb = 'runas'
+        [System.Diagnostics.Process]::Start($RESTARTPWSH) | Out-Null         
         EXIT
     }
     else { Remove-Item $RESTARTFILE -Force -ErrorAction SilentlyContinue }
     
 }
-Write-Host "$($Global:SCRIPTCODE)"
-PAUSE
-RESTARTADMIN
-PAUSE
+
+RESTARTADMIN 
+
 function MZTOOLMODULE {
 
     # Define o nome do módulo
