@@ -1968,6 +1968,8 @@ function DOWNLOADMZTOOL {
         Write-Host "`nHASH = " ; Write-Host "`n"$($_)"`n"$($NEWMZTOOLZIPHASH.Hash)"" -ForegroundColor Green
     }
 
+    Start-Sleep -Seconds 3
+
     RESETCURSOR   
 
     #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
@@ -2380,13 +2382,11 @@ function MICROSOFT365 {
         @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
+
+        $365STATUS = "1"
         
         if (& $MS365) { 
-            
             Start-Process PowerShell -WindowStyle Hidden { Start-Process WINWORD }
-
-            $365STATUS = "1"
-
         }
     }
     
