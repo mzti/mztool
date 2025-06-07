@@ -132,6 +132,10 @@ function NEWPWSH {
         $proc = Start-Process powershell -ArgumentList $arguments -PassThru -Wait
         return $proc
     }
+    elseif ($Hidden -and $ReturnProcess) {
+        $proc = Start-Process powershell -ArgumentList $arguments -PassThru -WindowStyle Hidden
+        return $proc
+    }
     elseif ($Wait) {
         [void](Start-Process powershell -ArgumentList $arguments -Wait)
         return
