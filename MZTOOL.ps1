@@ -1118,20 +1118,20 @@ function DISPLAYMENU {
     
     Clear-Host
     Write-Host '
-______________________________________________________
-|                                                    |
-|                       MZTOOL                       |
-| _______________________BETA_______________________ | 
-|                                                    | 
-|                                                    |
-| |1| INSTALAÇÃO COMPLETA                            |
-| |2| DIAGNÓSTICO DE HARDWARE E SISTEMA              |
-| |3| INSTALAR WINGET & WINDOWS UPDATE               |
-| |4| INSTALAR OFFICE                                |
-| |0| SAIR                                           |
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|
+________________________________________________________
+|                                                      |
+|                        MZTOOL                        |
+| ________________________BETA________________________ | 
+|                                                      | 
+|                                                      |
+| |1| INSTALAÇÃO COMPLETA                              |
+| |2| DIAGNÓSTICO DE HARDWARE E SISTEMA                |
+| |3| INSTALAR WINGET & WINDOWS UPDATE                 |
+| |4| INSTALAR OFFICE                                  |
+| |0| SAIR                                             |
+|                                                      |
+|                   MOZART INFORMÁTICA | DANIEL MOZART |
+|______________________________________________________|
 '
     # Informa se o Módulo está importado.
     Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE) { 'Green' } else { 'Red' })
@@ -1150,19 +1150,20 @@ ______________________________________________________
                        
             Clear-Host
             Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| __________________________________________________ |
-|                                                    |
-|                     AGUARDE                        |
-|                                                    |
-|                  EM INSTALAÇÃO                     |
-|                                                    |
-|                                                    |
-|                                 MOZART INFORMÁTICA |
-|                                      DANIEL MOZART |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| ___________________________________________________ |
+|                                                     |
+|                 INSTALAÇÃO COMPLETA                 |
+|                                                     |
+|                                                     |
+|                    IMPLEMENTANDO                    |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '
             $DEPLOYFUNCTION = @(
                 @{ Functions = 'PERFILTHEME' },
@@ -1179,19 +1180,20 @@ ______________________________________________________
             
             Clear-Host
             Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|      INSTALAÇÃO CONCLUÍDA - ENCERRANDO MZTOOL      |
-|                                                    |
-|   O WINDOWS SERÁ ATUALIZADO AGORA EM SEGUNDO PLANO |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|                INSTALAÇÃO CONCLUÍDA                 |
+|                                                     |
+|                                                     |
+|  O WINDOWS SERÁ ATUALIZADO AGORA EM SEGUNDO PLANO   |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '
             Start-Sleep -Seconds 5
 
@@ -1208,19 +1210,20 @@ ______________________________________________________
                
             Clear-Host
             Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|            FERRAMENTAS DE DIAGNÓSTICOS             |
-|                                                    |
-|                                                    |
-|               DOWNLOAD EM ANDAMENTO                |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|             FERRAMENTAS DE DIAGNÓSTICOS             |
+|                                                     |
+|                                                     |
+|                DOWNLOAD EM ANDAMENTO                |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '                               
             DOWNLOADMZTOOL            
           
@@ -1230,20 +1233,20 @@ ______________________________________________________
 
                 Clear-Host
                 Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|            FERRAMENTAS DE DIAGNÓSTICOS             |
-|                                                    |
-|                                                    |
-| |1| INICIAR FERRAMENTAS DE DIAGNÓSTICO             |
-| |2| FECHAR TODAS AS FERRAMENTAS                    |
-| |3| FECHAR FERRAMENTAS E VOLTAR AO MENU            |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|             FERRAMENTAS DE DIAGNÓSTICOS             |
+|                                                     |
+| |1| INICIAR FERRAMENTAS                             |
+| |2| FECHAR  FERRAMENTAS                             |
+| |3| FECHAR  FERRAMENTAS E VOLTAR AO MENU            |
+| |0| SAIR                                            |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '         
 
                 $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
@@ -1266,6 +1269,11 @@ ______________________________________________________
                         DIAGNOSTICS -STOP 
 
                         DISPLAYMENU
+                    }
+
+                    0 { 
+                        DIAGNOSTICS -STOP
+                        EXITMZTOOL
                     }
 
                     default {
@@ -1387,21 +1395,20 @@ ______________________________________________________
             
                 Clear-Host            
                 Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                 MICROSOFT OFFICE                   |
-|                                                    |
-|                                                    |
-| |1| INSTALAR OFFICE 365                            | 
-| |2| INSTALAR OFFICE 2007                           |
-| |3| VOLTAR                                         |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|              MICROSOFT 365 | OFFICE                 |
+|                                                     |
+| |1| INSTALAR OFFICE 365                             | 
+| |2| INSTALAR OFFICE 2007                            |
+| |3| VOLTAR                                          |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '
                 if (-not $CHOICE4) {
                     $CHOICE4 = (Read-Host 'INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA')
@@ -1414,19 +1421,20 @@ ______________________________________________________
 
                         Clear-Host
                         Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                   MICROSOFT 365                    |
-|                                                    |
-|                                                    |
-|                    INSTALANDO                      |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|                    MICROSOFT 365                    |
+|                                                     |
+|                                                     |
+|                    IMPLEMENTANDO                    |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '    
                                         
                         $365STATUS = MICROSOFT365    
@@ -1444,20 +1452,21 @@ ______________________________________________________
 
                         Clear-Host
                         Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|               MICROSOFT OFFICE 2007                |
-|                                                    |
-|                                                    |
-|                    INSTALANDO                      |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
- '
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|                 MICROSOFT OFICE 2007                |
+|                                                     |
+|                                                     |
+|                    IMPLEMENTANDO                    |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
+'    
                         OFFICE2007
 
                         CLEANTEMP                   
@@ -1562,22 +1571,20 @@ function DISPLAYMENUDOWNLOADERROR {
     
         Clear-Host
         Write-Host '
-______________________________________________________
-|                                                    |
-|                       MZTOOL                       |
-| __________________________________________________ | 
-|            FERRAMENTAS DE DIAGNÓSTICOS             | 
-|                                                    |'
-        Write-Host '|  ONEDRIVE     = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |"
-        Write-Host '|  GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                            |" 
-        Write-Host '|                                                    |
-|                                                    |
-| |1| TENTAR NOVAMENTE                               |
-| |2| VOLTAR AO MENU PRINCIPAL                       |
-| |0| ENCERRAR MZTOOL                                |
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|'
+_______________________________________________________
+|                                                     |
+|                        MZTOOL                       |
+| ___________________________________________________ | 
+|                                                     | 
+|              FERRAMENTAS DE DIAGNÓSTICOS            |
+|                                                     |'
+        Write-Host '| AWS          = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                              |"
+        Write-Host '| GOOGLE DRIVE = ' -NoNewline; Write-Host "OFFLINE"-ForegroundColor Red -NoNewline; Write-Host "                              |" 
+        Write-Host '| |1| TENTAR NOVAMENTE                                |
+| |2| VOLTAR AO MENU PRINCIPAL                        |
+| |0| SAIR                                            |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|'
 
         $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
     
@@ -1616,21 +1623,20 @@ function DISPLAYMENU365STATUS {
         
         Clear-Host
         Write-Host '
-______________________________________________________
-|                                                    |        
-|                      MZTOOL                        |
-| _________________________________________________  |
-|                   MICROSOFT 365                    |
-|                                                    |
-|       SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
-|                                                    |
-|   |1| TENTAR NOVAMENTE                             |
-|   |2| IGNORAR & CONTINUAR                          |
-|   |3| VOLTAR AO MENU                               |
-|   |0| ENCERRAR MZTOOL                              |      
-|                                                    |
-|                 MOZART INFORMÁTICA | DANIEL MOZART |
-|____________________________________________________|  
+_______________________________________________________
+|                                                     |        
+|                       MZTOOL                        |
+| __________________________________________________  |
+|                                                     |
+|                    MICROSOFT 365                    |
+|        SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
+|                                                     |
+|   |1| TENTAR NOVAMENTE                              |
+|   |2| IGNORAR & CONTINUAR                           |
+|   |3| VOLTAR AO MENU                                |
+|   |0| SAIR                                          |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|  
 ' 
         Write-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
            
@@ -1683,25 +1689,24 @@ ______________________________________________________
 
 function ENTRYERROR {
    
-    #ENTRADA INVÁLIDA.
-
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE"  
+    #ENTRADA INVÁLIDA.   
 
     Clear-Host
     Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                  OPÇÃO INVÁLIDA.                   |
-|  INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA   |
-|                                                    |
-|                                                    |
-|                                                    |
-|        MOZART INFORMÁTICA | DANIEL MOZART          |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|                                                     |
+|                                                     |
+|' Write-Host '                   OPÇÃO INVÁLIDA                    '-NoNewline -ForegroundColor Yellow; Write-Host '|  
+|                                                     |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '    
     Start-Sleep -Seconds 2
 
@@ -1726,19 +1731,20 @@ function EXITMZTOOL {
 
     Clear-Host
     Write-Host '
-______________________________________________________
-|                                                    |
-|                      MZTOOL                        |
-| _________________________________________________  | 
-|                                                    |
-|                                                    |
-|                                                    |
-|                 ENCERRANDO MZTOOL                  |
-|                                                    |
-|                                                    |
-|                 MOZART INFORMÁTICA                 |
-|                   DANIEL MOZART                    |
-|____________________________________________________|
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|                                                     |
+|                                                     |
+|                  ENCERRANDO MZTOOL                  |
+|                                                     |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
 '
     CLEANTEMP
 
