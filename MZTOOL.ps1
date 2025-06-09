@@ -50,8 +50,6 @@ $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
-    'Global:TITLE'         = $Global:TITLE 
-    'Global:WINVER'        = $Global:WINVER  
     'Global:PROFILELOADED' = "`$True"         
     'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
     'MZBETA'               = "irm https://bit.ly/MZBETA | iex"     
@@ -1117,10 +1115,10 @@ function MZTOOLMODULE {
     if (Test-Path -Path $MODULEPATH) {
         Remove-Item -Path $MODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
+    try { Invoke-RestMethod https://aw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
-        Set-Content -Path $MODULEPATH -Value $Global:MODULECONTENT -Force
+        #Set-Content -Path $MODULEPATH -Value $Global:MODULECONTENT -Force
     }  
 }
 
@@ -1184,7 +1182,8 @@ do {
                
                 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
                 $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {
-                    if ($_.Key -notin @('MZTOOL', 'MZBETA')) { 
+                    
+                    if ($_.Key -in @('TOOL', 'Global:DESKTOP', 'Global:PROFILELOADED')) { 
               
                         # Cria o arquivo de perfil do PowerShell se não existir.
                         if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
