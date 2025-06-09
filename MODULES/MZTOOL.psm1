@@ -808,8 +808,7 @@ function CLEANTEMP {
         
         REMOVEPROFILELOADED
     }
-   
-    Start-Sleep -Seconds 2
+
 }
 
 function RESETCURSOR {
