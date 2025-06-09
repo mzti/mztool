@@ -977,14 +977,14 @@ function CLEANTEMP {
         REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
     }
 
+   if (Test-Path $PROFILE -ErrorAction SilentlyContinue) {
+        
+        REMOVEPROFILELOADED
+    }
+        
     if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
 
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
-    }
-
-    if (Test-Path $PROFILE -ErrorAction SilentlyContinue) {
-        
-        REMOVEPROFILELOADED
     }
 
 }
@@ -1287,10 +1287,8 @@ $Global:PROFILELOADEDTRUE = $TRUE
 
                     # Remove as linhas que contenham o conteúdo definido em $Global:PROFILECONTENT.
                     # Note que usamos [regex]::Escape para evitar conflitos com caracteres especiais.
-                    else {                                   
-
+                    else { 
                         $Global:PROFILEBKP | Set-Content -Path $PROFILE -Encoding UTF8
-
                     }
 
                     # Interrompe o loop, já que a operação foi concluída
@@ -1307,8 +1305,7 @@ $Global:PROFILELOADEDTRUE = $TRUE
                     . $PROFILE
                     Start-Sleep -Seconds 2        
                     if ($Global:PROFILELOADED) {
-                        Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green
-                                             
+                        Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green                                             
                         REMOVEPROFILELOADED -ENV $TRUE
                     }
                     else { 
