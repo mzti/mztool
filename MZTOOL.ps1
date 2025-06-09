@@ -1314,14 +1314,34 @@ $Global:PROFILELOADED = $TRUE
                 Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
                }
 #>
+
+                function REMOVEENVPROFILELOADED {
+                    $profileLines = Get-Content -Path $PROFILE
+
+                    # Remove as linhas que contenham o conteúdo definido em $Global:PROFILECONTENT.
+                    # Note que usamos [regex]::Escape para evitar conflitos com caracteres especiais.
+                    $filteredLines = $profileLines | Where-Object { $_ -notmatch ([regex]::Escape($Global:PROFILECONTENT)) }
+
+                    # Atualiza o arquivo de perfil com as linhas restantes
+                    $filteredLines | Set-Content -Path $PROFILE -Encoding UTF8
+
+                    # Remove a variável global para evitar repetições futuras.
+                    Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
+
+                    # Interrompe o loop, já que a operação foi concluída
+                    break
+                }
+
                 if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
+                    REMOVEENVPROFILELOADED
                 }
                 else {
                     . $PROFILE
                     Start-Sleep -Seconds 2        
                     if ($Global:PROFILELOADED) {
                         Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green
+                        REMOVEENVPROFILELOADED
                     }
                     else { 
                         
@@ -1342,7 +1362,6 @@ $Global:PROFILELOADED = $TRUE
 
 } while (-not (($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) -or $Global:PROFILELOADED)) 
    
-
 $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {      
     
     if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
