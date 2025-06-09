@@ -1307,15 +1307,15 @@ $Global:PROFILELOADEDTRUE = $TRUE
            
                 function REMOVEPROFILELOADED {
                     param(
-                        [switch]$REMOVE
+                        [switch]$ENV
                     )
 
                     $profileLines = Get-Content -Path $PROFILE
                    
-                    if ($REMOVE) {
-                        $filteredLines = $profileLines | Where-Object { $_ -notmatch "$Global:PROFILELOADED" }
+                    if ($ENV) {
+                        $filteredLines = $profileLines | Where-Object { $_ -notmatch "`$Global:PROFILELOADED" }
                     }
-                    
+
                     # Remove as linhas que contenham o conteúdo definido em $Global:PROFILECONTENT.
                     # Note que usamos [regex]::Escape para evitar conflitos com caracteres especiais.
                     else {
