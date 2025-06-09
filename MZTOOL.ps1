@@ -1272,24 +1272,23 @@ $Global:PROFILELOADEDTRUE = $TRUE
                     param(
                         [switch]$ENV
                     )
-
+                    # Remove a variável global para evitar repetições futuras.
+                    Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
                     $profileLines = Get-Content -Path $PROFILE
                    
                     if ($ENV) {
                         $filteredLines = $profileLines | Where-Object { $_ -notmatch "`$Global:PROFILELOADED" }
+                        # Atualiza o arquivo de perfil com as linhas restantes
+                        $filteredLines | Set-Content -Path $PROFILE -Encoding UTF8
                     }
 
                     # Remove as linhas que contenham o conteúdo definido em $Global:PROFILECONTENT.
                     # Note que usamos [regex]::Escape para evitar conflitos com caracteres especiais.
-                    else {
-                        $filteredLines = $profileLines | Where-Object { $_ -notmatch ([regex]::Escape($Global:PROFILECONTENT)) }
+                    else {                                   
+
+                        $Global:PROFILEBKP | Set-Content -Path $PROFILE -Encoding UTF8
+
                     }
-
-                    # Atualiza o arquivo de perfil com as linhas restantes
-                    $filteredLines | Set-Content -Path $PROFILE -Encoding UTF8
-
-                    # Remove a variável global para evitar repetições futuras.
-                    Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
 
                     # Interrompe o loop, já que a operação foi concluída
                     break
