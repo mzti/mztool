@@ -1966,7 +1966,7 @@ function DOWNLOADMZTOOL {
     RESETCURSOR 
 
     $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
-        Write-Host "`nORIGIN HASH $($_)`nACTUAL HASH $($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
+        Write-Host "ORIGIN HASH $($_)`nACTUAL HASH $($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
     }     
 
     Start-Sleep -Seconds 3
@@ -2460,7 +2460,7 @@ function OFFICE2007 {
 
             RESETCURSOR
 
-            Write-Host "`nORIGIN HASH $OFFICE2007HASH`nACTUAL HASH $($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
+            Write-Host "ORIGIN HASH $OFFICE2007HASH`nACTUAL HASH $($NEWOFFICE2007HASH.Hash)" -ForegroundColor Green
             
             Start-Sleep -Seconds 3
 
