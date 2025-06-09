@@ -1249,6 +1249,8 @@ do {
                     }                    
                 }#>
 
+                
+
                 $Global:PROFILECONTENT = @'
 #PROFILEMZTOOL
 
@@ -1257,9 +1259,61 @@ $Global:PROFILELOADED = $TRUE
 #endregion
 
 '@ + $Global:MODULECONTENT
-               
+
+                if (-not (Test-Path $PROFILE)) { 
+                    New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 
+                    Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
+                }
+                 
+                else {
+                    # Verifica se o arquivo de perfil contém o marcador de início do bloco
+                    if (Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet) {
+
+                        # Lê todas as linhas do arquivo de perfil
+                        $profileLines = Get-Content -Path $PROFILE
+
+                        # Encontra o índice da linha onde aparece "#PROFILEMZTOOL"
+                        $startIndex = [Array]::IndexOf($profileLines, ($profileLines | Where-Object { $_ -match "#PROFILEMZTOOL" } | Select-Object -First 1))
+    
+                        # Encontra o índice da linha onde aparece "#ENDMODULE"
+                        $endIndex = [Array]::IndexOf($profileLines, ($profileLines | Where-Object { $_ -match "#ENDMODULE" } | Select-Object -First 1))
+    
+                        if ($startIndex -ge 0 -and $endIndex -ge 0 -and $endIndex -ge $startIndex) {
+                            # Separa as linhas antes do bloco existente...
+                            $linesBefore = if ($startIndex -gt 0) { $profileLines[0..($startIndex - 1)] } else { @() }
+                            # ...e as linhas que estarão após o bloco
+                            $linesAfter = if ($endIndex -lt ($profileLines.Count - 1)) { $profileLines[($endIndex + 1)..($profileLines.Count - 1)] } else { @() }
+        
+                            # Converte o novo conteúdo do bloco (que pode ser multi-linha) em um array
+                            $newBlock = $Global:PROFILECONTENT -split "`r?`n"
+        
+                            # Junta as partes: o conteúdo antigo (antes e depois) com o novo bloco no lugar do antigo
+                            $updatedProfile = $linesBefore + $newBlock + $linesAfter
+        
+                            # Atualiza o arquivo de perfil com o conteúdo modificado
+                            $updatedProfile | Set-Content -Path $PROFILE -Encoding UTF8
+                        }
+                        else {
+                            # Caso os marcadores não sejam encontrados corretamente, adiciona o novo bloco ao final
+                            Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
+                        }
+                    }
+                    else {
+                        # Se não existir nenhum bloco com o marcador "#PROFILEMZTOOL", simplesmente adiciona o conteúdo
+                        Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
+                    }
+                }
+                <#
+                if (Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet) { 
+                    $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notin "#PROFILEMZTOOL" .. "#ENDMODULE" } 
+                    $PROFILEBKP + $Global:PROFILECONTENT | Set-Content -Path $PROFILE           
+                }
+
+               else {
+              
                 Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
-                    
+               }
+#>
                 if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
                 }
@@ -1279,7 +1333,7 @@ $Global:PROFILELOADED = $TRUE
             }                
                   
             GETPROFILE       
-                 
+
         }
 
         Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow
