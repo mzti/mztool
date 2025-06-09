@@ -246,7 +246,7 @@ public static class ConsoleEventHandler {
         if ($CtrlType -eq 2) {
             Write-Host "A janela do PowerShell foi fechada. Executando função personalizada..." -ForegroundColor Yellow
             # Chame aqui a função desejada antes do término do processo.
-            # Exemplo: & MinhaFuncaoAoFechar
+            & CLEANTEMP
         }
         # Retorne $true para indicar que o evento foi tratado (impede, se possível, o fechamento imediato)
         return $true
