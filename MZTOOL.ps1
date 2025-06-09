@@ -1274,9 +1274,9 @@ $Global:PROFILELOADEDTRUE = $TRUE
                     )
                     # Remove a variável global para evitar repetições futuras.
                     Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
-                    $profileLines = Get-Content -Path $PROFILE
-                   
+                                      
                     if ($ENV) {
+                        $profileLines = Get-Content -Path $PROFILE
                         $filteredLines = $profileLines | Where-Object { $_ -notmatch "`$Global:PROFILELOADED" }
                         # Atualiza o arquivo de perfil com as linhas restantes
                         $filteredLines | Set-Content -Path $PROFILE -Encoding UTF8
