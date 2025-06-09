@@ -1151,8 +1151,9 @@ do {
 
     }
 
-    else {       
-               
+    else {     
+
+        Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow
         $TRYGETMODULE++      
         
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
@@ -1183,29 +1184,7 @@ do {
                     }
                 }
             }
-            function REMOVEPROFILELOADED {
-                param(
-                    [switch]$ENV
-                )
-                # Remove a variável global para evitar repetições futuras.
-                Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
-                                  
-                if ($ENV) {
-                    $profileLines = Get-Content -Path $PROFILE
-                    $filteredLines = $profileLines | Where-Object { $_ -notmatch "`$Global:PROFILELOADED" }
-                    # Atualiza o arquivo de perfil com as linhas restantes
-                    $filteredLines | Set-Content -Path $PROFILE -Encoding UTF8
-                }
-
-                # Remove as linhas que contenham o conteúdo definido em $Global:PROFILECONTENT.
-                # Note que usamos [regex]::Escape para evitar conflitos com caracteres especiais.
-                else { 
-                    $Global:PROFILEBKP | Set-Content -Path $PROFILE -Encoding UTF8
-                }
-
-                # Interrompe o loop, já que a operação foi concluída
-                break
-            }
+           
             function GETPROFILE {  
                
                 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
@@ -1237,10 +1216,40 @@ do {
                 $Global:PROFILECONTENT = @'
 #PROFILEMZTOOL
 
+#region VARIÁVEIS GLOBAIS
 $Global:PROFILELOADED = $TRUE
 $Global:PROFILELOADEDTRUE = $TRUE
 
 #endregion
+
+#region PROFILE FUNCTIONS.
+function REMOVEPROFILELOADED {
+    param(
+        [switch]$ENV
+    )
+    # Remove a variável global para evitar repetições futuras.
+    Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
+                      
+    if ($ENV) {
+        $profileLines = Get-Content -Path $PROFILE
+        $filteredLines = $profileLines | Where-Object { $_ -notmatch "`$Global:PROFILELOADED" }
+        # Atualiza o arquivo de perfil com as linhas restantes
+        $filteredLines | Set-Content -Path $PROFILE -Encoding UTF8
+    }
+
+    # Remove as linhas que contenham o conteúdo definido em $Global:PROFILECONTENT.
+    # Note que usamos [regex]::Escape para evitar conflitos com caracteres especiais.
+    else { 
+        $Global:PROFILEBKP | Set-Content -Path $PROFILE -Encoding UTF8
+    }
+
+    # Interrompe o loop, já que a operação foi concluída
+    break
+}
+
+#endregion
+
+#ENDPROFILEMZTOOL
 
 '@ + $Global:MODULECONTENT
 
@@ -1319,7 +1328,7 @@ $Global:PROFILELOADEDTRUE = $TRUE
 
         }
 
-        Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow
+        
         
     }    
 
