@@ -981,8 +981,12 @@ function CLEANTEMP {
 
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
     }
-   
-    Start-Sleep -Seconds 2
+
+    if (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue) {
+        
+        REMOVEPROFILELOADED
+    }
+
 }
 
 function RESETCURSOR {
@@ -998,50 +1002,6 @@ function RESETCURSOR {
     Write-Host $clearLine -NoNewline          
     $rawUI.CursorPosition = $cursorPos
 }
-
-<#
-function ENTRYERROR {
-    
-    #ENTRADA INVÁLIDA.
-
-    RESETCURSOR
-    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-    Start-Sleep -Seconds 1        
-    
-    $callStack = Get-PSCallStack
-
-    # Verifica se há um chamador. Geralmente, o índice 1 contém o contexto do menu.
-    if ($callStack.Count -gt 1) {
-        $callerFrame = $callStack[1]
-        $callerFunction = $callerFrame.Command  # Normalmente exibe o nome da função chamadora
-    
-        Start-Sleep -Seconds 1
-        # Invoca novamente a função chamadora
-        & $callerFunction
-    }
-    else {
-        Write-Host "Nenhum menu encontrado para retornar. Encerrando." -ForegroundColor Yellow
-        pause
-    }
-}#>
-<#
-function ENTRYERROR {
-    param (
-        [string]$FUNCTIONCALLSTACK
-    )
-  
-    #ENTRADA INVÁLIDA.
-
-    RESETCURSOR
-    Write-Host 'OPÇÃO INVÁLIDA. INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
-    Start-Sleep -Seconds 1  
-    Write-Host "$FUNCTIONCALLSTACK"
-    Pause
-    & $FUNCTIONCALLSTACK
-    Pause
-
-}
-#>
 
 function CLOCKDATE {
 
@@ -1127,6 +1087,7 @@ function WINGETMODULE {
     }  
 
 }
+
 #endregion
 
 #region TRUE
