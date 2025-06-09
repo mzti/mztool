@@ -980,8 +980,11 @@ function CLEANTEMP {
     if ((Test-Path $PROFILE -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
         
         REMOVEPROFILELOADED
+        pause
     }
-        
+    
+    pause
+    
     if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
 
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
@@ -1017,6 +1020,7 @@ function CLOCKDATE {
 #endregion
 
 #region FUNÇÕES REDUNDANTES
+
 function WINUPDATEMODULE {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
