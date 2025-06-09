@@ -1217,12 +1217,14 @@ do {
 #PROFILEMZTOOL
 
 #region VARIÁVEIS GLOBAIS
+
 $Global:PROFILELOADED = $TRUE
 $Global:PROFILELOADEDTRUE = $TRUE
 
 #endregion
 
-#region PROFILE FUNCTIONS.
+#region PROFILE FUNCTIONS
+
 function REMOVEPROFILELOADED {
     param(
         [switch]$ENV
@@ -1303,8 +1305,7 @@ function REMOVEPROFILELOADED {
                 }
            
                 if ($Global:PROFILELOADED) {
-                    Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
-                  
+                    Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green                  
                     REMOVEPROFILELOADED -ENV $TRUE
                 }
 
@@ -1326,9 +1327,7 @@ function REMOVEPROFILELOADED {
                   
             GETPROFILE       
 
-        }
-
-        
+        }   
         
     }    
 
