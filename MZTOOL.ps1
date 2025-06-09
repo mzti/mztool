@@ -1133,6 +1133,8 @@ function WINGETMODULE {
 $Global:MZTOOLMODULETRUE = $TRUE
 $Global:GIT = $FALSE
 #endregion
+
+#ENDMODULE
 '@ 
 
 function MZTOOLMODULE {
@@ -1224,7 +1226,7 @@ do {
             function GETPROFILE {  
                
                 # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
-                $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {
+                <# $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {
                     
                     if ($_.Key -in @('TOOL', 'Global:DESKTOP', 'Global:PROFILELOADED')) { 
               
@@ -1245,9 +1247,18 @@ do {
                             Add-Content -Path $PROFILE -Value $SETENVPROFILE -Encoding UTF8
                         }
                     }                    
-                }
+                }#>
+
+                $Global:PROFILECONTENT = @'
+#PROFILEMZTOOL
+
+$Global:PROFILELOADED = $TRUE
+
+#endregion
+
+'@ + $Global:MODULECONTENT
                
-                Add-Content -Path $PROFILE -Value $Global:MODULECONTENT -Encoding UTF8
+                Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
                     
                 if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
@@ -1267,8 +1278,8 @@ do {
                 }
             }                
                   
-            GETPROFILE
-            
+            GETPROFILE       
+                 
         }
 
         Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow

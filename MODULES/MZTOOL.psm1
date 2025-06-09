@@ -956,3 +956,5 @@ function WINGETMODULE {
 $Global:MZTOOLMODULETRUE = $TRUE
 $Global:GIT = $TRUE
 #endregion
+
+#ENDMODULE
