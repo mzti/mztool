@@ -982,7 +982,7 @@ function CLEANTEMP {
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
     }
 
-    if (Test-Path -Path $PROFILE -ErrorAction SilentlyContinue) {
+    if (Test-Path $PROFILE -ErrorAction SilentlyContinue) {
         
         REMOVEPROFILELOADED
     }
@@ -1222,6 +1222,9 @@ $Global:PROFILELOADEDTRUE = $TRUE
 
 '@ + $Global:MODULECONTENT
 
+                $Global:PROFILEBKP = @'
+#PROFILEBKP NULL
+'@
                 if (-not (Test-Path $PROFILE)) { 
                     New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 
                     Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
