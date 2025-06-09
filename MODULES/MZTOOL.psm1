@@ -47,7 +47,39 @@ public class Win32 {
     [DllImport("user32.dll")]
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 }
+public static class ConsoleEventHandler {
+    // Delegate para o manipulador de eventos de controle do console.
+    public delegate bool HandlerRoutine(int dwCtrlType);
+    [DllImport("Kernel32")]
+    public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
+}
 "@
+    #endregion
+    #region CLOSE WINDOW
+    $handler = [ConsoleEventHandler+HandlerRoutine] {
+        param([int]$CtrlType)
+        # Os códigos dos eventos são:
+        # 0 = CTRL_C_EVENT
+        # 1 = CTRL_BREAK_EVENT
+        # 2 = CTRL_CLOSE_EVENT  <-- botão "X" ou fechamento da janela
+        # 5 = CTRL_LOGOFF_EVENT
+        # 6 = CTRL_SHUTDOWN_EVENT
+        Write-Host "Evento de controle recebido: $CtrlType"
+        if ($CtrlType -eq 2) {
+            Write-Host "A janela do PowerShell foi fechada. Executando função personalizada..." -ForegroundColor Yellow
+            # Chame aqui a função desejada antes do término do processo.
+            # Exemplo: & MinhaFuncaoAoFechar
+        }
+        # Retorne $true para indicar que o evento foi tratado (impede, se possível, o fechamento imediato)
+        return $true
+    }
+    
+    # Registra o manipulador para os eventos de controle do console.
+    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null
+    
+    Write-Host "Manipulador de fechamento registrado. A janela do PowerShell agora irá acionar a função quando o botão 'X' for clicado."
+    Write-Host "Pressione Enter para finalizar o script (ou feche a janela para disparar o manipulador)."
+    Read-Host
     #endregion
 
     #region Fixar tamanho e remover redimensionamento
