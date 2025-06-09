@@ -1255,6 +1255,7 @@ do {
 #PROFILEMZTOOL
 
 $Global:PROFILELOADED = $TRUE
+$Global:PROFILELOADEDTRUE = $TRUE
 
 #endregion
 
@@ -1304,12 +1305,22 @@ $Global:PROFILELOADED = $TRUE
                     }
                 }
            
-                function REMOVEENVPROFILELOADED {
-                    $profileLines = Get-Content -Path $PROFILE
+                function REMOVEPROFILELOADED {
+                    param(
+                        [switch]$REMOVE
+                    )
 
+                    $profileLines = Get-Content -Path $PROFILE
+                   
+                    if ($REMOVE) {
+                        $filteredLines = $profileLines | Where-Object { $_ -notmatch "$Global:PROFILELOADED" }
+                    }
+                    
                     # Remove as linhas que contenham o conteúdo definido em $Global:PROFILECONTENT.
                     # Note que usamos [regex]::Escape para evitar conflitos com caracteres especiais.
-                    $filteredLines = $profileLines | Where-Object { $_ -notmatch ([regex]::Escape($Global:PROFILECONTENT)) }
+                    else {
+                        $filteredLines = $profileLines | Where-Object { $_ -notmatch ([regex]::Escape($Global:PROFILECONTENT)) }
+                    }
 
                     # Atualiza o arquivo de perfil com as linhas restantes
                     $filteredLines | Set-Content -Path $PROFILE -Encoding UTF8
@@ -1323,11 +1334,8 @@ $Global:PROFILELOADED = $TRUE
 
                 if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
-                    Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
-
-                    # Interrompe o loop, já que a operação foi concluída
-                    break
-                    #REMOVEENVPROFILELOADED
+                  
+                    REMOVEPROFILELOADED -ENV $TRUE
                 }
 
                 else {
@@ -1335,11 +1343,8 @@ $Global:PROFILELOADED = $TRUE
                     Start-Sleep -Seconds 2        
                     if ($Global:PROFILELOADED) {
                         Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green
-                        Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
-
-                        # Interrompe o loop, já que a operação foi concluída
-                        break
-                        REMOVEENVPROFILELOADED
+                                             
+                        REMOVEPROFILELOADED -ENV $TRUE
                     }
                     else { 
                         
@@ -1399,7 +1404,7 @@ ________________________________________________________
 |______________________________________________________|
 '
     # Informa se o Módulo ou o Perfil Powershell está importado.
-    if ($Global:PROFILELOADED) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
+    if ($Global:PROFILELOADEDTRUE) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
 
     elseif ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 
 
