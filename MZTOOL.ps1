@@ -1245,12 +1245,14 @@ $Global:PROFILELOADEDTRUE = $TRUE
                             $linesBefore = if ($startIndex -gt 0) { $profileLines[0..($startIndex - 1)] } else { @() }
                             # ...e as linhas que estarão após o bloco
                             $linesAfter = if ($endIndex -lt ($profileLines.Count - 1)) { $profileLines[($endIndex + 1)..($profileLines.Count - 1)] } else { @() }
-        
+                            
+                            $Global:PROFILEBKP = $linesBefore + $linesAfter
+                            
                             # Converte o novo conteúdo do bloco (que pode ser multi-linha) em um array
                             $newBlock = $Global:PROFILECONTENT -split "`r?`n"
         
                             # Junta as partes: o conteúdo antigo (antes e depois) com o novo bloco no lugar do antigo
-                            $updatedProfile = $linesBefore + $newBlock + $linesAfter
+                            $updatedProfile = $Global:PROFILEBKP + $newBlock
         
                             # Atualiza o arquivo de perfil com o conteúdo modificado
                             $updatedProfile | Set-Content -Path $PROFILE -Encoding UTF8
