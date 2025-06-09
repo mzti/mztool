@@ -982,7 +982,7 @@ function CLEANTEMP {
         REMOVEPROFILELOADED
     }
         
-    if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
+    if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
 
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
     }
