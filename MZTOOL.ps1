@@ -1303,18 +1303,7 @@ $Global:PROFILELOADED = $TRUE
                         Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
                     }
                 }
-                <#
-                if (Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet) { 
-                    $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notin "#PROFILEMZTOOL" .. "#ENDMODULE" } 
-                    $PROFILEBKP + $Global:PROFILECONTENT | Set-Content -Path $PROFILE           
-                }
-
-               else {
-              
-                Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
-               }
-#>
-
+           
                 function REMOVEENVPROFILELOADED {
                     $profileLines = Get-Content -Path $PROFILE
 
@@ -1334,13 +1323,22 @@ $Global:PROFILELOADED = $TRUE
 
                 if ($Global:PROFILELOADED) {
                     Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -ForegroundColor Green
-                    REMOVEENVPROFILELOADED
+                    Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
+
+                    # Interrompe o loop, já que a operação foi concluída
+                    break
+                    #REMOVEENVPROFILELOADED
                 }
+
                 else {
                     . $PROFILE
                     Start-Sleep -Seconds 2        
                     if ($Global:PROFILELOADED) {
                         Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green
+                        Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
+
+                        # Interrompe o loop, já que a operação foi concluída
+                        break
                         REMOVEENVPROFILELOADED
                     }
                     else { 
