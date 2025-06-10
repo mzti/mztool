@@ -233,7 +233,7 @@ public static class ConsoleEventHandler {
 }
 "@
     #endregion
-      #region CLOSE WINDOW
+    #region CLOSE WINDOW
     $handler = [ConsoleEventHandler+HandlerRoutine] {
         param([int]$CtrlType)
         # Os códigos dos eventos são:
@@ -244,16 +244,15 @@ public static class ConsoleEventHandler {
         # 6 = CTRL_SHUTDOWN_EVENT
         Write-Host "Evento de controle recebido: $CtrlType"
         if ($CtrlType -eq 2) {
-            Write-Host "A janela do PowerShell foi fechada. Executando função personalizada..." -ForegroundColor Yellow
-            # Chame aqui a função desejada antes do término do processo.
-            EXITMZTOOL
+            
+            NEWPWSH -Functions EXITMZTOOL
         }
         # Retorne $true para indicar que o evento foi tratado (impede, se possível, o fechamento imediato)
         return $true
     }
     
     # Registra o manipulador para os eventos de controle do console.
-    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null      
+    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null    
     #endregion
 
     #region Fixar tamanho e remover redimensionamento
@@ -993,7 +992,7 @@ function CLEANMODULEPROFILE {
     if ((Test-Path $PROFILE -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
         
         REMOVEPROFILELOADED
-        pause
+        
     }
 }
 
@@ -1238,7 +1237,7 @@ function REMOVEPROFILELOADED {
     param(
         [switch]$ENV
     )
-        
+
     RESETCURSOR
     Write-Host "Removendo PERFIL MZTOOL do PERFIL POWERSHELL."
 

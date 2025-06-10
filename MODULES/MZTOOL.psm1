@@ -66,9 +66,8 @@ public static class ConsoleEventHandler {
         # 6 = CTRL_SHUTDOWN_EVENT
         Write-Host "Evento de controle recebido: $CtrlType"
         if ($CtrlType -eq 2) {
-            Write-Host "A janela do PowerShell foi fechada. Executando função personalizada..." -ForegroundColor Yellow
-            # Chame aqui a função desejada antes do término do processo.
-            EXITMZTOOL
+            
+            NEWPWSH -Functions EXITMZTOOL
         }
         # Retorne $true para indicar que o evento foi tratado (impede, se possível, o fechamento imediato)
         return $true
