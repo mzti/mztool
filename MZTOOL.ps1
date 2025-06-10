@@ -1166,7 +1166,7 @@ do {
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
         if ($TRYGETMODULE -ge 5) {
 
-            Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas. TENTANDO PROFILE POWERSHELL" -ForegroundColor Red
+            Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas.`n`nTENTANDO PROFILE POWERSHELL" -ForegroundColor Red
             Start-Sleep -Seconds 5
             function EXECPOLICYPROFILE {
              
@@ -1184,7 +1184,7 @@ do {
                         Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
 
                         if (-not ($Global:PROFILELOADED)) {                       
-                            Write-Host "Tentativas de carregamento do MÓDULO e PERFIL POWERSHELL esgotadas. ENCERRANDO MZTOOL" -ForegroundColor Red
+                            Write-Host "Tentativas de carregamento do MÓDULO e PERFIL POWERSHELL esgotadas.`n`nENCERRANDO MZTOOL" -ForegroundColor Red
                             Start-Sleep -Seconds 3
                             EXIT 
                         }
