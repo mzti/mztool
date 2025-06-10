@@ -132,7 +132,7 @@ function RESTARTADMIN {
     $MZTOOLAPPDATA = "$env:APPDATA\MZTOOL"
 
     if (-not (Test-Path $MZTOOLAPPDATA)) {
-        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force -Force | Out-Null > $null 2>&1          
+        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force | Out-Null > $null 2>&1          
     }
 
     # Define o caminho do arquivo no diretório AppData\Roaming
