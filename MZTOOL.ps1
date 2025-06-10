@@ -42,6 +42,7 @@ Clear-Host
 $Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
+$Global:PROFILESTATUS = { Test-Path $PROFILE -ErrorAction SilentlyContinue }
 $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstance -Class Win32_OperatingSystem).OSArchitecture
 $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
@@ -989,7 +990,7 @@ function CLEANMODULEPROFILE {
     }
     
     pause 
-    if ((Test-Path $PROFILE -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
+    if ((& $Global:PROFILESTATUS) -and ($Global:PROFILELOADEDTRUE)) {
         
         REMOVEPROFILELOADED
         
@@ -1201,7 +1202,7 @@ do {
                     if ($_.Key -in @('TOOL', 'Global:DESKTOP', 'Global:PROFILELOADED')) { 
               
                         # Cria o arquivo de perfil do PowerShell se não existir.
-                        if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
+                        if (-not (& $Global:PROFILESTATUS)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
                                            
                         # Cria a linha de definição da variável (com o símbolo $ escapado).
                         $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"
@@ -1266,18 +1267,16 @@ function REMOVEPROFILELOADED {
 #ENDPROFILEMZTOOL
 
 '@ + $Global:MODULECONTENT
-
                 
-                if (Test-Path $PROFILE) { 
+                
+                if (& $Global:PROFILESTATUS) {          
                     
                     $Global:PROFILEBKP = Get-Content -Path $PROFILE
+                    $PROFILEMZTOOL = Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet
                
                     # Verifica se o arquivo de perfil contém o marcador de início do bloco
-                    if (Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet) {
-
-                        # Lê todas as linhas do arquivo de perfil
-                        #$profileLines = Get-Content -Path $PROFILE
-
+                    if ($PROFILEMZTOOL) {
+                        
                         # Encontra o índice da linha onde aparece "#PROFILEMZTOOL"
                         $startIndex = [Array]::IndexOf($Global:PROFILEBKP, ($Global:PROFILEBKP | Where-Object { $_ -match "#PROFILEMZTOOL" } | Select-Object -First 1))
     
