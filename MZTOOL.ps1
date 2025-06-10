@@ -977,18 +977,27 @@ function CLEANTEMP {
         REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
     }
 
-       if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
+    if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
 
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
-    }
+    }  
+}
 
+function CLEANMODULEPROFILE{
+
+    pause
+    if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
+    
+        Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+        pause
+    }
+    
     pause 
     if ((Test-Path $PROFILE -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
         
         REMOVEPROFILELOADED
         pause
     }
-  
 }
 
 function RESETCURSOR {
@@ -1118,16 +1127,16 @@ function MZTOOLMODULE {
     New-Item -Path $MODULEDIR -ItemType Directory -Force | Out-Null
 
     # Define o caminho completo para o arquivo .psm1 do módulo
-    $MODULEPATH = Join-Path -Path $MODULEDIR -ChildPath "$MODULENAME.psm1"
+    $Global:MZTOOLMODULEPATH = Join-Path -Path $MODULEDIR -ChildPath "$MODULENAME.psm1"
 
     # Verifica se o arquivo .psm1 já existe e o deleta, se necessário
-    if (Test-Path -Path $MODULEPATH) {
-        Remove-Item -Path $MODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+    if (Test-Path -Path $Global:MZTOOLMODULEPATH) {
+        Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-    try { Invoke-RestMethod https://aw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $MODULEPATH -Encoding UTF8 }
+    try { Invoke-RestMethod https://aw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
-        #Set-Content -Path $MODULEPATH -Value $Global:MODULECONTENT -Force
+        #Set-Content -Path $Global:MZTOOLMODULEPATH -Value $Global:MODULECONTENT -Force
     }  
 }
 
@@ -2007,6 +2016,7 @@ _______________________________________________________
 |_____________________________________________________|
 '
     CLEANTEMP
+    CLEANMODULEPROFILE
     pause
     EXIT 
 
