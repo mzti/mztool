@@ -41,6 +41,18 @@ VÍDEO SEM EDIÇOES - https://www.youtube.com/watch?v=w7V6YisqsB4
 
 ## VARIÁVEIS DE AMBIENTE
 
+## DEMONSTRAÇÃO
+
+
+
+https://github.com/user-attachments/assets/959a14dc-1a25-4350-be1d-6e704cc257ed
+
+
+
+VÍDEO SEM EDIÇOES - https://www.youtube.com/watch?v=w7V6YisqsB4
+
+## VARIÁVEIS DE AMBIENTE
+
 Após a primeira execução da ferramenta, é instalada uma variável de ambiente global que armazena o código acima e logo é possível executar a ferramenta com a variável a partir de então:
 
 ```PowerShell
@@ -48,6 +60,12 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 ```
 
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/ENVTOOL.png?raw=true)
+
+### COMPATIBILIDADE 
+
+Windows 10 X64 & X86, Windows 11.
+
+*Versões anteriores ao Windows 10 e outros sistemas operacionais não são compatíves com Winget.
 
 ### COMPATIBILIDADE 
 
