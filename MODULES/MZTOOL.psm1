@@ -748,6 +748,7 @@ function REMOVEFILE {
 }
 
 function CLEANTEMP {
+    
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'     

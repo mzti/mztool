@@ -1354,7 +1354,7 @@ ________________________________________________________
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
 |______________________________________________________|
 '
-    if ($Global:PROFILESTATUS) { 
+    if (& $Global:PROFILESTATUS) { 
         . $PROFILE | Out-Null 
     }
     # Informa se o Módulo ou o Perfil Powershell está importado.
