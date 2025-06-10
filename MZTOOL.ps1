@@ -8,7 +8,7 @@
 .NOTES
     Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
     Compatibilidade: Windows 11 e 10. PowerShell 5.1 ou superior.
-    Versão: BETA.
+    Versão: MAIN.
      
 .EXAMPLE
 
@@ -52,8 +52,7 @@ $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
-    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"     
+    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"         
 }
 
 #$ErrorActionPreference = 'SilentlyContinue'
@@ -180,7 +179,7 @@ $Global:MODULECONTENT = @'
 #MÓDULO MZTOOL
 
 #region Variáveis Globais
-$Global:TITLE = "MZTOOL BETA"
+$Global:TITLE = "MZTOOL"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
@@ -1318,7 +1317,7 @@ function REMOVEPROFILELOADED {
    
 $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {      
     
-    if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
+    if ($_.Key -in @('MZTOOL', 'TOOL')) {
        
         $PWSHKEY = "PowerShell " ; if ($_.Key -eq 'TOOL') { $PWSHKEY = $null } 
 
@@ -1362,7 +1361,7 @@ ________________________________________________________
 
     elseif ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 
 
-        Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
+        Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT" } else { "- PS1" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
     
     }
 
@@ -1736,78 +1735,17 @@ _______________________________________________________
             
             EXITMZTOOL         
             
-        }
-       
-        # COMANDOS DE TESTE OCULTOS DO MENU.
-        
-        #Testa a função ANYDESK.
-        any {
-
-            NEWPWSH -Functions 'ANYDESK' 
-            DISPLAYMENU
-
-        }    
-
-        #Testa a função WINGETAPPS.
-        w {
-            
-            NEWPWSH -Functions 'WINGETAPPS' -Wait
-            DISPLAYMENU
-
-        }
-
-        #Testa a função WINUPDATE.
-        u {
-
-            NEWPWSH -Functions 'WINUPDATEMODULE', 'WINUPDATE' -Wait
-            DISPLAYMENU
-
-        }
-        
-        #Testa a função CLOCKDATE.
-        h {
-
-            NEWPWSH -Functions 'CLOCKDATE'
-            DISPLAYMENU
-
-        }
-
-        #Testa a função PRO.
-        p {
-
-            NEWPWSH -Functions 'PRO' 
-            DISPLAYMENU
-
-        }
-
-        #Testa a função IMGHEALTH.
-        sfc {
-
-            NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP'             
-            DISPLAYMENU
-
-        }
-
-        #Testa a função DRIVERBOOSTER.
-        db {
-
-            DOWNLOADMZTOOL
-            NEWPWSH -Functions 'DRIVERBOOSTER'
-            DISPLAYMENU
-
-        }
-
-        awin {
-            awin exit
-        }
+        }                  
 
         default {
+
             ENTRYERROR
         }
+
     }
 }
-#Funções auxiliares do MENU.
 
+#Funções auxiliares do MENU.
 function DISPLAYMENUDOWNLOADERROR {      
     
     do {
@@ -3047,10 +2985,6 @@ function PRO {
 
     Clear-Host
 
-}
-
-function awin {
-    Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
     
 DISPLAYMENU 
