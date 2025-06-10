@@ -2848,10 +2848,7 @@ function PINICONS {
     }
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -Name 'DisableNotificationCenter' -Type DWord -Value 1
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'ToastEnabled' -Type DWord -Value 0
-
-    #Ativa plano de energia para Alto Desempenho.    
-    #POWERCFG /SETACTIVE SCHEME_MIN
-
+  
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     REFRESHUSER
           
@@ -2937,10 +2934,11 @@ function STARTSOFTWARES {
 
     #Mostra e atualiza a Área de Trabalho.
     DESKTOPUPDATE 
-
+    
+    Start-Process WINWORD
     Start-Process ACROBAT
     Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/    
-
+     
 }
 
 function IMGHEALTH {
