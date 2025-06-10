@@ -39,7 +39,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 Clear-Host
 
 #VARIÁVEIS GLOBAIS.
-$Global:TITLE = 'MZTOOL BETA'
+$Global:TITLE = 'MZTOOL'
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:PROFILESTATUS = { Test-Path $PROFILE -ErrorAction SilentlyContinue }
@@ -1128,7 +1128,7 @@ function MZTOOLMODULE {
     if (Test-Path -Path $Global:MZTOOLMODULEPATH) {
         Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 }
+    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $Global:MZTOOLMODULEPATH -Value $Global:MODULECONTENT -Force
@@ -1342,7 +1342,7 @@ function DISPLAYMENU {
 ________________________________________________________
 |                                                      |
 |                        MZTOOL                        |
-| ________________________BETA________________________ | 
+| ____________________________________________________ | 
 |                                                      | 
 |                                                      |
 | |1| IMPLEMENTAÇÃO COMPLETA                           |

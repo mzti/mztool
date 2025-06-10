@@ -1,7 +1,7 @@
 #MÓDULO MZTOOL
 
 #region Variáveis Globais
-$Global:TITLE = "MZTOOL BETA"
+$Global:TITLE = "MZTOOL"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
