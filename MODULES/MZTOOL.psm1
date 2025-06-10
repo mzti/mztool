@@ -68,18 +68,14 @@ public static class ConsoleEventHandler {
         if ($CtrlType -eq 2) {
             Write-Host "A janela do PowerShell foi fechada. Executando função personalizada..." -ForegroundColor Yellow
             # Chame aqui a função desejada antes do término do processo.
-            CLEANTEMP
+            EXITMZTOOL
         }
         # Retorne $true para indicar que o evento foi tratado (impede, se possível, o fechamento imediato)
         return $true
     }
     
     # Registra o manipulador para os eventos de controle do console.
-    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null
-    
-    Write-Host "Manipulador de fechamento registrado. A janela do PowerShell agora irá acionar a função quando o botão 'X' for clicado."
-    Write-Host "Pressione Enter para finalizar o script (ou feche a janela para disparar o manipulador)."
-    Read-Host
+    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null      
     #endregion
 
     #region Fixar tamanho e remover redimensionamento
