@@ -801,19 +801,17 @@ function CLEANTEMP {
 }
 
 function CLEANMODULEPROFILE {
-
-    pause
+  
     if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
-    
-        Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
-        pause
-    }
-    
-    pause 
-    if ((Test-Path $PROFILE -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
+  
+        REMOVEFILE -Path $Global:MZTOOLMODULEPATH -Description "MÓDULO MZTOOL."
+       
+    }    
+  
+    if ((& $Global:PROFILESTATUS) -and ($Global:PROFILELOADEDTRUE)) {
         
         REMOVEPROFILELOADED
-        pause
+        
     }
 }
 

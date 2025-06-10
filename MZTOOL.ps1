@@ -981,15 +981,13 @@ function CLEANTEMP {
 }
 
 function CLEANMODULEPROFILE {
-
-    pause
+  
     if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
   
         REMOVEFILE -Path $Global:MZTOOLMODULEPATH -Description "MÓDULO MZTOOL."
-        pause
-    }
-    
-    pause 
+       
+    }    
+  
     if ((& $Global:PROFILESTATUS) -and ($Global:PROFILELOADEDTRUE)) {
         
         REMOVEPROFILELOADED
