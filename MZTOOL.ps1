@@ -1796,6 +1796,7 @@ function DISPLAYMENU365STATUS {
 
         Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
         Start-Sleep -Seconds 5
+        Start-Process PowerShell -WindowStyle Hidden { Start-Process WINWORD }
 
     }
 
@@ -2405,11 +2406,7 @@ function MICROSOFT365 {
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
 
-        $365STATUS = "1"
-        
-        if (& $MS365) { 
-            Start-Process PowerShell -WindowStyle Hidden { Start-Process WINWORD }
-        }
+        if (& $MS365) { $365STATUS = "1" }      
     }
     
     else {        
@@ -2433,7 +2430,7 @@ function OFFICE2007 {
     if (-NOT ($INSTALLED)) {                  
        
         $OFFICE2007AWS = 'https://d15d16xpb69uci.cloudfront.net/OFFICE2007.zip'
-        $OFFICE2007GOOGLEDRIVE = $OFFICE2007AWS
+        $OFFICE2007GOOGLEDRIVE = 'https://NULL.NULL'
 
         $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
         $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
@@ -2943,7 +2940,6 @@ function STARTSOFTWARES {
 
     Start-Process ACROBAT
     Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/    
-    Start-Process -FilePath "C:\Windows\System32\SystemPropertiesPerformance.exe"    
 
 }
 
