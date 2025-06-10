@@ -732,25 +732,25 @@ function UNINSTALLOFFICE {
 
     return $StillInstalled
 }
+function REMOVEFILE {
+    param (
+        [string]$Path,
+        [string]$Description
+    )
+
+    # Função para remoção de arquivos temporários.
+
+    RESETCURSOR
+    
+    Write-Host "`rLimpando $Description" -NoNewline   
+    
+    Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+}
 
 function CLEANTEMP {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
-    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
-
-    # Função para remoção de arquivos temporários.
-    function REMOVEFILE {
-        param (
-            [string]$Path,
-            [string]$Description
-        )
-
-        RESETCURSOR
-
-        Write-Host "`rLimpando $Description" -NoNewline   
-        
-        Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
-    }
+    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'     
 
     # Remove arquivos temporários do sistema.
     REMOVEFILE -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
