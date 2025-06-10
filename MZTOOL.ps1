@@ -1991,7 +1991,6 @@ _______________________________________________________
 '
     CLEANTEMP
     CLEANMODULEPROFILE
-    pause
     EXIT 
 
 }
