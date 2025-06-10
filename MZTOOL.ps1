@@ -977,19 +977,18 @@ function CLEANTEMP {
         REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
     }
 
+       if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
+
+        REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
+    }
+
+    pause 
     if ((Test-Path $PROFILE -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
         
         REMOVEPROFILELOADED
         pause
     }
-    
-    pause
-    
-    if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
-
-        REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
-    }
-
+  
 }
 
 function RESETCURSOR {
