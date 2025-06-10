@@ -1111,18 +1111,18 @@ function MZTOOLMODULE {
     $MODULENAME = "MZTOOL"
 
     # Define o caminho do diretório do módulo (pasta padrão para módulos do usuário)
-    $MODULEDIR = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath "Modules\$MODULENAME"
+    $Global:MZTOOLMODULEDIR = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath "Modules\$MODULENAME"
 
     # Deleta o diretório, se existir.
-    if (Test-Path $MODULEDIR) {
-        Remove-Item  -Path $MODULEDIR -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+    if (Test-Path $Global:MZTOOLMODULEDIR) {
+        Remove-Item  -Path $Global:MZTOOLMODULEDIR -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
 
     # Cria o diretório do módulo.
-    New-Item -Path $MODULEDIR -ItemType Directory -Force | Out-Null
+    New-Item -Path $Global:MZTOOLMODULEDIR -ItemType Directory -Force | Out-Null
 
     # Define o caminho completo para o arquivo .psm1 do módulo
-    $Global:MZTOOLMODULEPATH = Join-Path -Path $MODULEDIR -ChildPath "$MODULENAME.psm1"
+    $Global:MZTOOLMODULEPATH = Join-Path -Path $Global:MZTOOLMODULEDIR -ChildPath "$MODULENAME.psm1"
 
     # Verifica se o arquivo .psm1 já existe e o deleta, se necessário
     if (Test-Path -Path $Global:MZTOOLMODULEPATH) {

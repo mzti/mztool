@@ -748,7 +748,7 @@ function REMOVEFILE {
 }
 
 function CLEANTEMP {
-    
+
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'     
@@ -806,7 +806,7 @@ function CLEANMODULEPROFILE {
     if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
   
         REMOVEFILE -Path $Global:MZTOOLMODULEPATH -Description "MÓDULO MZTOOL."
-       
+        REMOVEFILE -Path $Global:MZTOOLMODULEDIR -Description "MÓDULO MZTOOL."
     }    
   
     if ((& $Global:PROFILESTATUS) -and ($Global:PROFILELOADEDTRUE)) {
