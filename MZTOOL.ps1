@@ -252,7 +252,7 @@ public static class ConsoleEventHandler {
     }
     
     # Registra o manipulador para os eventos de controle do console.
-    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null    
+    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null      
     #endregion
 
     #region Fixar tamanho e remover redimensionamento
@@ -910,26 +910,26 @@ function UNINSTALLOFFICE {
 
     return $StillInstalled
 }
-
 function REMOVEFILE {
     param (
         [string]$Path,
         [string]$Description
     )
 
-    # Função para remoção de arquivos.
+    # Função para remoção de arquivos temporários.
 
     RESETCURSOR
-
-    Write-Host "`rRemovendo $Description" -NoNewline   
-        
+    
+    Write-Host "`rLimpando $Description" -NoNewline   
+    
     Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 function CLEANTEMP {
+
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
-    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
+    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'     
 
     # Remove arquivos temporários do sistema.
     REMOVEFILE -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
@@ -984,7 +984,7 @@ function CLEANMODULEPROFILE {
     if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
   
         REMOVEFILE -Path $Global:MZTOOLMODULEPATH -Description "MÓDULO MZTOOL."
-       
+        REMOVEFILE -Path $Global:MZTOOLMODULEDIR -Description "MÓDULO MZTOOL."
     }    
   
     if ((& $Global:PROFILESTATUS) -and ($Global:PROFILELOADEDTRUE)) {
@@ -1022,7 +1022,6 @@ function CLOCKDATE {
 #endregion
 
 #region FUNÇÕES REDUNDANTES
-
 function WINUPDATEMODULE {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
