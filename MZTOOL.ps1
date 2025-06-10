@@ -1263,10 +1263,10 @@ function REMOVEPROFILELOADED {
 
 '@ + $Global:MODULECONTENT
 
-                $Global:PROFILEBKP = @'
-#PROFILEBKP NULL
-'@
-                if (Test-Path $PROFILE) {                    
+                
+                if (Test-Path $PROFILE) { 
+                    
+                    $Global:PROFILEBKP = Get-Content -Path $PROFILE
                
                     # Verifica se o arquivo de perfil contém o marcador de início do bloco
                     if (Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet) {
