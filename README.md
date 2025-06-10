@@ -21,17 +21,18 @@
 
 
 ## COMO USAR A FERRAMENTA 
-### EM UM AMBIENTE WINDOWS, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO NA CAIXA EXECUTAR.
-```PowerShell
-PowerShell irm https://bit.ly/MZT00L | iex
-```
-
-![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/EXECUTAR.png?raw=true)
-
-### OU COLE O CÓDIGO NA CAIXA EXECUTAR EM UMA SESSÃO POWERSHELL OU WINDOWS TERMINAL COM POWERSHELL.
+### EM UM AMBIENTE WINDOWS
+### COLE O CÓDIGO NA CAIXA EXECUTAR EM UMA SESSÃO POWERSHELL OU WINDOWS TERMINAL COM POWERSHELL.
 ```PowerShell
 irm https://bit.ly/MZT00L | iex
 ```
+![image](https://github.com/user-attachments/assets/866ad246-5419-45ba-9e62-993e9ea14ba4)
+
+### OU, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO ABAIXO NA CAIXA EXECUTAR.
+```PowerShell
+PowerShell irm https://bit.ly/MZT00L | iex
+```
+![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/EXECUTAR.png?raw=true)
 
 
 ## DEMONSTRAÇÃO
