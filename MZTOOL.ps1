@@ -1354,7 +1354,9 @@ ________________________________________________________
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
 |______________________________________________________|
 '
-    if ($Global:PROFILESTATUS) { . $PROFILE | Out-Null }
+    if ($Global:PROFILESTATUS) { 
+        . $PROFILE | Out-Null 
+    }
     # Informa se o Módulo ou o Perfil Powershell está importado.
     if ($Global:PROFILELOADEDTRUE) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
 
