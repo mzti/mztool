@@ -912,24 +912,25 @@ function UNINSTALLOFFICE {
     return $StillInstalled
 }
 
+function REMOVEFILE {
+    param (
+        [string]$Path,
+        [string]$Description
+    )
+
+    # Função para remoção de arquivos.
+
+    RESETCURSOR
+
+    Write-Host "`rRemovendo $Description" -NoNewline   
+        
+    Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 function CLEANTEMP {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
     Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
-
-    # Função para remoção de arquivos temporários.
-    function REMOVEFILE {
-        param (
-            [string]$Path,
-            [string]$Description
-        )
-
-        RESETCURSOR
-
-        Write-Host "`rLimpando $Description" -NoNewline   
-        
-        Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
-    }
 
     # Remove arquivos temporários do sistema.
     REMOVEFILE -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
@@ -983,8 +984,8 @@ function CLEANMODULEPROFILE {
 
     pause
     if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
-    
-        Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+  
+        REMOVEFILE -Path $Global:MZTOOLMODULEPATH -Description "MÓDULO MZTOOL."
         pause
     }
     
@@ -1237,6 +1238,10 @@ function REMOVEPROFILELOADED {
     param(
         [switch]$ENV
     )
+        
+    RESETCURSOR
+    Write-Host "Removendo PERFIL MZTOOL do PERFIL POWERSHELL."
+
     # Remove a variável global para evitar repetições futuras.
     Remove-Variable -Name 'PROFILELOADED' -Scope Global -ErrorAction SilentlyContinue
                       
@@ -1319,7 +1324,7 @@ function REMOVEPROFILELOADED {
                 }
 
                 else {
-                    . $PROFILE #| Out-Null
+                    . $PROFILE | Out-Null
                     Start-Sleep -Seconds 2        
                     if ($Global:PROFILELOADED) {
                         Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green                                             
