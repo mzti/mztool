@@ -1272,19 +1272,19 @@ function REMOVEPROFILELOADED {
                     if (Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet) {
 
                         # Lê todas as linhas do arquivo de perfil
-                        $profileLines = Get-Content -Path $PROFILE
+                        #$profileLines = Get-Content -Path $PROFILE
 
                         # Encontra o índice da linha onde aparece "#PROFILEMZTOOL"
-                        $startIndex = [Array]::IndexOf($profileLines, ($profileLines | Where-Object { $_ -match "#PROFILEMZTOOL" } | Select-Object -First 1))
+                        $startIndex = [Array]::IndexOf($Global:PROFILEBKP, ($Global:PROFILEBKP | Where-Object { $_ -match "#PROFILEMZTOOL" } | Select-Object -First 1))
     
                         # Encontra o índice da linha onde aparece "#ENDMODULE"
-                        $endIndex = [Array]::IndexOf($profileLines, ($profileLines | Where-Object { $_ -match "#ENDMODULE" } | Select-Object -First 1))
+                        $endIndex = [Array]::IndexOf($Global:PROFILEBKP, ($Global:PROFILEBKP | Where-Object { $_ -match "#ENDMODULE" } | Select-Object -First 1))
     
                         if ($startIndex -ge 0 -and $endIndex -ge 0 -and $endIndex -ge $startIndex) {
                             # Separa as linhas antes do bloco existente...
-                            $linesBefore = if ($startIndex -gt 0) { $profileLines[0..($startIndex - 1)] } else { @() }
+                            $linesBefore = if ($startIndex -gt 0) { $Global:PROFILEBKP[0..($startIndex - 1)] } else { @() }
                             # ...e as linhas que estarão após o bloco
-                            $linesAfter = if ($endIndex -lt ($profileLines.Count - 1)) { $profileLines[($endIndex + 1)..($profileLines.Count - 1)] } else { @() }
+                            $linesAfter = if ($endIndex -lt ($Global:PROFILEBKP.Count - 1)) { $Global:PROFILEBKP[($endIndex + 1)..($Global:PROFILEBKP.Count - 1)] } else { @() }
                             
                             $Global:PROFILEBKP = $linesBefore + $linesAfter
                             
@@ -1319,7 +1319,7 @@ function REMOVEPROFILELOADED {
                 }
 
                 else {
-                    . $PROFILE
+                    . $PROFILE #| Out-Null
                     Start-Sleep -Seconds 2        
                     if ($Global:PROFILELOADED) {
                         Write-Host "`nPERFIL DE USUÁRIO POWERSHELL CARREGADO." -NoNewline -ForegroundColor Green                                             
@@ -1380,7 +1380,7 @@ ________________________________________________________
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
 |______________________________________________________|
 '
-    . $PROFILE
+    . $PROFILE | Out-Null
     # Informa se o Módulo ou o Perfil Powershell está importado.
     if ($Global:PROFILELOADEDTRUE) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
 
