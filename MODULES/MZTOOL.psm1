@@ -799,18 +799,27 @@ function CLEANTEMP {
         REMOVEFILE -Path $env:TOOL -Description "pasta TOOL."
     }
 
-    if (Test-Path $PROFILE -ErrorAction SilentlyContinue) {
-        
-        REMOVEPROFILELOADED
-    }
-
     if (Test-Path -Path $Global:MZTOOLAPPDATA -ErrorAction SilentlyContinue) {
 
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
+    }  
+}
+
+function CLEANMODULEPROFILE {
+
+    pause
+    if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
+    
+        Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+        pause
     }
-
-  
-
+    
+    pause 
+    if ((Test-Path $PROFILE -ErrorAction SilentlyContinue) -and ($Global:PROFILELOADEDTRUE)) {
+        
+        REMOVEPROFILELOADED
+        pause
+    }
 }
 
 function RESETCURSOR {

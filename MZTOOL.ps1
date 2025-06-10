@@ -132,7 +132,7 @@ function RESTARTADMIN {
     $MZTOOLAPPDATA = "$env:APPDATA\MZTOOL"
 
     if (-not (Test-Path $MZTOOLAPPDATA)) {
-        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force          
+        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force -Force | Out-Null > $null 2>&1          
     }
 
     # Define o caminho do arquivo no diretório AppData\Roaming
@@ -983,7 +983,7 @@ function CLEANTEMP {
     }  
 }
 
-function CLEANMODULEPROFILE{
+function CLEANMODULEPROFILE {
 
     pause
     if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
@@ -1270,12 +1270,8 @@ function REMOVEPROFILELOADED {
                 $Global:PROFILEBKP = @'
 #PROFILEBKP NULL
 '@
-                if (-not (Test-Path $PROFILE)) { 
-                    New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 
-                    Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
-                }
-                 
-                else {
+                if (Test-Path $PROFILE) {                    
+               
                     # Verifica se o arquivo de perfil contém o marcador de início do bloco
                     if (Select-String -Path $PROFILE -Pattern "#PROFILEMZTOOL" -Quiet) {
 
@@ -1314,6 +1310,11 @@ function REMOVEPROFILELOADED {
                         # Se não existir nenhum bloco com o marcador "#PROFILEMZTOOL", simplesmente adiciona o conteúdo
                         Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
                     }
+                }          
+                 
+                else {
+                    New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 
+                    Add-Content -Path $PROFILE -Value $Global:PROFILECONTENT -Encoding UTF8
                 }
            
                 if ($Global:PROFILELOADED) {
@@ -1383,6 +1384,7 @@ ________________________________________________________
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
 |______________________________________________________|
 '
+    . $PROFILE
     # Informa se o Módulo ou o Perfil Powershell está importado.
     if ($Global:PROFILELOADEDTRUE) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
 
