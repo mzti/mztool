@@ -28,18 +28,11 @@ PowerShell irm https://bit.ly/MZT00L | iex
 
 ![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/EXECUTAR.png?raw=true)
 
+### OU COLE O CÓDIGO NA CAIXA EXECUTAR EM UMA SESSÃO POWERSHELL OU WINDOWS TERMINAL COM POWERSHELL.
+```PowerShell
+irm https://bit.ly/MZT00L | iex
+```
 
-## DEMONSTRAÇÃO
-
-
-
-https://github.com/user-attachments/assets/959a14dc-1a25-4350-be1d-6e704cc257ed
-
-
-
-VÍDEO SEM EDIÇOES - https://www.youtube.com/watch?v=w7V6YisqsB4
-
-## VARIÁVEIS DE AMBIENTE
 
 ## DEMONSTRAÇÃO
 
@@ -64,11 +57,6 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 ### COMPATIBILIDADE 
 
 Windows 10 X64 & X86, Windows 11.
+*Versões anteriores ao Windows 10 não são compatíves.
 
-*Versões anteriores ao Windows 10 e outros sistemas operacionais não são compatíves com Winget.
-
-### COMPATIBILIDADE 
-
-Windows 10 X64 & X86, Windows 11.
-
-*Versões anteriores ao Windows 10 e outros sistemas operacionais não são compatíves com Winget.
+PowerShell 5.1.0 ou superior.
