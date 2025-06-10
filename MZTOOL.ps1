@@ -1166,7 +1166,7 @@ do {
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
         if ($TRYGETMODULE -ge 5) {
 
-            Write-Host "Tentativas de carregamento do módulo MZTOOL esgotadas.`n`nTENTANDO PROFILE POWERSHELL" -ForegroundColor Red
+            Write-Host "`n`nTentativas de carregamento do módulo MZTOOL esgotadas.`n`nTENTANDO PROFILE POWERSHELL" -ForegroundColor Red
             Start-Sleep -Seconds 5
             function EXECPOLICYPROFILE {
              
@@ -1184,7 +1184,7 @@ do {
                         Write-host "POLITICA DE EXECUÇÃO JÁ DEFINIDA TEMPORARIAMENTE." -ForegroundColor Green
 
                         if (-not ($Global:PROFILELOADED)) {                       
-                            Write-Host "Tentativas de carregamento do MÓDULO e PERFIL POWERSHELL esgotadas.`n`nENCERRANDO MZTOOL" -ForegroundColor Red
+                            Write-Host "`n`nTentativas de carregamento do MÓDULO e PERFIL POWERSHELL esgotadas.`n`nENCERRANDO MZTOOL" -ForegroundColor Red
                             Start-Sleep -Seconds 3
                             EXIT 
                         }
@@ -1193,32 +1193,6 @@ do {
             }
            
             function GETPROFILE {  
-               
-                # Define as variáveis no perfil do PowerShell e verifica se foi carregado, se não, tenta carregá-lo.
-                <# $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {
-                    
-                    if ($_.Key -in @('TOOL', 'Global:DESKTOP', 'Global:PROFILELOADED')) { 
-              
-                        # Cria o arquivo de perfil do PowerShell se não existir.
-                        if (-not (& $Global:PROFILESTATUS)) { New-Item $PROFILE -ItemType File -Force | Out-Null > $null 2>&1 }
-                                           
-                        # Cria a linha de definição da variável (com o símbolo $ escapado).
-                        $SETENVPROFILE = "`$$($_.Key) = `"$($_.Value)`"`n`n"
-  
-                        # Verifica se a variável já existe no arquivo de perfil.
-                        if (Select-String -Path $PROFILE -Pattern "`$$($_.Key) =" -Quiet) {            
-                            $PROFILEBKP = Get-Content -Path $PROFILE | Where-Object { $_ -notmatch "`$$($_.Key) =" } 
-                            $PROFILEBKP + $SETENVPROFILE | Set-Content -Path $PROFILE           
-                        } 
-                      
-                        # Adiciona a variável ao arquivo de perfil na biblioteca Powershell do ambiente User.
-                        else {
-                            Add-Content -Path $PROFILE -Value $SETENVPROFILE -Encoding UTF8
-                        }
-                    }                    
-                }#>
-
-                
 
                 $Global:PROFILECONTENT = @'
 #PROFILEMZTOOL
@@ -1264,8 +1238,7 @@ function REMOVEPROFILELOADED {
 
 #ENDPROFILEMZTOOL
 
-'@ + $Global:MODULECONTENT
-                
+'@ + $Global:MODULECONTENT                
                 
                 if (& $Global:PROFILESTATUS) {          
                     
