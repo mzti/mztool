@@ -42,7 +42,8 @@ irm https://bit.ly/MZT00L | iex
 ```PowerShell
 PowerShell irm https://bit.ly/MZT00L | iex
 ```
-![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/EXECUTAR.png?raw=true)
+![image](https://github.com/user-attachments/assets/f7bc4572-3880-4bc8-a0de-9c9dcdd28040)
+
 
 
 ## DEMONSTRAÇÃO
@@ -63,7 +64,8 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 %MZTOOL%
 ```
 
-![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/ENVTOOL.png?raw=true)
+![image](https://github.com/user-attachments/assets/d8d3f908-6fcd-407a-8115-502a9e018f93)
+
 
 ### COMPATIBILIDADE 
 
