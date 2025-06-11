@@ -1376,7 +1376,7 @@ ________________________________________________________
             #Verifica se há conexão com internet.
             INTERNET
            
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> FULL DEPLOY"
                        
             Clear-Host
             Write-Host '
