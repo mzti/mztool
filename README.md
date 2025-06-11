@@ -14,17 +14,17 @@
 
 ![image](https://github.com/user-attachments/assets/f8fd0c6a-13ae-4216-8119-5958d63c12b1)
 
-- 2 - Download e execução standalone automatizada em nuvem de softwares para monitoramento e diagnóstico de hardwares. 
+- 2 - Download, extração e execução automatizada em nuvem AWS (CloudFront) de softwares standalone para monitoramento e diagnóstico de hardwares. 
       
       HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, GPUZ.
 
  ![image](https://github.com/user-attachments/assets/07a41ae4-6b9b-40c1-a76d-c82c6558bac2)
   
-- 3 - Atualização automátizada de softwares e drivers através do Winget e Módulo Windows Update.
+- 3 - Atualização automatizada de softwares e drivers através do Winget e Módulo Windows Update.
 
  ![image](https://github.com/user-attachments/assets/25ab021f-24b4-4f17-b77b-3e345f887a12)
 
-- 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
+- 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365 com instalação personalizada via XML.
 
 ![image](https://github.com/user-attachments/assets/52044d82-b57d-4df7-b62d-aea413c67416)
 
