@@ -42,17 +42,12 @@ irm https://bit.ly/MZT00L | iex
 ```PowerShell
 PowerShell irm https://bit.ly/MZT00L | iex
 ```
-![image](https://github.com/user-attachments/assets/f7bc4572-3880-4bc8-a0de-9c9dcdd28040)
-
+![image](https://github.com/user-attachments/assets/036e7a94-888c-40e4-aff4-4e5ef77917e5)
 
 
 ## DEMONSTRAÇÃO
 
-
-
 https://github.com/user-attachments/assets/959a14dc-1a25-4350-be1d-6e704cc257ed
-
-
 
 VÍDEO SEM EDIÇOES - https://www.youtube.com/watch?v=w7V6YisqsB4
 
@@ -65,7 +60,6 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 ```
 
 ![image](https://github.com/user-attachments/assets/d8d3f908-6fcd-407a-8115-502a9e018f93)
-
 
 ### COMPATIBILIDADE 
 
