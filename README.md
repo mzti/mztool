@@ -1,5 +1,4 @@
-![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/MENU.png?raw=true)
-![image](https://github.com/DanielMozartt/MZTOOL/blob/MZTOOL/PNG/WINGET%20%25%20WINUPDATE.png?raw=true)
+![image](https://github.com/user-attachments/assets/c00c49c6-f4a9-4b0e-9ce3-7f8327387e45)
 
 ## FUNCIONALIDADES
 
@@ -13,11 +12,21 @@
       
       Personalização do Perfil de Usuário (Regedit, XML, Appx): Tema, Ícones da Área de Trabalho e Barra de Tarefas, Remoção de Widgets, Remoção de Bloatwares, Remoção do Microsoft Copilot, Remoção de Ícones Visão de Tarefas e Notícias, Remoção de notificações da Central de Ações, Define o Google Chrome como navegador padrão e o Acrobat Reader como leitor de PDF padrão.
 
+![image](https://github.com/user-attachments/assets/f8fd0c6a-13ae-4216-8119-5958d63c12b1)
+
 - 2 - Download e execução standalone automatizada em nuvem de softwares para monitoramento e diagnóstico de hardwares. 
       
       HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, GPUZ.
+
+ ![image](https://github.com/user-attachments/assets/07a41ae4-6b9b-40c1-a76d-c82c6558bac2)
+  
 - 3 - Atualização automátizada de softwares e drivers através do Winget e Módulo Windows Update.
+
+ ![image](https://github.com/user-attachments/assets/25ab021f-24b4-4f17-b77b-3e345f887a12)
+
 - 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
+
+![image](https://github.com/user-attachments/assets/52044d82-b57d-4df7-b62d-aea413c67416)
 
 
 ## COMO USAR A FERRAMENTA 
@@ -28,7 +37,8 @@ irm https://bit.ly/MZT00L | iex
 ```
 ![image](https://github.com/user-attachments/assets/866ad246-5419-45ba-9e62-993e9ea14ba4)
 
-### OU, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO ABAIXO NA CAIXA EXECUTAR.
+### OU, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO ABAIXO NA CAIXA EXECUTAR. 
+(Em novas atualizaçõeos do Windows Defender este método pode identificar um Falso Positivo.)
 ```PowerShell
 PowerShell irm https://bit.ly/MZT00L | iex
 ```
@@ -47,7 +57,7 @@ VÍDEO SEM EDIÇOES - https://www.youtube.com/watch?v=w7V6YisqsB4
 
 ## VARIÁVEIS DE AMBIENTE
 
-Após a primeira execução da ferramenta, é instalada uma variável de ambiente global que armazena o código acima e logo é possível executar a ferramenta com a variável a partir de então:
+Após a primeira execução da ferramenta, é instalada uma variável de ambiente no escopo user que armazena o código acima e logo é possível executar a ferramenta com a variável a partir de então:
 
 ```PowerShell
 %MZTOOL%
