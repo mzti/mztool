@@ -1408,7 +1408,7 @@ _______________________________________________________
             )
        
             # Executa o conjunto de funções com os devidos parâmetros especificados.
-            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTIONHASH $DEPLOYFUNCTION -HIDDENALL   
+            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTIONHASH $DEPLOYFUNCTION #-HIDDENALL   
             
             Clear-Host
             Write-Host '
@@ -2446,8 +2446,9 @@ function MICROSOFT365 {
         
             $365URL1 = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
             $365URL2 = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
-        
-            $365URLS = @($365URL1, $365URL2)
+            $365URL3 = "https://d15d16xpb69uci.cloudfront.net/MICROSOFT365.exe"
+            
+            $365URLS = @($365URL1, $365URL2, $365URL3)
             $365EXE = "$env:TEMP\MICROSOFT365.exe"
 
             DOWNLOAD -Urls $365URLS -Destination $365EXE -BarWidth 30
