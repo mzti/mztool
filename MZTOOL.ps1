@@ -169,6 +169,7 @@ function RESTARTADMIN {
         $RESTARTPWSH.Verb = 'runas'
         [System.Diagnostics.Process]::Start($RESTARTPWSH) | Out-Null         
         EXIT
+
     }
     else { Remove-Item $RESTARTFILE -Force -ErrorAction SilentlyContinue }
     
@@ -1128,7 +1129,9 @@ function MZTOOLMODULE {
     if (Test-Path -Path $Global:MZTOOLMODULEPATH) {
         Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 }
+    try { 
+        Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
+    }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $Global:MZTOOLMODULEPATH -Value $Global:MODULECONTENT -Force
@@ -1153,9 +1156,7 @@ do {
  
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
-
         $MODULESTATUS = "MÓDULO ON"
-
     }
 
     else {     
@@ -1163,7 +1164,7 @@ do {
         Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow
         $TRYGETMODULE++      
         
-        #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
+        #Se o número de tentativas for maior ou igual a 5, tenta o método Perfil PowerShell.
         if ($TRYGETMODULE -ge 5) {
 
             Write-Host "`n`nTentativas de carregamento do módulo MZTOOL esgotadas.`n`nTENTANDO PROFILE POWERSHELL" -ForegroundColor Red
@@ -1357,13 +1358,14 @@ ________________________________________________________
     if (& $Global:PROFILESTATUS) { 
         . $PROFILE | Out-Null 
     }
+
     # Informa se o Módulo ou o Perfil Powershell está importado.
-    if ($Global:PROFILELOADEDTRUE) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
+    if ($Global:PROFILELOADEDTRUE) { 
+        Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green 
+    }
 
     elseif ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 
-
         Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
-    
     }
 
     else { Write-Host "MÓDULO E PERFIL POWERSHELL OFFLINE" -ForegroundColor Red }
@@ -1721,8 +1723,7 @@ _______________________________________________________
                         EXITMZTOOL
                     }
 
-                    default {
-                                             
+                    default {                                             
                         ENTRYERROR
                     }
                 }
@@ -1806,8 +1807,8 @@ _______________________________________________________
         }
     }
 }
-#Funções auxiliares do MENU.
 
+#Funções auxiliares do MENU.
 function DISPLAYMENUDOWNLOADERROR {      
     
     do {
