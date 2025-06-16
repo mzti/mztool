@@ -3007,9 +3007,8 @@ function STARTSOFTWARES {
 
     Start-Process WINWORD
     Start-Process ACROBAT
-    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/    
+    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.mozartinformatica.com, https://www.instagram.com/mozartinformatica/    
  
-
 }
 
 function IMGHEALTH {
