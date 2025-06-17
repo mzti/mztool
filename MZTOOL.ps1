@@ -1687,7 +1687,7 @@ _______________________________________________________
 
                         PAUSE
                        
-                        DISPLAYMENU365STATUS -365STATUS $M365STATUS    
+                        DISPLAYMENU365STATUS -M365STATUS $M365STATUS    
                    
                         CLEANTEMP
              
