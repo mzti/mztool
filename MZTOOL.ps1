@@ -1859,21 +1859,15 @@ _______________________________________________________
 }
 
 function DISPLAYMENU365STATUS {
-    param(
-        [string]$M365STATUS 
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [int]$M365STATUS 
     ) 
     Write-Host "sTATUS B: $M365STATUS"
 
     pause
-    if ($M365STATUS -eq "1") {
-
-        Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
-        Start-Sleep -Seconds 5
-        Start-Process WINWORD
-
-    }
-
-    if ($M365STATUS -eq "2" -or -not($M365STATUS)) {
+    function M365ERROR {
         
         Clear-Host
         Write-Host '
@@ -1930,15 +1924,36 @@ _______________________________________________________
             } 
         }  
     }  
-    
-    if ($M365STATUS -eq "3") {
 
-        Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
-        Start-Sleep -Seconds 5
+    switch ($M365STATUS) {
+        1 {
+
+            Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
+            Start-Sleep -Seconds 5
+            Start-Process WINWORD
+
+        }
+        2 { 
+
+            M365ERROR
         
-    } 
+        }
     
+    
+        3 {
 
+            Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
+            Start-Sleep -Seconds 5
+        
+        } 
+        default { 
+
+            M365ERROR
+        
+        }
+
+    }
+    
 }
 
 function ENTRYERROR {
@@ -2474,7 +2489,7 @@ function MICROSOFT365 {
         }
 
         else {
-            $365STATUS = "2"            
+            $365STATUS = 2            
         }    
     
         #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
@@ -2483,13 +2498,13 @@ function MICROSOFT365 {
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
 
-        $365STATUS = "1" 
+        $365STATUS = 1 
       
     }
     
     else {        
         
-        $365STATUS = "3"
+        $365STATUS = 3
     }   
 
     return $365STATUS
