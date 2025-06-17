@@ -2472,7 +2472,7 @@ function MICROSOFT365 {
     
         Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
 
-        if (& $MS365) { $365STATUS = "1" }
+        $365STATUS = "1" 
       
     }
     

@@ -698,7 +698,7 @@ function UNINSTALLOFFICE {
     
         foreach ($app in $OfficeApps) {
                     
-            If ($app.UninstallString -notmatch "MsiExec.exe") {           
+            if ($app.UninstallString -notmatch "MsiExec.exe") {           
                
                 $uninstallCmd = $app.UninstallString
                 
@@ -725,7 +725,7 @@ function UNINSTALLOFFICE {
     }
     else {
         RESETCURSOR
-        Write-Warning "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO."
+        Write-Host "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO."
     }
 
     $StillInstalled = (GetAllInstalledOffice).Count -gt 0
