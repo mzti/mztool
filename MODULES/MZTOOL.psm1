@@ -700,10 +700,8 @@ function UNINSTALLOFFICE {
                     
             if ($app.UninstallString -notmatch "MsiExec.exe") {           
                
-                $uninstallCmd = $app.UninstallString
-                
-                RESETCURSOR
-              
+                $uninstallCmd = $app.UninstallString             
+                       
                 Write-Warning "INICIANDO DESINSTALAÇÃO - $($app.DisplayName)"
          
                 Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait -NoNewWindow
@@ -716,16 +714,15 @@ function UNINSTALLOFFICE {
     
     if ($InstalledOffice.Count -gt 0) {       
        
-        Write-Warning "`nINSTALAÇÃO DO OFFICE OU 365 ENCONTRADA:"
+        Write-Warning "INSTALAÇÃO DO MICROSOFT OFFICE OU 365 ENCONTRADA:"
         foreach ($app in $InstalledOffice) {
-            RESETCURSOR
+           
             Write-Host "$($app.DisplayName) - VERSÃO: $($app.DisplayVersion)" -ForegroundColor Green
         }         
         UninstallOfficeApps -OfficeApps $InstalledOffice
     }
-    else {
-        RESETCURSOR
-        Write-Host "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO."
+    else {      
+        Write-Host "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA.`nINICIANDO INSTALAÇÃO."
     }
 
     $StillInstalled = (GetAllInstalledOffice).Count -gt 0
