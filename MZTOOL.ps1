@@ -1860,12 +1860,12 @@ _______________________________________________________
 
 function DISPLAYMENU365STATUS {
     param(
-        [switch]$365STATUS 
+        [string]$M365STATUS 
     ) 
-    Write-Host "sTATUS B: $365STATUS"
+    Write-Host "sTATUS B: $M365STATUS"
 
     pause
-    if ($365STATUS -eq "1") {
+    if ($M365STATUS -eq "1") {
 
         Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
         Start-Sleep -Seconds 5
@@ -1873,7 +1873,7 @@ function DISPLAYMENU365STATUS {
 
     }
 
-    if ($365STATUS -eq "2" -or -not($365STATUS)) {
+    if ($M365STATUS -eq "2" -or -not($M365STATUS)) {
         
         Clear-Host
         Write-Host '
@@ -1931,7 +1931,7 @@ _______________________________________________________
         }  
     }  
     
-    if ($365STATUS -eq "3") {
+    if ($M365STATUS -eq "3") {
 
         Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
         Start-Sleep -Seconds 5
