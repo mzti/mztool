@@ -2439,6 +2439,7 @@ function MICROSOFT365 {
         function POSTINSTALLM365 {
 
             if (& $MS365) {
+
                 #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
                 $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
                 @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
@@ -2446,6 +2447,7 @@ function MICROSOFT365 {
                 Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
 
                 $M365STATUS = 1 
+
             }
             else { 
 
@@ -2455,7 +2457,7 @@ function MICROSOFT365 {
             
             return $M365STATUS
         }  
-        
+
         $365XML = "$env:Temp\MICROSOFT365.xml"
 
         $XML.save("$365XML") 
@@ -2465,9 +2467,11 @@ function MICROSOFT365 {
 
         if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !(& $MS365)) {      
         
-            Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+            #Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
         
-            POSTINSTALLM365
+            #POSTINSTALLM365
+
+            $M365STATUS = 1 
         
         }
 
@@ -2486,10 +2490,11 @@ function MICROSOFT365 {
             DOWNLOAD -Urls $365URLS -Destination $365EXE -BarWidth 30
         
             if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
-                Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
+                #Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
             }
             
-            POSTINSTALLM365
+            #POSTINSTALLM365
+            $M365STATUS = 1 
         }
 
         else {
