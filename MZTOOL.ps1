@@ -2446,12 +2446,13 @@ function MICROSOFT365 {
         elseif ($WINGETRUNNING -and !(& $MS365)) {
 
             #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
-        
-            $365URL1 = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
-            $365URL2 = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
-            $365URL3 = "https://d15d16xpb69uci.cloudfront.net/MICROSOFT365.exe"
+           
+            $365URLS = @(
+                "https://officecdn.microsoft.com/pr/wsus/setup.exe",
+                "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br",
+                "https://d15d16xpb69uci.cloudfront.net/MICROSOFT365.exe"            
+            )
             
-            $365URLS = @($365URL1, $365URL2, $365URL3)
             $365EXE = "$env:TEMP\MICROSOFT365.exe"
 
             DOWNLOAD -Urls $365URLS -Destination $365EXE -BarWidth 30
