@@ -1863,6 +1863,8 @@ function DISPLAYMENU365STATUS {
         [switch]$365STATUS 
     ) 
     Write-Host "sTATUS B: $365STATUS"
+
+    pause
     if ($365STATUS -eq "1") {
 
         Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
