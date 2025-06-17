@@ -1678,14 +1678,16 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '    
-                                        
-                        $365STATUS = MICROSOFT365 
                         
-                        Write-Host "$365STATUS"
+                        $M365STATUS = MICROSOFT365 |
+                        Where-Object { $_ -is [string] -and $_ -match '^(1|2|3)$' } |
+                        Select-Object -Last 1
+                        
+                        Write-Host "$M365STATUS"
 
                         PAUSE
                        
-                        DISPLAYMENU365STATUS -365STATUS $365STATUS    
+                        DISPLAYMENU365STATUS -365STATUS $M365STATUS    
                    
                         CLEANTEMP
              
@@ -2398,6 +2400,8 @@ function ANYDESK {
 }
 
 function MICROSOFT365 {
+    [CmdletBinding()]
+    param()
     
     #Implementação do Microsoft Office 365.
     
