@@ -1679,7 +1679,11 @@ _______________________________________________________
 |_____________________________________________________|
 '    
                                         
-                        $365STATUS = MICROSOFT365    
+                        $365STATUS = MICROSOFT365 
+                        
+                        Write-Host "$365STATUS"
+
+                        PAUSE
                        
                         DISPLAYMENU365STATUS -365STATUS $365STATUS    
                    
