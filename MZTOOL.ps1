@@ -1683,7 +1683,7 @@ _______________________________________________________
                         Where-Object { $_ -is [string] -and $_ -match '^(1|2|3)$' } |
                         Select-Object -Last 1
                         
-                        Write-Host "$M365STATUS"
+                        Write-Host "sTATUS: $M365STATUS"
 
                         PAUSE
                        
@@ -1862,7 +1862,7 @@ function DISPLAYMENU365STATUS {
     param(
         [switch]$365STATUS 
     ) 
-
+    Write-Host "sTATUS B: $365STATUS"
     if ($365STATUS -eq "1") {
 
         Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
