@@ -1687,7 +1687,7 @@ _______________________________________________________
 
                         PAUSE
                        
-                        DISPLAYMENU365STATUS -M365STATUS $M365STATUS    
+                        DISPLAYMENUM365STATUS -M365STATUS $M365STATUS    
                    
                         CLEANTEMP
              
@@ -1858,7 +1858,7 @@ _______________________________________________________
     } while ($true)
 }
 
-function DISPLAYMENU365STATUS {
+function DISPLAYMENUM365STATUS {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -1885,9 +1885,9 @@ _______________________________________________________
 |                                                     |
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|  
-' 
-        Write-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
-           
+'         
+        $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
+  
         switch ($CHOICE) {
             1 {
                 $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
