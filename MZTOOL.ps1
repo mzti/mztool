@@ -1880,40 +1880,21 @@ _______________________________________________________
 |        SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
 |                                                     |
 |   |1| TENTAR NOVAMENTE                              |
-|   |2| IGNORAR & CONTINUAR                           |
-|   |3| VOLTAR AO MENU                                |
+|   |2| VOLTAR AO MENU                                |
 |   |0| SAIR                                          |
+|                                                     |
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|  
 ' 
         Write-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
            
-        $timeoutEmSegundos = 10
-            
-        $cronometro = [System.Diagnostics.Stopwatch]::StartNew()
-        while (-not [System.Console]::KeyAvailable -and ($cronometro.Elapsed.TotalSeconds -lt $timeoutEmSegundos)) {
-            Start-Sleep -Milliseconds 100
-        }
-
-        if ([System.Console]::KeyAvailable) {
-            # Se uma tecla estiver disponível, lê a linha (o que o usuário digitou)
-            $CHOICE = [System.Console]::ReadLine().Trim()
-        }
-        else {
-            # Se o tempo expirar sem entrada, seta a opção para 2
-            $CHOICE = 2
-               
-        }
         switch ($CHOICE) {
             1 {
                 $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
                 if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
                 DISPLAYMENU4 -CHOICE4 "1"
-            }
+            }         
             2 {
-                #SCRIPT CONTINUA.
-            }
-            3 {
                 DISPLAYMENU                     
             }
             0 {
@@ -2097,8 +2078,7 @@ function DOWNLOADMZTOOL {
 }
 
 function DIAGNOSTICS {
-    param(
-        #[Parameter(Mandatory = $true)]
+    param(      
         [Switch]$START,
         [Switch]$STOP
     )  
@@ -2454,8 +2434,28 @@ function MICROSOFT365 {
   </AppSettings>
   <Display Level="FALSE" AcceptEULA="TRUE" />
 </Configuration> 
-'@           
+'@        
 
+        function POSTINSTALLM365 {
+
+            if (& $MS365) {
+                #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
+                $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+                @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
+
+                Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
+
+                $M365STATUS = 1 
+            }
+            else { 
+
+                $M365STATUS = 2 
+            
+            }
+            
+            return $M365STATUS
+        }  
+        
         $365XML = "$env:Temp\MICROSOFT365.xml"
 
         $XML.save("$365XML") 
@@ -2466,6 +2466,9 @@ function MICROSOFT365 {
         if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !(& $MS365)) {      
         
             Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+        
+            POSTINSTALLM365
+        
         }
 
         elseif ($WINGETRUNNING -and !(& $MS365)) {
@@ -2485,29 +2488,22 @@ function MICROSOFT365 {
             if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
                 Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
             }
-     
+            
+            POSTINSTALLM365
         }
 
         else {
-            $365STATUS = 2            
+            $M365STATUS = 2            
         }    
-    
-        #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
-        $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-        @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
-    
-        Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
 
-        $365STATUS = 1 
-      
     }
     
     else {        
         
-        $365STATUS = 3
+        $M365STATUS = 3
     }   
 
-    return $365STATUS
+    return $M365STATUS
 
 }   
 
