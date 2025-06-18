@@ -3084,7 +3084,7 @@ function PRO {
     }
 
 }
-
+<#
 function BATTERYREPORT {
 
     $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
@@ -3127,44 +3127,38 @@ function BATTERYREPORT {
     Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
 
 }
-<#
+#>
 function BATTERYREPORT {
 
-    # 1 ▸ Resolve o caminho da pasta de trabalho
-    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) {
-        # já existe?
-        $MZTOOLAPPDATA
-    }
-    else {
-        "$env:APPDATA\MZTOOL"                 # padrão
-    }
+    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
 
-    # 2 ▸ Garante que a pasta exista
     if (-not (Test-Path $Global:MZTOOLAPPDATA)) {
         New-Item -Path $Global:MZTOOLAPPDATA -ItemType Directory -Force | Out-Null
     }
 
-    # 3 ▸ Cria / sobrescreve o relatório da bateria
     $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA 'BATTERYREPORT.html'
     powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
 
-    # 4 ▸ Se o relatório foi gerado, analisa-o
     if (Test-Path $BATTERYREPORT) {
 
-        # --- abre o HTML em background ---
         Start-Process $BATTERYREPORT
 
-        # --- extrai a linha “Cycle Count” (primeira ocorrência) ---
-        $cycleLine = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count' |
-        Select-Object -First 1 -ExpandProperty Line
+        $cycleLine = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count'           | Select-Object -First 1 -ExpandProperty Line
+        $designLine = Select-String -Path $BATTERYREPORT -Pattern 'Design Capacity'       | Select-Object -First 1 -ExpandProperty Line
+        $fullLine = Select-String -Path $BATTERYREPORT -Pattern 'Full Charge Capacity'  | Select-Object -First 1 -ExpandProperty Line
 
-        # --- tenta capturar o número dentro da célula HTML ---
-        $CYCLES = $null
-        if ($cycleLine -match '>\s*(\d+)\s*<') {
-            $CYCLES = [int]$Matches[1]
+        $CYCLES = if ($cycleLine -match '>\s*(\d+)\s*<') { [int]$Matches[1] } else { $null }
+        $DESIGN = if ($designLine -match '>\s*(\d+)\s*<') { [double]$Matches[1] } else { $null }
+        $FULL = if ($fullLine -match '>\s*(\d+)\s*<') { [double]$Matches[1] } else { $null }
+
+        if ($FULL -and $DESIGN -and $DESIGN -ne 0) {
+            $STATE = [math]::Round(($FULL / $DESIGN) * 100, 2)
+            Write-Host "Estado da bateria: $STATE % da capacidade original." -ForegroundColor Cyan
+        }
+        else {
+            Write-Host "Não foi possível calcular o estado da bateria." -ForegroundColor Yellow
         }
 
-        # 5 ▸ Emite diagnóstico
         if ($CYCLES -gt 500) {
             Write-Host "🪫  Bateria já passou de 500 ciclos." -ForegroundColor Yellow
         }
@@ -3172,16 +3166,16 @@ function BATTERYREPORT {
             Write-Host "🔋  Bateria saudável, ciclos: $CYCLES." -ForegroundColor Green
         }
         else {
-            Write-Host "⚠️  Falha ao ler o número de ciclos no relatório." -ForegroundColor Yellow
-        }
-
-        Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
+            Write-Host "Falha ao ler o número de ciclos." -ForegroundColor Yellow
+        }       
     }
     else {
         Write-Host "Não foi possível gerar o relatório de bateria." -ForegroundColor Red
     }
+
+    Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
 }
-#>
+
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
