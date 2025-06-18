@@ -1366,7 +1366,7 @@ ________________________________________________________
     }
 
     elseif ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 
-        Write-Host"$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
+        Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
     }
 
     else { Write-Host "MÓDULO E PERFIL POWERSHELL OFFLINE" -ForegroundColor Red }
