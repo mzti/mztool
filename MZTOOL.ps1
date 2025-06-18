@@ -3129,12 +3129,12 @@ function BATTERYREPORT {
 }
 #>
 function BATTERYREPORT {
-
+    <#
     $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
 
     if (-not (Test-Path $Global:MZTOOLAPPDATA)) {
         New-Item -Path $Global:MZTOOLAPPDATA -ItemType Directory -Force | Out-Null
-    }
+    }#>
 
     $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA 'BATTERYREPORT.html'
     powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
