@@ -1804,6 +1804,14 @@ _______________________________________________________
             DISPLAYMENU
 
         }
+        
+        #Testa a função BATTERYREPORT.
+        battery { 
+
+            BATTERYREPORT
+            DISPLAYMENU
+
+        }
 
         awin {
             awin exit
@@ -1886,7 +1894,7 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|  
 '         
-        $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
+        $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA"
   
         switch ($CHOICE) {
             1 {
@@ -1909,17 +1917,17 @@ _______________________________________________________
     switch ($M365STATUS) {
         1 {
 
-            Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
+            Write-Host "MICROSOFT 365 INSTALADO COM SUCESSO."    
             Start-Sleep -Seconds 5
-            Start-Process WINWORD
+            Start-Process WINWORD 
 
         }
+
         2 { 
 
             M365ERROR
         
-        }
-    
+        }    
     
         3 {
 
@@ -1927,6 +1935,7 @@ _______________________________________________________
             Start-Sleep -Seconds 5
         
         } 
+        
         default { 
 
             M365ERROR
@@ -3071,6 +3080,39 @@ function PRO {
         Rename-Item Tokens.dat Tokens.old
         SLMGR.VBS /RILC
         changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T    
+    }
+
+}
+
+function BATTERYREPORT {
+
+    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
+
+    if (-not (Test-Path $MZTOOLAPPDATA)) {
+        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force | Out-Null > $null 2>&1          
+    }
+
+    $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA "BATTERYREPORT.html"
+    
+    powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
+    
+    if (Test-Path $BATTERYREPORT -ErrorAction SilentlyContinue) {
+        
+        Start-Process $BATTERYREPORT
+        
+        $CYCLES = (Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count').Line |
+        Select-Object -First 1 -ExpandProperty Line |
+        ForEach-Object { ($_ -split '</td><td>')[1] } |
+        ForEach-Object { [int]($_ -replace '\D') }
+
+        if ($CYCLES -gt 500) {
+            Write-Host "👀 Bateria já passou de 500 ciclos." -ForegroundColor Yellow
+        }
+        else {
+            Write-Host "🔋 Bateria saudável, ciclos: $CYCLES." -ForegroundColor Green
+        }
+
+        Read-Host "PRESSIONE ENTER PARA CONTINUAR"
     }
 
 }
