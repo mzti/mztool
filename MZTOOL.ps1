@@ -1156,7 +1156,7 @@ do {
  
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
-        $MODULESTATUS = "💾MÓDULO ON"
+        $MODULESTATUS = "MÓDULO ON"
     }
 
     else {     
@@ -1355,6 +1355,7 @@ ________________________________________________________
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
 |______________________________________________________|
 '
+    Write-Host "💾"-NoNewline
     if (& $Global:PROFILESTATUS) { 
         . $PROFILE | Out-Null 
     }
@@ -1365,7 +1366,7 @@ ________________________________________________________
     }
 
     elseif ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 
-        Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
+        Write-Host"$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
     }
 
     else { Write-Host "MÓDULO E PERFIL POWERSHELL OFFLINE" -ForegroundColor Red }
@@ -3102,7 +3103,6 @@ function BATTERYREPORT {
         
         $CYCLELINE = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count' |
         Select-Object -First 1 -ExpandProperty Line
-
       
         $CYCLES = $null
         if ($CYCLELINE -match '>\s*(\d+)\s*<') {
@@ -3112,7 +3112,7 @@ function BATTERYREPORT {
         if ($CYCLES -gt 500) {
             Write-Host "🪫 Bateria já passou de 500 ciclos. Ciclos atuais: $CYCLES." -ForegroundColor Yellow
         }
-        elseif ($CYCLES -gt 0 -and (-lt 501)) {
+        elseif ($CYCLES -gt 0 -and $CYCLES -lt 500) {
             Write-Host "🔋 Bateria saudável, ciclos atuais: $CYCLES." -ForegroundColor Green
         }
         else {
