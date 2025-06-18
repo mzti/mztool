@@ -3143,13 +3143,16 @@ function BATTERYREPORT {
 
         Start-Process $BATTERYREPORT
 
-        $cycleLine = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count'           | Select-Object -First 1 -ExpandProperty Line
-        $designLine = Select-String -Path $BATTERYREPORT -Pattern 'Design Capacity'       | Select-Object -First 1 -ExpandProperty Line
+        $cycleLine = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count'          | Select-Object -First 1 -ExpandProperty Line
+        $designLine = Select-String -Path $BATTERYREPORT -Pattern 'Design Capacity'     | Select-Object -First 1 -ExpandProperty Line
         $fullLine = Select-String -Path $BATTERYREPORT -Pattern 'Full Charge Capacity'  | Select-Object -First 1 -ExpandProperty Line
 
         $CYCLES = if ($cycleLine -match '>\s*(\d+)\s*<') { [int]$Matches[1] } else { $null }
         $DESIGN = if ($designLine -match '>\s*(\d+)\s*<') { [double]$Matches[1] } else { $null }
-        $FULL = if ($fullLine -match '>\s*(\d+)\s*<') { [double]$Matches[1] } else { $null }
+        $FULL = if ($fullLine -match '>([^<]+)<') {
+            [double]($Matches[1] -replace '[^\d]', '')
+        }
+        else { $null }
 
         if ($FULL -and $DESIGN -and $DESIGN -ne 0) {
             $STATE = [math]::Round(($FULL / $DESIGN) * 100, 2)
@@ -3166,11 +3169,11 @@ function BATTERYREPORT {
             Write-Host "🔋  Bateria saudável, ciclos: $CYCLES." -ForegroundColor Green
         }
         else {
-            Write-Host "Falha ao ler o número de ciclos." -ForegroundColor Yellow
+            Write-Host "⚠️ Falha ao ler o número de ciclos." -ForegroundColor Yellow
         }       
     }
     else {
-        Write-Host "Não foi possível gerar o relatório de bateria." -ForegroundColor Red
+        Write-Host "⚠️ Não foi possível gerar o relatório de bateria." -ForegroundColor Red
     }
 
     Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
