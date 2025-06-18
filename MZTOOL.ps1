@@ -3083,7 +3083,7 @@ function PRO {
     }
 
 }
-<#
+
 function BATTERYREPORT {
 
     $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
@@ -3100,24 +3100,34 @@ function BATTERYREPORT {
         
         Start-Process $BATTERYREPORT
         
-        $CYCLES = (Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count').Line |
-        Select-Object -First 1 -ExpandProperty Line |
-        ForEach-Object { ($_ -split '</td><td>')[1] } |
-        ForEach-Object { [int]($_ -replace '\D') }
+        $CYCLELINE = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count' |
+        Select-Object -First 1 -ExpandProperty Line
+
+      
+        $CYCLES = $null
+        if ($CYCLELINE -match '>\s*(\d+)\s*<') {
+            $CYCLES = [int]$Matches[1]
+        }
 
         if ($CYCLES -gt 500) {
-            Write-Host "🪫 Bateria já passou de 500 ciclos." -ForegroundColor Yellow
+            Write-Host "🪫 Bateria já passou de 500 ciclos. Ciclos atuais: $CYCLES." -ForegroundColor Yellow
         }
-        elseif ($CYCLES -gt 0 -and (-lt 500)) {
-            Write-Host "🔋 Bateria saudável, ciclos: $CYCLES." -ForegroundColor Green
+        elseif ($CYCLES -gt 0 -and (-lt 501)) {
+            Write-Host "🔋 Bateria saudável, ciclos atuais: $CYCLES." -ForegroundColor Green
         }
         else {
-            Write-Host "Falha na leitura do relatório." - -ForegroundColor Yellow
-        }
-        Read-Host "PRESSIONE ENTER PARA CONTINUAR"
+            Write-Host "⚠️ Falha ao ler o número de ciclos no relatório." -ForegroundColor Yellow
+        }        
     }
 
-}#>
+    else {
+        Write-Host "⚠️ Não foi possível gerar o relatório de bateria." -ForegroundColor Red
+    }
+
+    Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
+
+}
+<#
 function BATTERYREPORT {
 
     # 1 ▸ Resolve o caminho da pasta de trabalho
@@ -3171,7 +3181,7 @@ function BATTERYREPORT {
         Write-Host "Não foi possível gerar o relatório de bateria." -ForegroundColor Red
     }
 }
-
+#>
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
