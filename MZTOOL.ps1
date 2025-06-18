@@ -1156,7 +1156,7 @@ do {
  
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
-        $MODULESTATUS = "MÓDULO ON"
+        $MODULESTATUS = "💾MÓDULO ON"
     }
 
     else {     
@@ -1804,7 +1804,7 @@ _______________________________________________________
             DISPLAYMENU
 
         }
-        
+
         #Testa a função BATTERYREPORT.
         battery { 
 
@@ -3083,7 +3083,7 @@ function PRO {
     }
 
 }
-
+<#
 function BATTERYREPORT {
 
     $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
@@ -3106,15 +3106,70 @@ function BATTERYREPORT {
         ForEach-Object { [int]($_ -replace '\D') }
 
         if ($CYCLES -gt 500) {
-            Write-Host "👀 Bateria já passou de 500 ciclos." -ForegroundColor Yellow
+            Write-Host "🪫 Bateria já passou de 500 ciclos." -ForegroundColor Yellow
         }
-        else {
+        elseif ($CYCLES -gt 0 -and (-lt 500)) {
             Write-Host "🔋 Bateria saudável, ciclos: $CYCLES." -ForegroundColor Green
         }
-
+        else {
+            Write-Host "Falha na leitura do relatório." - -ForegroundColor Yellow
+        }
         Read-Host "PRESSIONE ENTER PARA CONTINUAR"
     }
 
+}#>
+function BATTERYREPORT {
+
+    # 1 ▸ Resolve o caminho da pasta de trabalho
+    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) {
+        # já existe?
+        $MZTOOLAPPDATA
+    }
+    else {
+        "$env:APPDATA\MZTOOL"                 # padrão
+    }
+
+    # 2 ▸ Garante que a pasta exista
+    if (-not (Test-Path $Global:MZTOOLAPPDATA)) {
+        New-Item -Path $Global:MZTOOLAPPDATA -ItemType Directory -Force | Out-Null
+    }
+
+    # 3 ▸ Cria / sobrescreve o relatório da bateria
+    $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA 'BATTERYREPORT.html'
+    powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
+
+    # 4 ▸ Se o relatório foi gerado, analisa-o
+    if (Test-Path $BATTERYREPORT) {
+
+        # --- abre o HTML em background ---
+        Start-Process $BATTERYREPORT
+
+        # --- extrai a linha “Cycle Count” (primeira ocorrência) ---
+        $cycleLine = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count' |
+        Select-Object -First 1 -ExpandProperty Line
+
+        # --- tenta capturar o número dentro da célula HTML ---
+        $CYCLES = $null
+        if ($cycleLine -match '>\s*(\d+)\s*<') {
+            $CYCLES = [int]$Matches[1]
+        }
+
+        # 5 ▸ Emite diagnóstico
+        if ($CYCLES -gt 500) {
+            Write-Host "🪫  Bateria já passou de 500 ciclos." -ForegroundColor Yellow
+        }
+        elseif ($CYCLES -gt 0 -and $CYCLES -lt 500) {
+            Write-Host "🔋  Bateria saudável, ciclos: $CYCLES." -ForegroundColor Green
+        }
+        else {
+            Write-Host "⚠️  Falha ao ler o número de ciclos no relatório." -ForegroundColor Yellow
+        }
+
+        Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
+    }
+    else {
+        Write-Host "Não foi possível gerar o relatório de bateria." -ForegroundColor Red
+    }
 }
 
 function awin {
