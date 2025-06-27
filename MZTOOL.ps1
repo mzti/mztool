@@ -1814,6 +1814,12 @@ _______________________________________________________
 
         }
 
+        amdulps {
+
+            AMDULPS
+        
+        }
+
         awin {
             awin exit
         }
@@ -3179,6 +3185,29 @@ function BATTERYREPORT {
     Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
 }
 
+function AMDULPS {
+    [CmdletBinding()]
+    param(
+        [string]$ClassGuid = '{4d36e968-e325-11ce-bfc1-08002be10318}'
+    )
+    $base = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\$ClassGuid"
+  
+    if (-not (Test-Path $base)) {
+        throw "Chave não encontrada: $base"
+    }
+  
+    Get-ChildItem $base |
+    Where-Object { $_.PSChildName -match '^\d{4}$' } |
+    ForEach-Object {
+        $key = "$base\$($_.PSChildName)"
+        New-ItemProperty -Path $key -Name EnableUlps -PropertyType DWord -Value 0 -Force | Out-Null
+        Write-Verbose "EnableUlps=0 em $($_.PSChildName)"
+    }
+  
+    Write-Host "ULPS desativado. Por favor, reinicie." -ForegroundColor Cyan
+}
+
+  
 function awin {
     Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
