@@ -1920,7 +1920,7 @@ _______________________________________________________
             Write-Host "MICROSOFT 365 INSTALADO COM SUCESSO."    
             Start-Sleep -Seconds 5
             Start-Process WINWORD 
-
+            pause
         }
 
         2 { 
