@@ -1680,7 +1680,7 @@ _______________________________________________________
 |_____________________________________________________|
 '    
                         
-                        $M365STATUS = MICROSOFT365 
+                        $M365STATUS = MICROSOFT365 | Select-Object -Last 1
 
                         Write-Host "sTATUS: $M365STATUS"
 
