@@ -2425,6 +2425,8 @@ function MICROSOFT365 {
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
     
     #$INSTALLED = UNINSTALLOFFICE
+
+    $INSTALLED = $false
     
     if (-not ($INSTALLED)) {             
         
