@@ -2505,10 +2505,10 @@ function MICROSOFT365 {
             DOWNLOAD -Urls $365URLS -Destination $365EXE -BarWidth 30
         
             if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
-                #Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
+                Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
             }
             
-            #POSTINSTALLM365
+            POSTINSTALLM365
             $M365STATUS = 1 
         }
 
