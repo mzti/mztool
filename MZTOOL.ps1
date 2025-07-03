@@ -2424,7 +2424,7 @@ function MICROSOFT365 {
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
     
-    $INSTALLED = UNINSTALLOFFICE
+    #$INSTALLED = UNINSTALLOFFICE
     
     if (-not ($INSTALLED)) {             
         
