@@ -2426,7 +2426,7 @@ function MICROSOFT365 {
     
     #$INSTALLED = UNINSTALLOFFICE
 
-    $INSTALLED = $false
+    $INSTALLED = $null
     
     if (-not ($INSTALLED)) {             
         
