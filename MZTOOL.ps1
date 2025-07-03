@@ -1680,16 +1680,10 @@ _______________________________________________________
 |_____________________________________________________|
 '    
                         
-                        $M365STATUS = MICROSOFT365 | Select-Object -Last 1
-
-                        Write-Host "sTATUS: $M365STATUS"
-
-                        PAUSE
-                       
-                        DISPLAYMENUM365STATUS -M365STATUS $M365STATUS   
-                        
-                        Pause
-                   
+                        $M365STATUS = MICROSOFT365 | Select-Object -Last 1                       
+                     
+                        DISPLAYMENUM365STATUS -M365STATUS $M365STATUS                           
+                                     
                         CLEANTEMP
              
                         DISPLAYMENU 
@@ -1880,9 +1874,7 @@ function DISPLAYMENUM365STATUS {
         [Parameter(Mandatory)]
         [int]$M365STATUS 
     ) 
-    Write-Host "sTATUS B: $M365STATUS"
-
-    pause
+  
     function M365ERROR {
         
         Clear-Host
@@ -2422,11 +2414,9 @@ function MICROSOFT365 {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> MICROSOFT365"
     
     #Verifica se o Microsoft 365 já está instalado.
-    #$MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
-    $MS365 = $null 
-    #$INSTALLED = UNINSTALLOFFICE
-
-    $INSTALLED = $null
+    $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
+    
+    $INSTALLED = UNINSTALLOFFICE    
     
     if (-not ($INSTALLED)) {             
         
