@@ -2430,26 +2430,24 @@ function MICROSOFT365 {
         
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
         [xml]$XML = @'
-<Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
-  <Add OfficeClientEdition="64" Channel="Current">
-    <Product ID="O365ProPlusEEANoTeamsRetail">
+<Configuration ID="b498f2f1-0144-4998-8873-909801e7e0b3">
+  <Add OfficeClientEdition="64" Channel="Current" MigrateArch="TRUE">
+    <Product ID="O365BusinessEEANoTeamsRetail">
       <Language ID="pt-br" />
       <ExcludeApp ID="Access" />
       <ExcludeApp ID="Groove" />
       <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="OneDrive" />
       <ExcludeApp ID="OneNote" />
       <ExcludeApp ID="Publisher" />
-      <ExcludeApp ID="Bing" />
     </Product>
   </Add>
+  <Property Name="SharedComputerLicensing" Value="0" />
+  <Property Name="FORCEAPPSHUTDOWN" Value="TRUE" />
+  <Property Name="DeviceBasedLicensing" Value="0" />
+  <Property Name="SCLCacheOverride" Value="0" />
   <Updates Enabled="TRUE" />
-  <AppSettings>
-    <User Key="software\microsoft\office\16.0\excel\options" Name="defaultformat" Value="51" Type="REG_DWORD" App="excel16" Id="L_SaveExcelfilesas" />
-    <User Key="software\microsoft\office\16.0\powerpoint\options" Name="defaultformat" Value="27" Type="REG_DWORD" App="ppt16" Id="L_SavePowerPointfilesas" />
-    <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
-    <User Key="software\microsoft\office\16.0\word\options" Name="verticalruler" Value="1" Type="REG_DWORD" App="word16" Id="L_VerticalrulerPrintviewonly" />
-  </AppSettings>
-  <Display Level="FALSE" AcceptEULA="TRUE" />
+  <RemoveMSI />
 </Configuration> 
 '@        
 
@@ -2484,9 +2482,9 @@ function MICROSOFT365 {
 
         if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !(& $MS365)) {      
         
-            #Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+            Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
         
-            #POSTINSTALLM365
+            POSTINSTALLM365
 
             $M365STATUS = 1 
         
@@ -2583,8 +2581,8 @@ function OFFICE2007 {
                 }
             
             } while (
-            (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
-            ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
+                (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
+                ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
             )
 
             RESETCURSOR
