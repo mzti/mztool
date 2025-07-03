@@ -1682,7 +1682,13 @@ _______________________________________________________
                         
                         $M365STATUS = MICROSOFT365 
 
-                        DISPLAYMENUM365STATUS -M365STATUS $M365STATUS    
+                        Write-Host "sTATUS: $M365STATUS"
+
+                        PAUSE
+                       
+                        DISPLAYMENUM365STATUS -M365STATUS $M365STATUS   
+                        
+                        Pause
                    
                         CLEANTEMP
              
@@ -1874,7 +1880,9 @@ function DISPLAYMENUM365STATUS {
         [Parameter(Mandatory)]
         [int]$M365STATUS 
     ) 
- 
+    Write-Host "sTATUS B: $M365STATUS"
+
+    pause
     function M365ERROR {
         
         Clear-Host
@@ -1920,7 +1928,7 @@ _______________________________________________________
             Write-Host "MICROSOFT 365 INSTALADO COM SUCESSO."    
             Start-Sleep -Seconds 5
             Start-Process WINWORD 
-            pause
+
         }
 
         2 { 
