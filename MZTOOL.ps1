@@ -1680,14 +1680,8 @@ _______________________________________________________
 |_____________________________________________________|
 '    
                         
-                        $M365STATUS = MICROSOFT365 <#|
-                        Where-Object { $_ -is [string] -and $_ -match '^(1|2|3)$' } |
-                        Select-Object -Last 1
-                        #>
-                        Write-Host "sTATUS: $M365STATUS"
+                        $M365STATUS = MICROSOFT365 
 
-                        PAUSE
-                       
                         DISPLAYMENUM365STATUS -M365STATUS $M365STATUS    
                    
                         CLEANTEMP
@@ -1880,9 +1874,7 @@ function DISPLAYMENUM365STATUS {
         [Parameter(Mandatory)]
         [int]$M365STATUS 
     ) 
-    Write-Host "sTATUS B: $M365STATUS"
-
-    pause
+ 
     function M365ERROR {
         
         Clear-Host
