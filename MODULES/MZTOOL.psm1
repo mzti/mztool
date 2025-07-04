@@ -144,7 +144,7 @@ function NEWPWSH {
 
     # Junta as definições das funções especificadas
     $funcDefinitions = foreach ($fn in $Functions) {
-    (Get-Command -Type Function $fn).Definition
+        (Get-Command -Type Function $fn).Definition
     } -join "`n"
 
     $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
@@ -270,20 +270,20 @@ function DEPLOYFUNCTIONPROGRESS {
 
 function DEPLOYFUNCTION {
     param(
-        [hashtable[]]$DEPLOYFUNCTIONHASH,
+        [hashtable[]]$DEPLOYFUNCTION,
         [int]$BarWidth = 30,
         [int]$LinePosition = 17,
         [switch]$HIDDENALL
     )
     
-    $total = $DEPLOYFUNCTIONHASH.Count
+    $total = $DEPLOYFUNCTION.Count
     $completed = 0
 
     # Exibe a barra inicial (0% concluído)
     DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
     
    
-    foreach ($group in $DEPLOYFUNCTIONHASH) {       
+    foreach ($group in $DEPLOYFUNCTION) {       
         
         # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
         # Inicializa os valores padrão para os switches
