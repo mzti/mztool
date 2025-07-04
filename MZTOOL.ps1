@@ -1571,7 +1571,7 @@ _______________________________________________________
                             NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
-         
+                        PAUSE
                         CLEANTEMP
 
                         DISPLAYMENU3
