@@ -1410,7 +1410,7 @@ _______________________________________________________
             )
        
             # Executa o conjunto de funções com os devidos parâmetros especificados.
-            DEPLOYFUNCTION <#-BarWidth 30 -LinePosition 17#> -DEPLOYFUNCTION $DEPLOYFUNCTION <#-HIDDENALL#> |
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION <#-HIDDENALL#> |
             Where-Object { $_.Id -gt 0 } |
             ForEach-Object { Wait-Process -Id $_.Id } 
             
