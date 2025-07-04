@@ -1400,25 +1400,30 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '
-            $DEPLOYFUNCTION = @(
+            # Executa o conjunto de funções com os devidos parâmetros especificados.
+            $DEPLOYFUNCTION1 = @(
                 @{ Functions = 'PERFILTHEME' },
                 @{ Functions = 'ANYDESK' },
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
-                @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
+                @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' }
+            )       
+            
+            DEPLOYFUNCTION  -DEPLOYFUNCTION $DEPLOYFUNCTION1 <#-HIDDENALL#> 
+                        
+            $DEPLOYFUNCTION2 = @(
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
                 @{ Functions = 'MICROSOFT365'; Wait = $true }                
             )
-       
-            # Executa o conjunto de funções com os devidos parâmetros especificados.
-            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION <#-HIDDENALL#> |
+
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION2 <#-HIDDENALL#> |
             Where-Object { $_.Id -gt 0 } |
-            ForEach-Object { Wait-Process -Id $_.Id } 
-            
-            $DEPLOYFUNCTION = @(
+            ForEach-Object { Wait-Process -Id $_.Id }
+
+            $DEPLOYFUNCTION3 = @(
                 @{ Functions = 'PINICONS', 'STARTSOFTWARES' }
             )
 
-            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION <#-HIDDENALL#>
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION3 <#-HIDDENALL#>
 
             Clear-Host
             Write-Host '
