@@ -2501,6 +2501,7 @@ function MICROSOFT365 {
             }
             
             POSTINSTALLM365
+            
             $M365STATUS = 1 
         }
 
