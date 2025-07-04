@@ -1566,7 +1566,7 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '
-                        $Null = @(                             
+                        @(                             
                             NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
@@ -1598,7 +1598,7 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 ' 
-                        $Null = @(
+                        @(
                             NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
