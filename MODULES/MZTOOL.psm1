@@ -268,12 +268,14 @@ function DEPLOYFUNCTIONPROGRESS {
     Write-Host $progressText -NoNewline
 }
 
+<#
 function DEPLOYFUNCTION {
     param(
         [hashtable[]]$DEPLOYFUNCTION,
         [int]$BarWidth = 30,
         [int]$LinePosition = 17,
-        [switch]$HIDDENALL
+        [switch]$HIDDENALL,
+        [switch]$WAITALL
     )
     
     $total = $DEPLOYFUNCTION.Count
@@ -281,8 +283,7 @@ function DEPLOYFUNCTION {
 
     # Exibe a barra inicial (0% concluído)
     DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-    
-   
+    $NEWPWSHHASH = @() 
     foreach ($group in $DEPLOYFUNCTION) {       
         
         # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
@@ -306,22 +307,88 @@ function DEPLOYFUNCTION {
             Wait      = $Wait
             Hidden    = $Hidden
         }
-
+        $NEWPWSHHASH = $NEWPWSHHASH + @arguments 
         # Chama a função passando os parâmetros via splatting
-        NEWPWSH @arguments
-           
+   NEWPWSH @arguments
       
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
         
         # Aguarda 3 segundos antes de iniciar o próximo grupo
-        Start-Sleep -Seconds 3
+        Start-Sleep -Seconds 3   
     }
-
     # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
     Write-Host ""
 }   
+#>
+function DEPLOYFUNCTION {
+    param(
+        [hashtable[]] $DEPLOYFUNCTION,
+        [int]        $BarWidth = 30,
+        [int]        $LinePosition = 17,
+        [switch]     $HIDDENAll,
+        [switch]     $WAITALL
+    )
+
+    $total = $DEPLOYFUNCTION.Count
+    $completed = 0
+
+    # exibe 0% no início
+    DEPLOYFUNCTIONPROGRESS `
+        -PercentComplete 0 `
+        -BarWidth        $BarWidth `
+        -Message         'IMPLEMENTANDO' `
+        -LinePosition    $LinePosition
+
+    # 1) monta array de hashtables prontas para splatting
+    $argumentList = foreach ($group in $DEPLOYFUNCTION) {
+        $wait = ($group.ContainsKey('Wait') -and $group.Wait)
+        $hidden = $HiddenAll.IsPresent
+        @{
+            Functions = $group.Functions
+            Wait      = $wait
+            Hidden    = $hidden
+        }
+    }
+
+    # 2) dispara TODOS os processos em paralelo (captura o retorno)
+    $processes = foreach ($arg in $argumentList) {
+        $proc = NEWPWSH @arg
+
+        # atualiza a barra após criar cada processo
+        $completed++
+        $percent = [math]::Round(($completed * 100) / $total)
+        DEPLOYFUNCTIONPROGRESS `
+            -PercentComplete $percent `
+            -BarWidth        $BarWidth `
+            -Message         'IMPLEMENTANDO' `
+            -LinePosition    $LinePosition
+
+        $proc
+    }
+
+    # 3) aguarda conforme a flag -WaitAll ou a propriedade Wait de cada grupo
+    if ($WaitAll) {
+        $ids = $processes |
+        Where-Object { $_.Id -gt 0 } |
+        Select-Object -ExpandProperty Id
+    }
+    else {
+        $ids = for ($i = 0; $i -lt $processes.Count; $i++) {
+            if ($argumentList[$i].Wait -and $processes[$i].Id -gt 0) {
+                $processes[$i].Id
+            }
+        }
+    }
+
+    if ($ids) {
+        Wait-Process -Id $ids
+    }
+
+    # finaliza a barra
+    Write-Host ''
+}
 
 function TESTLINK {
     param(

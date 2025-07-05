@@ -1408,16 +1408,14 @@ _______________________________________________________
                 @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' }
             )       
             
-            DEPLOYFUNCTION  -DEPLOYFUNCTION $DEPLOYFUNCTION1 <#-HIDDENALL#> 
-                        
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION1 <#-HIDDENALL#> 
+
             $DEPLOYFUNCTION2 = @(
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
                 @{ Functions = 'MICROSOFT365'; Wait = $true }                
             )
 
-            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION2 <#-HIDDENALL#> |
-            Where-Object { $_.Id -gt 0 } |
-            ForEach-Object { Wait-Process -Id $_.Id }
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION2 -WAITALL <#-HIDDENALL#> 
 
             $DEPLOYFUNCTION3 = @(
                 @{ Functions = 'PINICONS', 'STARTSOFTWARES' }
