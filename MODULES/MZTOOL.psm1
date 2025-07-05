@@ -327,36 +327,31 @@ function DEPLOYFUNCTION {
         [hashtable[]] $DEPLOYFUNCTION,
         [int]        $BarWidth = 30,
         [int]        $LinePosition = 17,
-        [switch]     $HIDDENAll,
-        [switch]     $WAITALL
+        [switch]     $HiddenAll,
+        [switch]     $WaitAll
     )
 
     $total = $DEPLOYFUNCTION.Count
     $completed = 0
 
-    # exibe 0% no início
     DEPLOYFUNCTIONPROGRESS `
         -PercentComplete 0 `
         -BarWidth        $BarWidth `
         -Message         'IMPLEMENTANDO' `
         -LinePosition    $LinePosition
 
-    # 1) monta array de hashtables prontas para splatting
-    $argumentList = foreach ($group in $DEPLOYFUNCTION) {
-        $wait = ($group.ContainsKey('Wait') -and $group.Wait)
-        $hidden = $HiddenAll.IsPresent
+    # 1) monta lista de splatting com Hidden e Wait
+    $argsList = foreach ($group in $DEPLOYFUNCTION) {
+        $wait = $group.ContainsKey('Wait') -and $group.Wait
         @{
             Functions = $group.Functions
+            Hidden    = $HiddenAll.IsPresent
             Wait      = $wait
-            Hidden    = $hidden
         }
     }
 
-    # 2) dispara TODOS os processos em paralelo (captura o retorno)
-    $processes = foreach ($arg in $argumentList) {
-        $proc = NEWPWSH @arg
-
-        # atualiza a barra após criar cada processo
+    # 2) dispara todos em paralelo e captura processos via -ReturnProcess
+    $processes = foreach ($arg in $argsList) {
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS `
@@ -365,10 +360,10 @@ function DEPLOYFUNCTION {
             -Message         'IMPLEMENTANDO' `
             -LinePosition    $LinePosition
 
-        $proc
+        NEWPWSH @arg -ReturnProcess
     }
 
-    # 3) aguarda conforme a flag -WaitAll ou a propriedade Wait de cada grupo
+    # 3) aguarda: todos ou apenas os marcados Wait
     if ($WaitAll) {
         $ids = $processes |
         Where-Object { $_.Id -gt 0 } |
@@ -376,7 +371,7 @@ function DEPLOYFUNCTION {
     }
     else {
         $ids = for ($i = 0; $i -lt $processes.Count; $i++) {
-            if ($argumentList[$i].Wait -and $processes[$i].Id -gt 0) {
+            if ($argsList[$i].Wait -and $processes[$i].Id -gt 0) {
                 $processes[$i].Id
             }
         }
@@ -386,9 +381,9 @@ function DEPLOYFUNCTION {
         Wait-Process -Id $ids
     }
 
-    # finaliza a barra
     Write-Host ''
 }
+
 
 function TESTLINK {
     param(
