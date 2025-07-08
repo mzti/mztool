@@ -340,7 +340,7 @@ function DEPLOYFUNCTION {
         -Message         'IMPLEMENTANDO' `
         -LinePosition    $LinePosition
 
-    # 1) Monta lista de argumentos para NEWPWSH
+    # 1) Prepara cada chamada a NEWPWSH
     $argsList = foreach ($group in $DEPLOYFUNCTION) {
         @{
             Functions = $group.Functions
@@ -349,12 +349,9 @@ function DEPLOYFUNCTION {
         }
     }
 
-    # 2) Dispara todos em paralelo e captura os objetos de processo
-    $processes = foreach ($arg in $argsList) {
+    # 2) Dispara tudo em paralelo, capturando o process object
+    $processes = foreach ($args in $argsList) {
         $completed++
-        $p = NEWPWSH @arg -ReturnProcess
-
-        # Atualiza progress bar
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS `
             -PercentComplete $percent `
@@ -362,10 +359,10 @@ function DEPLOYFUNCTION {
             -Message         'IMPLEMENTANDO' `
             -LinePosition    $LinePosition
 
-        $p
+        NEWPWSH @args -ReturnProcess
     }
 
-    # 3) Monta a lista de IDs a aguardar
+    # 3) Monta a lista de IDs que devemos aguardar
     if ($WaitAll) {
         $idsToWait = $processes | Where-Object Id -gt 0 | Select-Object -ExpandProperty Id
     }
@@ -377,17 +374,21 @@ function DEPLOYFUNCTION {
         }
     }
 
-    # 4) Filtra somente os processos que ainda existem
-    $aliveIds = Get-Process -Id $idsToWait -ErrorAction SilentlyContinue |
-    Select-Object -ExpandProperty Id
+    # 4) Só faz Get-Process/Wait-Process se houver IDs válidos
+    if ($idsToWait -and $idsToWait.Count) {
+        # filtra PIDs que ainda existem
+        $aliveIds = Get-Process -Id $idsToWait -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty Id
 
-    if ($aliveIds) {
-        Wait-Process -Id $aliveIds
+        if ($aliveIds) {
+            Wait-Process -Id $aliveIds -ErrorAction SilentlyContinue
+        }
     }
 
-    # 5) Fecha barra de progresso
+    # 5) limpa barra
     Write-Host ''
 }
+
 
 
 function TESTLINK {
