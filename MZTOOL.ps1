@@ -2416,8 +2416,8 @@ function ANYDESK {
 }
 
 function MICROSOFT365 {
-    [CmdletBinding()]
-    param()
+    #[CmdletBinding()]
+    #param()
     
     #Implementação do Microsoft Office 365.
     
