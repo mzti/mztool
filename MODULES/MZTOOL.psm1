@@ -340,19 +340,21 @@ function DEPLOYFUNCTION {
         -Message         'IMPLEMENTANDO' `
         -LinePosition    $LinePosition
 
-    # 1) monta lista de splatting com Hidden e Wait
+    # 1) Monta lista de argumentos para NEWPWSH
     $argsList = foreach ($group in $DEPLOYFUNCTION) {
-        $wait = $group.ContainsKey('Wait') -and $group.Wait
         @{
             Functions = $group.Functions
             Hidden    = $HiddenAll.IsPresent
-            Wait      = $wait
+            Wait      = $group.ContainsKey('Wait') -and $group.Wait
         }
     }
 
-    # 2) dispara todos em paralelo e captura processos via -ReturnProcess
+    # 2) Dispara todos em paralelo e captura os objetos de processo
     $processes = foreach ($arg in $argsList) {
         $completed++
+        $p = NEWPWSH @arg -ReturnProcess
+
+        # Atualiza progress bar
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS `
             -PercentComplete $percent `
@@ -360,27 +362,30 @@ function DEPLOYFUNCTION {
             -Message         'IMPLEMENTANDO' `
             -LinePosition    $LinePosition
 
-        NEWPWSH @arg -ReturnProcess
+        $p
     }
 
-    # 3) aguarda: todos ou apenas os marcados Wait
+    # 3) Monta a lista de IDs a aguardar
     if ($WaitAll) {
-        $ids = $processes |
-        Where-Object { $_.Id -gt 0 } |
-        Select-Object -ExpandProperty Id
+        $idsToWait = $processes | Where-Object Id -gt 0 | Select-Object -ExpandProperty Id
     }
     else {
-        $ids = for ($i = 0; $i -lt $processes.Count; $i++) {
+        $idsToWait = for ($i = 0; $i -lt $processes.Count; $i++) {
             if ($argsList[$i].Wait -and $processes[$i].Id -gt 0) {
                 $processes[$i].Id
             }
         }
     }
 
-    if ($ids) {
-        Wait-Process -Id $ids
+    # 4) Filtra somente os processos que ainda existem
+    $aliveIds = Get-Process -Id $idsToWait -ErrorAction SilentlyContinue |
+    Select-Object -ExpandProperty Id
+
+    if ($aliveIds) {
+        Wait-Process -Id $aliveIds
     }
 
+    # 5) Fecha barra de progresso
     Write-Host ''
 }
 
