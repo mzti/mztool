@@ -2425,9 +2425,9 @@ function MICROSOFT365 {
     
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
-    pause  
+      
     $INSTALLED = UNINSTALLOFFICE    
-    pause   
+       
     if (-not ($INSTALLED)) {             
         
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
@@ -2452,7 +2452,7 @@ function MICROSOFT365 {
   <RemoveMSI />
 </Configuration> 
 '@        
-        pause
+        
         function POSTINSTALLM365 {
 
             if (& $MS365) {
@@ -2516,8 +2516,7 @@ function MICROSOFT365 {
         }
 
         else {
-            $M365STATUS = 2  
-            pause          
+            $M365STATUS = 2                        
         }    
 
     }
@@ -2525,7 +2524,7 @@ function MICROSOFT365 {
     else {        
         
         $M365STATUS = 3
-        pause
+        
     }   
 
     return $M365STATUS
