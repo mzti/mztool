@@ -2527,7 +2527,7 @@ function MICROSOFT365 {
     }   
 
     return $M365STATUS
-
+    pause
 }   
 
 function OFFICE2007 {
