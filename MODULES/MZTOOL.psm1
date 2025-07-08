@@ -350,7 +350,7 @@ function DEPLOYFUNCTION {
     }
 
     # 2) Dispara tudo em paralelo, capturando o process object
-    $processes = foreach ($args in $argsList) {
+    $processes = foreach ($arg in $argsList) {
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS `
@@ -359,7 +359,7 @@ function DEPLOYFUNCTION {
             -Message         'IMPLEMENTANDO' `
             -LinePosition    $LinePosition
 
-        NEWPWSH @args -ReturnProcess
+        NEWPWSH @arg -ReturnProcess
     }
 
     # 3) Monta a lista de IDs que devemos aguardar
