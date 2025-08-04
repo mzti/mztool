@@ -1494,7 +1494,7 @@ _______________________________________________________
 '                               
                         DOWNLOADMZTOOL            
           
-                        function DISPLAYMENU3 {
+                        function DISPLAYMENU2 {
                 
                             $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
 
