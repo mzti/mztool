@@ -1584,8 +1584,8 @@ _______________________________________________________
                     }
 
                     4 {
-                        NEWPWSH -Functions 'PRO' -Wait
-                        DISPLAYMENU1B
+                        NEWPWSH -Functions 'PRO'
+                        EXITMZTOOL
                     }
 
                     0 {  
