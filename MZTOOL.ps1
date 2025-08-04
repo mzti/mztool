@@ -1639,7 +1639,9 @@ _______________________________________________________
                             NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
+                        
                         PAUSE
+                        
                         CLEANTEMP
 
                         DISPLAYMENU3
@@ -1671,7 +1673,9 @@ _______________________________________________________
                             NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
-
+                        
+                        PAUSE
+                        
                         CLEANTEMP
                                     
                         DISPLAYMENU3
