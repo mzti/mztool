@@ -1347,9 +1347,9 @@ ________________________________________________________
 |                                                      | 
 |                                                      |
 | |1| IMPLEMENTAÇÃO COMPLETA                           |
-| |2| DIAGNÓSTICO DE HARDWARE E SISTEMA                |
-| |3| IMPLEMENTAR WINGET & WINDOWS UPDATE              |
-| |4| IMPLEMENTAR OFFICE                               |
+| |2| FERRAMENTAS                                      |
+| |3| WINGET & WINDOWS UPDATE                          |
+| |4| MICROSOFT 365 & OFFICE                           |
 | |0| SAIR                                             |
 |                                                      |
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
@@ -1554,9 +1554,11 @@ _______________________________________________________
                         DISPLAYMENU2
 
                     }
+
                     2 { 
                         NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP'
                     }
+
                     0 {  
                         EXITMZTOOL
                     }
@@ -1565,10 +1567,12 @@ _______________________________________________________
                         ENTRYERROR
                     }
                 }
-
-                DISPLAYMENU1B 
+                
             }
+
+            DISPLAYMENU1B 
         }
+        
         3 {
             function DISPLAYMENU3 {
     
