@@ -1555,8 +1555,27 @@ _______________________________________________________
 
                     }
 
-                    2 { 
-                        NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP'
+                    2 {
+                        Clear-Host
+                        Write-Host '
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|             FERRAMENTAS DE DIAGNÓSTICOS             |
+|                                                     |
+|                                                     |
+|         VERIFICAÇÃO DE SISTEMA EM ANDAMENTO         |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
+'
+                        NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP' -Wait
+
+                        DISPLAYMENU1B
                     }
 
                     0 {  
@@ -1572,7 +1591,7 @@ _______________________________________________________
 
             DISPLAYMENU1B 
         }
-        
+
         3 {
             function DISPLAYMENU3 {
     
