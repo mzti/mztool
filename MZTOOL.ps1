@@ -1461,6 +1461,7 @@ ________________________________________________________
 | |2| VERIFICAÇÃO DE SISTEMA (SFC SCANNOW)             |
 | |3| STATUS DA BATERIA                                |
 | |4| CONVERSÃO PARA WINDOWS PRO                       |
+| |5| VOLTAR                                           |
 | |0| SAIR                                             |
 |                                                      |
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
@@ -1588,6 +1589,10 @@ _______________________________________________________
                         EXITMZTOOL
                     }
 
+                    5 { 
+                        DISPLAYMENU
+                    }
+
                     0 {  
                         EXITMZTOOL
                     }
@@ -1648,10 +1653,8 @@ _______________________________________________________
                         @(                             
                             NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess #-Hidden
-                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
-                        
-                        PAUSE
-                        
+                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id -ErrorAction SilentlyContinue }         
+                      
                         CLEANTEMP
 
                         DISPLAYMENU3
@@ -1683,9 +1686,7 @@ _______________________________________________________
                             NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id -ErrorAction SilentlyContinue } 
-                        
-                        PAUSE
-                        
+                                        
                         CLEANTEMP
                                     
                         DISPLAYMENU3
