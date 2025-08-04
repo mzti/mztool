@@ -1682,7 +1682,7 @@ _______________________________________________________
                         @(
                             NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess #-Hidden
                             NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess #-Hidden
-                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
+                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id -ErrorAction SilentlyContinue } 
                         
                         PAUSE
                         
