@@ -1445,16 +1445,38 @@ _______________________________________________________
             DISPLAYMENU
             
         }
-       
-        #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
+
+        #OPÇÃO 2 - FERRAMENTAS.
         2 {
-            #Verifica se há conexão com internet.
-            INTERNET
+            function DISPLAYMENU1B {
+                Clear-Host
+                Write-Host '
+________________________________________________________
+|                                                      |
+|                        MZTOOL                        |
+| ________________________BETA________________________ | 
+|                                                      | 
+|                                                      |
+| |1| DIAGNÓSTICO DE HARDWARE E SISTEMA                |
+| |2| VERIFICAÇÃO DE SISTEMA (SFC SCANNOW)             |
+|                                                      |
+|                                                      |
+| |0| SAIR                                             |
+|                                                      |
+|                   MOZART INFORMÁTICA | DANIEL MOZART |
+|______________________________________________________|
+'
+                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'            
+                Switch ($CHOICE) {
+                    #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
+                    1 {
+                        #Verifica se há conexão com internet.
+                        INTERNET
             
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"    
+                        $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"    
                
-            Clear-Host
-            Write-Host '
+                        Clear-Host
+                        Write-Host '
 _______________________________________________________
 |                                                     |
 |                       MZTOOL                        |
@@ -1470,14 +1492,14 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '                               
-            DOWNLOADMZTOOL            
+                        DOWNLOADMZTOOL            
           
-            function DISPLAYMENU2 {
+                        function DISPLAYMENU3 {
                 
-                $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
+                            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
 
-                Clear-Host
-                Write-Host '
+                            Clear-Host
+                            Write-Host '
 _______________________________________________________
 |                                                     |
 |                       MZTOOL                        |
@@ -1494,45 +1516,59 @@ _______________________________________________________
 |_____________________________________________________|
 '         
 
-                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                            $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
              
-                Switch ($CHOICE) {
+                            Switch ($CHOICE) {
 
-                    1 {
-                        DIAGNOSTICS -START
+                                1 {
+                                    DIAGNOSTICS -START
                                                     
-                        DISPLAYMENU2
-                    }
+                                    DISPLAYMENU2
+                                }
                     
-                    2 {                     
-                        DIAGNOSTICS -STOP                                            
+                                2 {                     
+                                    DIAGNOSTICS -STOP                                            
 
+                                    DISPLAYMENU2
+                                }
+
+                                3 {
+                                    DIAGNOSTICS -STOP 
+
+                                    DISPLAYMENU
+                                }
+
+                                0 { 
+                                    DIAGNOSTICS -STOP
+
+                                    EXITMZTOOL
+                                }
+
+                                default {
+                                    ENTRYERROR
+                                }
+
+                            }
+                        }
+                
                         DISPLAYMENU2
+
                     }
-
-                    3 {
-                        DIAGNOSTICS -STOP 
-
-                        DISPLAYMENU
+                    2 { 
+                        NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP'
                     }
-
-                    0 { 
-                        DIAGNOSTICS -STOP
-
+                    0 {  
                         EXITMZTOOL
                     }
 
                     default {
                         ENTRYERROR
                     }
-
                 }
+
+                DISPLAYMENU1B 
             }
-                
-            DISPLAYMENU2
-
         }
-
         3 {
             function DISPLAYMENU3 {
     
