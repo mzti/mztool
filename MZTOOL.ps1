@@ -1459,8 +1459,8 @@ ________________________________________________________
 |                                                      |
 | |1| DIAGNÓSTICO DE HARDWARE E SISTEMA                |
 | |2| VERIFICAÇÃO DE SISTEMA (SFC SCANNOW)             |
-|                                                      |
-|                                                      |
+| |3| STATUS DA BATERIA                                |
+| |4| CONVERSÃO PARA WINDOWS PRO                       |
 | |0| SAIR                                             |
 |                                                      |
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
@@ -1575,6 +1575,16 @@ _______________________________________________________
 '
                         NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP' -Wait
 
+                        DISPLAYMENU1B
+                    }
+
+                    3 {
+                        BATTERYREPORT
+                        DISPLAYMENU1B
+                    }
+
+                    4 {
+                        NEWPWSH -Functions 'PRO' -Wait
                         DISPLAYMENU1B
                     }
 
