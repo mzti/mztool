@@ -747,7 +747,7 @@ function UNINSTALLOFFICE {
         foreach ($path in $UninstallPaths) {
             $apps = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
             Where-Object { 
-                $_.DisplayName -like "*Office*" -or 
+                #$_.DisplayName -like "*Office*" -or 
                 $_.DisplayName -like "*Microsoft Office*" -or 
                 $_.DisplayName -like "*Microsoft 365*" 
             }
