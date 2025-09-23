@@ -2129,11 +2129,11 @@ function DOWNLOADMZTOOL {
     
         $TRYGETMZTOOLZIP++   
         
-        if ($TRYGETMZTOOLZIP -ge 3) {
+        if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {
             $MZTOOLAWS = 'HTTPS://NULL.NULL'           
             $DRIVEURLS = @($MZTOOLAWS, $MZTOOLGOOGLEDRIVE)              
         }
-            
+ 
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
         if ($TRYGETMZTOOLZIP -ge 5) {
     
