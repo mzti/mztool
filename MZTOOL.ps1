@@ -2130,6 +2130,7 @@ function DOWNLOADMZTOOL {
         $TRYGETMZTOOLZIP++   
         
         if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {
+            Write-Host "HASH ERROR"
             $MZTOOLAWS = 'HTTPS://NULL.NULL'           
             $DRIVEURLS = @($MZTOOLAWS, $MZTOOLGOOGLEDRIVE)              
         }
