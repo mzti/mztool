@@ -2182,7 +2182,7 @@ function DIAGNOSTICS {
         @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
         @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
         @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
-        @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
+        @{ Name = "GPU-Z"; Path = "GPU-Z.exe" }
     )
 
     if ($Global:WINVER -match '64 bits') {
