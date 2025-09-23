@@ -2105,7 +2105,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $MZTOOLZIPHASH1 = "60BB6C51F32894D33FFFA1E688DE1C58"
+    $MZTOOLZIPHASH1 = "2DD189FA98F7AF9D8C8210D706FF7C62"
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
 
@@ -2182,7 +2182,7 @@ function DIAGNOSTICS {
         @{ Name = "aida64"; Path = "AIDA_64\aida64.exe" },
         @{ Name = "BlueScreenView"; Path = "BLUE_SCREEN_VIEW\BlueScreenView.exe" },
         @{ Name = "HDSentinel"; Path = "HDSENTINEL\HDSentinel.exe" },
-        @{ Name = "GPU-Z"; Path = "GPU-Z.exe" }
+        @{ Name = "GPU_Z"; Path = "GPU_Z.exe" }
     )
 
     if ($Global:WINVER -match '64 bits') {
