@@ -2126,7 +2126,12 @@ function DOWNLOADMZTOOL {
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
               
         $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5 -ErrorAction SilentlyContinue
-    
+        
+        Write-Host "Hash esperado: $MZTOOLZIPHASH"
+        Write-Host "Hash obtido:   $($NEWMZTOOLZIPHASH.Hash)"
+
+        Pause
+
         $TRYGETMZTOOLZIP++   
         
         if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {                              
