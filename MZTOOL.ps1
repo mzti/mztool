@@ -2131,8 +2131,8 @@ function DOWNLOADMZTOOL {
         
         if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {
             Write-Host "HASH ERROR"
-            $MZTOOLAWS = 'HTTPS://NULL.NULL'           
-            $DRIVEURLS = @($MZTOOLAWS, $MZTOOLGOOGLEDRIVE)              
+                     
+            $DRIVEURLS = @($MZTOOLGOOGLEDRIVE)              
         }
  
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
