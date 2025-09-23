@@ -2149,7 +2149,7 @@ function DOWNLOADMZTOOL {
     RESETCURSOR 
 
     $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
-        Write-Host "ORIGIN HASH $($_)`nACTUAL HASH $($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
+        Write-Host "HASH OK $($_)" -NoNewline -ForegroundColor Green
     }     
 
     Start-Sleep -Seconds 3
