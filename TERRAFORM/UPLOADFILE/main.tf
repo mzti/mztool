@@ -18,25 +18,3 @@ provisioner "local-exec" {
 
 }
 
-# resource "null_resource" "invalidate_cloudfront" {
-#   # Garante que só roda depois do upload do arquivo
-#   depends_on = [aws_s3_object.mztool_zip]
-
-#   provisioner "local-exec" {
-#     command = <<EOT
-#       aws cloudfront create-invalidation \
-#         --distribution-id E2WXAENP66ZGFB \
-#         --paths "/MZTOOL.zip"
-#     EOT
-#   }
-# }
-
-
-# resource "aws_cloudfront_invalidation" "invalidate_mztool_zip" {
-#   distribution_id = E2WXAENP66ZGFB
-#   paths           = ["/mztool.zip"]
-
-#   Garante que só roda depois do upload
-#   depends_on = [aws_s3_object.mztool_zip]
-# }
-
