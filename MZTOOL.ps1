@@ -3165,57 +3165,8 @@ function PRO {
     }
 
 }
-<#
+
 function BATTERYREPORT {
-
-    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
-
-    if (-not (Test-Path $MZTOOLAPPDATA)) {
-        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force | Out-Null > $null 2>&1          
-    }
-
-    $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA "BATTERYREPORT.html"
-    
-    powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
-    
-    if (Test-Path $BATTERYREPORT -ErrorAction SilentlyContinue) {
-        
-        Start-Process $BATTERYREPORT
-        
-        $CYCLELINE = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count' |
-        Select-Object -First 1 -ExpandProperty Line
-      
-        $CYCLES = $null
-        if ($CYCLELINE -match '>\s*(\d+)\s*<') {
-            $CYCLES = [int]$Matches[1]
-        }
-
-        if ($CYCLES -gt 500) {
-            Write-Host "🪫 Bateria já passou de 500 ciclos. Ciclos atuais: $CYCLES." -ForegroundColor Yellow
-        }
-        elseif ($CYCLES -gt 0 -and $CYCLES -lt 500) {
-            Write-Host "🔋 Bateria saudável, ciclos atuais: $CYCLES." -ForegroundColor Green
-        }
-        else {
-            Write-Host "⚠️ Falha ao ler o número de ciclos no relatório." -ForegroundColor Yellow
-        }        
-    }
-
-    else {
-        Write-Host "⚠️ Não foi possível gerar o relatório de bateria." -ForegroundColor Red
-    }
-
-    Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
-
-}
-#>
-function BATTERYREPORT {
-    <#
-    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
-
-    if (-not (Test-Path $Global:MZTOOLAPPDATA)) {
-        New-Item -Path $Global:MZTOOLAPPDATA -ItemType Directory -Force | Out-Null
-    }#>
 
     $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA 'BATTERYREPORT.html'
     powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
@@ -3282,10 +3233,6 @@ function AMDULPS {
     Write-Host "ULPS desativado. Por favor, reinicie." -ForegroundColor Cyan
 }
 
-  
-function awin {
-    Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
-}
     
 DISPLAYMENU 
 
