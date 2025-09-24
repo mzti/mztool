@@ -144,7 +144,7 @@ function NEWPWSH {
 
     # Junta as definições das funções especificadas
     $funcDefinitions = foreach ($fn in $Functions) {
-    (Get-Command -Type Function $fn).Definition
+        (Get-Command -Type Function $fn).Definition
     } -join "`n"
 
     $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
@@ -268,22 +268,23 @@ function DEPLOYFUNCTIONPROGRESS {
     Write-Host $progressText -NoNewline
 }
 
+<#
 function DEPLOYFUNCTION {
     param(
-        [hashtable[]]$DEPLOYFUNCTIONHASH,
+        [hashtable[]]$DEPLOYFUNCTION,
         [int]$BarWidth = 30,
         [int]$LinePosition = 17,
-        [switch]$HIDDENALL
+        [switch]$HIDDENALL,
+        [switch]$WAITALL
     )
     
-    $total = $DEPLOYFUNCTIONHASH.Count
+    $total = $DEPLOYFUNCTION.Count
     $completed = 0
 
     # Exibe a barra inicial (0% concluído)
     DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-    
-   
-    foreach ($group in $DEPLOYFUNCTIONHASH) {       
+    $NEWPWSHHASH = @() 
+    foreach ($group in $DEPLOYFUNCTION) {       
         
         # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
         # Inicializa os valores padrão para os switches
@@ -306,22 +307,89 @@ function DEPLOYFUNCTION {
             Wait      = $Wait
             Hidden    = $Hidden
         }
-
+        $NEWPWSHHASH = $NEWPWSHHASH + @arguments 
         # Chama a função passando os parâmetros via splatting
-        NEWPWSH @arguments
-           
+   NEWPWSH @arguments
       
         $completed++
         $percent = [math]::Round(($completed * 100) / $total)
         DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
         
         # Aguarda 3 segundos antes de iniciar o próximo grupo
-        Start-Sleep -Seconds 3
+        Start-Sleep -Seconds 3   
     }
-
     # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
     Write-Host ""
 }   
+#>
+function DEPLOYFUNCTION {
+    param(
+        [hashtable[]] $DEPLOYFUNCTION,
+        [int]        $BarWidth = 30,
+        [int]        $LinePosition = 17,
+        [switch]     $HiddenAll,
+        [switch]     $WaitAll
+    )
+
+    $total = $DEPLOYFUNCTION.Count
+    $completed = 0
+
+    DEPLOYFUNCTIONPROGRESS `
+        -PercentComplete 0 `
+        -BarWidth        $BarWidth `
+        -Message         'IMPLEMENTANDO' `
+        -LinePosition    $LinePosition
+
+    # 1) Prepara cada chamada a NEWPWSH
+    $argsList = foreach ($group in $DEPLOYFUNCTION) {
+        @{
+            Functions = $group.Functions
+            Hidden    = $HiddenAll.IsPresent
+            Wait      = $group.ContainsKey('Wait') -and $group.Wait
+        }
+    }
+
+    # 2) Dispara tudo em paralelo, capturando o process object
+    $processes = foreach ($arg in $argsList) {
+        $completed++
+        $percent = [math]::Round(($completed * 100) / $total)
+        DEPLOYFUNCTIONPROGRESS `
+            -PercentComplete $percent `
+            -BarWidth        $BarWidth `
+            -Message         'IMPLEMENTANDO' `
+            -LinePosition    $LinePosition
+
+        NEWPWSH @arg -ReturnProcess
+    }
+
+    # 3) Monta a lista de IDs que devemos aguardar
+    if ($WaitAll) {
+        $idsToWait = $processes | Where-Object Id -gt 0 | Select-Object -ExpandProperty Id
+    }
+    else {
+        $idsToWait = for ($i = 0; $i -lt $processes.Count; $i++) {
+            if ($argsList[$i].Wait -and $processes[$i].Id -gt 0) {
+                $processes[$i].Id
+            }
+        }
+    }
+
+    # 4) Só faz Get-Process/Wait-Process se houver IDs válidos
+    if ($idsToWait -and $idsToWait.Count) {
+        # filtra PIDs que ainda existem
+        $aliveIds = Get-Process -Id $idsToWait -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty Id
+
+        if ($aliveIds) {
+            Wait-Process -Id $aliveIds -ErrorAction SilentlyContinue
+        }
+    }
+
+    # 5) limpa barra
+    Write-Host ''
+}
+
+
 
 function TESTLINK {
     param(
@@ -679,7 +747,7 @@ function UNINSTALLOFFICE {
         foreach ($path in $UninstallPaths) {
             $apps = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
             Where-Object { 
-                $_.DisplayName -like "*Office*" -or 
+                #$_.DisplayName -like "*Office*" -or 
                 $_.DisplayName -like "*Microsoft Office*" -or 
                 $_.DisplayName -like "*Microsoft 365*" 
             }
@@ -698,12 +766,10 @@ function UNINSTALLOFFICE {
     
         foreach ($app in $OfficeApps) {
                     
-            If ($app.UninstallString -notmatch "MsiExec.exe") {           
+            if ($app.UninstallString -notmatch "MsiExec.exe") {           
                
-                $uninstallCmd = $app.UninstallString
-                
-                RESETCURSOR
-              
+                $uninstallCmd = $app.UninstallString             
+                       
                 Write-Warning "INICIANDO DESINSTALAÇÃO - $($app.DisplayName)"
          
                 Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait -NoNewWindow
@@ -716,16 +782,15 @@ function UNINSTALLOFFICE {
     
     if ($InstalledOffice.Count -gt 0) {       
        
-        Write-Warning "`nINSTALAÇÃO DO OFFICE OU 365 ENCONTRADA:"
+        Write-Warning "INSTALAÇÃO DO MICROSOFT OFFICE OU 365 ENCONTRADA:"
         foreach ($app in $InstalledOffice) {
-            RESETCURSOR
+           
             Write-Host "$($app.DisplayName) - VERSÃO: $($app.DisplayVersion)" -ForegroundColor Green
         }         
         UninstallOfficeApps -OfficeApps $InstalledOffice
     }
-    else {
-        RESETCURSOR
-        Write-Warning "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA. INICIANDO INSTALAÇÃO."
+    else {      
+        Write-Host "NENHUMA INSTALAÇÃO DO OFFICE OU 365 ENCONTRADA.`nINICIANDO INSTALAÇÃO."
     }
 
     $StillInstalled = (GetAllInstalledOffice).Count -gt 0

