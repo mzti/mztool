@@ -2108,8 +2108,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIPHASH1 = "2DD189FA98F7AF9D8C8210D706FF7C62"
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
-    $MZTOOLZIPHASH3 = "60BB6C51F32894D33FFFA1E688DE1C58"
-    $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2", "$MZTOOLZIPHASH3")
+    $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
 
     $MZTOOLAWS = "$Global:CLOUDFRONT/MZTOOL.zip"      
     $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
@@ -2129,11 +2128,6 @@ function DOWNLOADMZTOOL {
               
         $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5 -ErrorAction SilentlyContinue
         
-        Write-Host "Hash esperado: $MZTOOLZIPHASH"
-        Write-Host "Hash obtido:   $($NEWMZTOOLZIPHASH.Hash)"
-
-        Pause
-
         $TRYGETMZTOOLZIP++   
         
         if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {                              
