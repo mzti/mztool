@@ -47,6 +47,7 @@ $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstan
 $Global:PSVER = { $PSVersionTable.PSVersion }
 $Global:MZPSVER = "5.1.0"
 $Global:SCRIPTCODE = $MyInvocation.MyCommand.Definition
+$Global:CLOUDFRONT = "https://d15d16xpb69uci.cloudfront.net"
 
 $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
@@ -2110,7 +2111,7 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIPHASH3 = "60BB6C51F32894D33FFFA1E688DE1C58"
     $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2", "$MZTOOLZIPHASH3")
 
-    $MZTOOLAWS = 'https://d15d16xpb69uci.cloudfront.net/MZTOOL.zip'      
+    $MZTOOLAWS = "$Global:CLOUDFRONT/MZTOOL.zip"      
     $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     TOOLDIR
@@ -2578,7 +2579,7 @@ function MICROSOFT365 {
             $365URLS = @(
                 "https://officecdn.microsoft.com/pr/wsus/setup.exe",
                 "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br",
-                "https://d15d16xpb69uci.cloudfront.net/MICROSOFT365.exe"            
+                "$Global:CLOUDFRONT/MICROSOFT365.exe"            
             )
             
             $365EXE = "$env:TEMP\MICROSOFT365.exe"
@@ -2621,7 +2622,7 @@ function OFFICE2007 {
     $INSTALLED = UNINSTALLOFFICE
     if (-NOT ($INSTALLED)) {                  
        
-        $OFFICE2007AWS = 'https://d15d16xpb69uci.cloudfront.net/OFFICE2007.zip'
+        $OFFICE2007AWS = "$Global:CLOUDFRONT/OFFICE2007.zip"
         $OFFICE2007GOOGLEDRIVE = $OFFICE2007AWS
 
         $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
