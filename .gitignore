@@ -1,6 +1,7 @@
 #---FOLDERS---#
 /BKP
 /DATA
+
 #---TERRAFORM---#
 .terraform/
 **/.terraform/
