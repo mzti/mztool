@@ -1,7 +1,9 @@
 Compress-Archive -Path ".\DATA\ZIP\*" -DestinationPath ".\DATA\MZTOOL.zip" -Force
 
-terraform init -upgrade
-terraform apply -auto-approve
-terraform output -json > terraform-outputs.json
+terraform -chdir=TERRAFORM\UPLOADFILE init -upgrade
+terraform -chdir=TERRAFORM\UPLOADFILE apply -auto-approve
+terraform -chdir=TERRAFORM\UPLOADFILE output -json > terraform-outputs.json
+
+pause
 
 .\COMMIT.ps1

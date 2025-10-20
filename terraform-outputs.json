@@ -1,1 +1,7 @@
-{}
+{
+  "mztool_zip_md5": {
+    "sensitive": false,
+    "type": "string",
+    "value": "26031883f986523e1e63e7799b39798b"
+  }
+}
