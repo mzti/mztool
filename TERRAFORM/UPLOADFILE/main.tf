@@ -1,12 +1,12 @@
 resource "aws_s3_object" "mztool_zip" {
   bucket = "mztool"
   key    = "MZTOOL.zip"
-  source = "K:\\OneDrive\\Área de Trabalho\\GITHUB\\DATA\\MZTOOL\\MZTOOL.zip"
-  etag   = filemd5("K:\\OneDrive\\Área de Trabalho\\GITHUB\\DATA\\MZTOOL\\MZTOOL.zip")
+  source = ".\\DATA\\MZTOOL.zip"
+  etag   = filemd5(".\\DATA\\MZTOOL.zip")
 }
 
 output "mztool_zip_md5" {
-  value = filemd5("K:\\OneDrive\\Área de Trabalho\\GITHUB\\DATA\\MZTOOL\\MZTOOL.zip")
+  value = filemd5(".\\DATA\\MZTOOL.zip")
 }
 
 resource "null_resource" "invalidate_cloudfront" {
