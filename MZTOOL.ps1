@@ -1031,9 +1031,7 @@ function WINUPDATEMODULE {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
     #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
-    if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
-        PSGETMANANGEMENT
-    }
+    PSGETMANANGEMENT
        
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
@@ -1046,10 +1044,14 @@ function WINUPDATEMODULE {
 }
 
 function WINGETMODULE {
+
+ 
+    #Implementa e ou atualiza o WINGET.
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
-   
-    #Implementa e ou atualiza o WINGET.
+
+    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
+    PSGETMANANGEMENT
      
     #Verifica se a versão do Windows é a 11.
     if ($Global:WINVER -Match 'Windows 11') {
@@ -2236,9 +2238,7 @@ function WINUPDATEMODULE {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
     #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
-    if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
-        PSGETMANANGEMENT
-    }
+    PSGETMANANGEMENT
        
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
@@ -2251,10 +2251,13 @@ function WINUPDATEMODULE {
 }
 
 function WINGETMODULE {
-    
+     
+    #Implementa e ou atualiza o WINGET.
+
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
    
-    #Implementa e ou atualiza o WINGET.
+    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
+    PSGETMANANGEMENT
      
     #Verifica se a versão do Windows é a 11.
     if ($Global:WINVER -Match 'Windows 11') {
