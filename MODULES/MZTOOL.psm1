@@ -916,9 +916,7 @@ function WINUPDATEMODULE {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
     #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
-    if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
-        PSGETMANANGEMENT
-    }
+    PSGETMANANGEMENT
        
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
@@ -931,6 +929,13 @@ function WINUPDATEMODULE {
 }
 
 function PSGETMANANGEMENT {
+
+    #IMPLEMENTAÇÃO DOS MÓDULO PowerShellGet e PackageManagement.       
+    
+    if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
+   
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PSGETMANANGEMENT" 
+
     # Força TLS 1.2 para conexões seguras
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -970,14 +975,18 @@ function PSGETMANANGEMENT {
     # Importa os módulos para testar
     Import-Module PowerShellGet -Force
     Import-Module PackageManagement -Force
+ }
 
 }
 
 function WINGETMODULE {
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
-   
     #Implementa e ou atualiza o WINGET.
+     
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"   
+
+    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
+    PSGETMANANGEMENT
      
     #Verifica se a versão do Windows é a 11.
     if ($Global:WINVER -Match 'Windows 11') {
