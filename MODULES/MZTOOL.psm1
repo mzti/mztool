@@ -915,6 +915,11 @@ function WINUPDATEMODULE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
+    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
+    if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
+        PSGETMANANGEMENT
+    }
+       
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
     Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted  |  Clear-Host
@@ -923,6 +928,49 @@ function WINUPDATEMODULE {
     Install-Module PSWindowsUpdate -AllowClobber -Force |  Clear-Host
     Import-Module PSWindowsUpdate -Force |  Clear-Host        
                 
+}
+
+function PSGETMANANGEMENT {
+    # Força TLS 1.2 para conexões seguras
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+    # Versões desejadas
+    $psGetVersion = "2.2.5"
+    $pkgMgmtVersion = "1.4.8.1"
+
+    # URLs dos pacotes na PowerShell Gallery
+    $psGetUrl = "https://www.powershellgallery.com/api/v2/package/PowerShellGet/$psGetVersion"
+    $pkgMgmtUrl = "https://www.powershellgallery.com/api/v2/package/PackageManagement/$pkgMgmtVersion"
+
+    # Pasta de destino (para todos os usuários)
+    $destRoot = "C:\Program Files\WindowsPowerShell\Modules"
+
+    # Função para baixar e instalar módulo
+    function Install-PSModuleFromNuPkg($name, $url, $version) {
+        $tempFile = "$env:TEMP\$name.$version.zip"
+        $destPath = Join-Path $destRoot $name
+
+        Write-Host "Baixando $name $version..."
+        Invoke-WebRequest -Uri $url -OutFile $tempFile -UseBasicParsing
+
+        Write-Host "Extraindo para $destPath..."
+        if (-not (Test-Path $destPath)) {
+            New-Item -ItemType Directory -Path $destPath -Force | Out-Null
+        }
+        Expand-Archive -Path $tempFile -DestinationPath $destPath -Force
+
+        Remove-Item $tempFile -Force
+        Write-Host "$name $version instalado em $destPath"
+    }
+
+    # Instala os dois módulos
+    Install-PSModuleFromNuPkg -name "PowerShellGet" -url $psGetUrl -version $psGetVersion
+    Install-PSModuleFromNuPkg -name "PackageManagement" -url $pkgMgmtUrl -version $pkgMgmtVersion
+
+    # Importa os módulos para testar
+    Import-Module PowerShellGet -Force
+    Import-Module PackageManagement -Force
+
 }
 
 function WINGETMODULE {

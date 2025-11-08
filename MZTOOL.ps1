@@ -1032,6 +1032,11 @@ function WINUPDATEMODULE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
+    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
+    if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
+        PSGETMANANGEMENT
+    }
+       
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
     Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted  |  Clear-Host
@@ -2236,6 +2241,11 @@ function WINUPDATEMODULE {
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
+    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
+    if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
+        PSGETMANANGEMENT
+    }
+       
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
     Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted  |  Clear-Host
