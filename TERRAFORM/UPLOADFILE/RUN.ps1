@@ -4,7 +4,6 @@ terraform -chdir=TERRAFORM\UPLOADFILE init -upgrade
 terraform -chdir=TERRAFORM\UPLOADFILE apply -auto-approve
 terraform -chdir=TERRAFORM\UPLOADFILE output -json > TERRAFORM\UPLOADFILE\terraform-outputs.json
 
-
 $tfvarsPath = ".\TERRAFORM\UPLOADFILE\terraform.tfvars"
 $lines = Get-Content $tfvarsPath
 $vars = @{}
