@@ -934,7 +934,7 @@ function PSGETMANANGEMENT {
 
     if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
                    
-        $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE" 
+        $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PSGETMANANGEMENT" 
 
         # Força TLS 1.2 para conexões seguras
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
