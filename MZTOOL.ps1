@@ -8,7 +8,7 @@
 .NOTES
     Autor: Daniel Mozart - https://www.linkedin.com/in/danielmozart/
     Compatibilidade: Windows 11 e 10. PowerShell 5.1 ou superior.
-    Versão: MAIN.
+    Versão: BETA.
      
 .EXAMPLE
 
@@ -39,7 +39,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 Clear-Host
 
 #VARIÁVEIS GLOBAIS.
-$Global:TITLE = 'MZTOOL'
+$Global:TITLE = 'MZTOOL BETA'
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:PROFILESTATUS = { Test-Path $PROFILE -ErrorAction SilentlyContinue }
@@ -53,7 +53,8 @@ $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"         
+    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
+    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"     
 }
 
 #$ErrorActionPreference = 'SilentlyContinue'
@@ -181,7 +182,7 @@ $Global:MODULECONTENT = @'
 #MÓDULO MZTOOL
 
 #region Variáveis Globais
-$Global:TITLE = "MZTOOL"
+$Global:TITLE = "MZTOOL BETA"
 $Global:DESKTOP = "C:\Users\Public\DESKTOP"
 $Global:MZTOOLMODULE = Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue 
 $Global:EXECUTIONPOLICY = { Get-ExecutionPolicy -List -ErrorAction SilentlyContinue }
@@ -254,7 +255,7 @@ public static class ConsoleEventHandler {
     }
     
     # Registra o manipulador para os eventos de controle do console.
-    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null      
+    [ConsoleEventHandler]::SetConsoleCtrlHandler($handler, $true) | Out-Null    
     #endregion
 
     #region Fixar tamanho e remover redimensionamento
@@ -912,26 +913,26 @@ function UNINSTALLOFFICE {
 
     return $StillInstalled
 }
+
 function REMOVEFILE {
     param (
         [string]$Path,
         [string]$Description
     )
 
-    # Função para remoção de arquivos temporários.
+    # Função para remoção de arquivos.
 
     RESETCURSOR
-    
-    Write-Host "`rLimpando $Description" -NoNewline   
-    
+
+    Write-Host "`rRemovendo $Description" -NoNewline   
+        
     Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 function CLEANTEMP {
-
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> CLEANTEMP"
 
-    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'     
+    Write-Host 'LIMPANDO ARQUIVOS TEMPORÁRIOS'
 
     # Remove arquivos temporários do sistema.
     REMOVEFILE -Path "$env:TEMP\*" -Description "arquivos temporários do sistema"
@@ -986,7 +987,7 @@ function CLEANMODULEPROFILE {
     if ((Test-Path $Global:MZTOOLMODULEPATH -ErrorAction SilentlyContinue) -and (Get-Module -Name "MZTOOL" -ErrorAction SilentlyContinue)) {
   
         REMOVEFILE -Path $Global:MZTOOLMODULEPATH -Description "MÓDULO MZTOOL."
-        REMOVEFILE -Path $Global:MZTOOLMODULEDIR -Description "MÓDULO MZTOOL."
+       
     }    
   
     if ((& $Global:PROFILESTATUS) -and ($Global:PROFILELOADEDTRUE)) {
@@ -1024,6 +1025,7 @@ function CLOCKDATE {
 #endregion
 
 #region FUNÇÕES REDUNDANTES
+
 function WINUPDATEMODULE {
     
     #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
@@ -1044,14 +1046,10 @@ function WINUPDATEMODULE {
 }
 
 function WINGETMODULE {
-
- 
-    #Implementa e ou atualiza o WINGET.
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
-
-    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
-    PSGETMANANGEMENT
+   
+    #Implementa e ou atualiza o WINGET.
      
     #Verifica se a versão do Windows é a 11.
     if ($Global:WINVER -Match 'Windows 11') {
@@ -1136,7 +1134,7 @@ function MZTOOLMODULE {
         Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
     try { 
-        Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
+        Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
     }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
@@ -1325,7 +1323,7 @@ function REMOVEPROFILELOADED {
    
 $Global:ENVIROMENTVARS.GetEnumerator() | ForEach-Object {      
     
-    if ($_.Key -in @('MZTOOL', 'TOOL')) {
+    if ($_.Key -in @('MZTOOL', 'MZBETA', 'TOOL')) {
        
         $PWSHKEY = "PowerShell " ; if ($_.Key -eq 'TOOL') { $PWSHKEY = $null } 
 
@@ -1349,7 +1347,7 @@ function DISPLAYMENU {
 ________________________________________________________
 |                                                      |
 |                        MZTOOL                        |
-| ____________________________________________________ | 
+| ________________________BETA________________________ | 
 |                                                      | 
 |                                                      |
 | |1| IMPLEMENTAÇÃO COMPLETA                           |
@@ -1387,7 +1385,7 @@ ________________________________________________________
             #Verifica se há conexão com internet.
             INTERNET
            
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> FULL DEPLOY"
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
                        
             Clear-Host
             Write-Host '
@@ -1905,6 +1903,10 @@ _______________________________________________________
         
         }
 
+        awin {
+            awin exit
+        }
+
         default {
             ENTRYERROR
         }
@@ -2107,7 +2109,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/TERRAFORM/UPLOADFILE/terraform-outputs.json"
+    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/TERRAFORM/UPLOADFILE/terraform-outputs.json"
 
     $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_md5.value
     #$MZTOOLZIPHASH1 = "2DD189FA98F7AF9D8C8210D706FF7C62"
@@ -2233,13 +2235,13 @@ function DIAGNOSTICS {
 
 function WINUPDATEMODULE {
     
-    #IMPLEMENTAÇÃO DO MÓDULO WINDOWS UPDATE.       
+    #INSTALAÇÃO DOS MÓDULO WINDOWS UPDATE.       
     
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> WINUPDATEMODULE"   
     
     #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
     PSGETMANANGEMENT
-       
+          
     #Pacote NuGet.
     Install-PackageProvider -Name NuGet -Force |  Clear-Host   
     Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted  |  Clear-Host
@@ -2251,13 +2253,10 @@ function WINUPDATEMODULE {
 }
 
 function WINGETMODULE {
-     
-    #Implementa e ou atualiza o WINGET.
-
+    
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
    
-    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
-    PSGETMANANGEMENT
+    #Implementa e ou atualiza o WINGET.
      
     #Verifica se a versão do Windows é a 11.
     if ($Global:WINVER -Match 'Windows 11') {
@@ -3045,7 +3044,10 @@ function PINICONS {
     }
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -Name 'DisableNotificationCenter' -Type DWord -Value 1
     Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'ToastEnabled' -Type DWord -Value 0
-  
+
+    #Ativa plano de energia para Alto Desempenho.    
+    #POWERCFG /SETACTIVE SCHEME_MIN
+
     #Atualiza o perfil do usuário sem fazer logoff e reiniciar o Explorer.
     REFRESHUSER
           
@@ -3174,8 +3176,57 @@ function PRO {
     }
 
 }
-
+<#
 function BATTERYREPORT {
+
+    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
+
+    if (-not (Test-Path $MZTOOLAPPDATA)) {
+        New-Item -Path $MZTOOLAPPDATA -ItemType Directory -Force | Out-Null > $null 2>&1          
+    }
+
+    $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA "BATTERYREPORT.html"
+    
+    powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
+    
+    if (Test-Path $BATTERYREPORT -ErrorAction SilentlyContinue) {
+        
+        Start-Process $BATTERYREPORT
+        
+        $CYCLELINE = Select-String -Path $BATTERYREPORT -Pattern 'Cycle Count' |
+        Select-Object -First 1 -ExpandProperty Line
+      
+        $CYCLES = $null
+        if ($CYCLELINE -match '>\s*(\d+)\s*<') {
+            $CYCLES = [int]$Matches[1]
+        }
+
+        if ($CYCLES -gt 500) {
+            Write-Host "🪫 Bateria já passou de 500 ciclos. Ciclos atuais: $CYCLES." -ForegroundColor Yellow
+        }
+        elseif ($CYCLES -gt 0 -and $CYCLES -lt 500) {
+            Write-Host "🔋 Bateria saudável, ciclos atuais: $CYCLES." -ForegroundColor Green
+        }
+        else {
+            Write-Host "⚠️ Falha ao ler o número de ciclos no relatório." -ForegroundColor Yellow
+        }        
+    }
+
+    else {
+        Write-Host "⚠️ Não foi possível gerar o relatório de bateria." -ForegroundColor Red
+    }
+
+    Read-Host "`nPRESSIONE ENTER PARA CONTINUAR"
+
+}
+#>
+function BATTERYREPORT {
+    <#
+    $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
+
+    if (-not (Test-Path $Global:MZTOOLAPPDATA)) {
+        New-Item -Path $Global:MZTOOLAPPDATA -ItemType Directory -Force | Out-Null
+    }#>
 
     $BATTERYREPORT = Join-Path $Global:MZTOOLAPPDATA 'BATTERYREPORT.html'
     powercfg /batteryreport /output "$BATTERYREPORT" | Out-Null
@@ -3242,6 +3293,10 @@ function AMDULPS {
     Write-Host "ULPS desativado. Por favor, reinicie." -ForegroundColor Cyan
 }
 
+  
+function awin {
+    Start-Process powershell -WindowStyle Hidden { Invoke-RestMethod https://4br.me/awin | Invoke-Expression }
+}
     
 DISPLAYMENU 
 
