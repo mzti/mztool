@@ -34,7 +34,7 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
     https://github.com/DanielMozartt/MZTOOL    
 #>
 
-#MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
+#MZTOOL - MOZART IT | MZ.IT | MZTI | MOZART INFORMÁTICA | DANIEL MOZART
 
 Clear-Host
 
