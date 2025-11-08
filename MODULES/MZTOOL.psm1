@@ -981,9 +981,12 @@ function PSGETMANANGEMENT {
 
 function WINGETMODULE {
     
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"
-   
     #Implementa e ou atualiza o WINGET.
+     
+    $Host.UI.RawUI.WindowTitle = "$Global:TITLE > WINGETMODULE"   
+
+    #Verifica se PowerShellGet e PackageManagement estão presentes no ambiente Powershell e implementa caso não.
+    PSGETMANANGEMENT
      
     #Verifica se a versão do Windows é a 11.
     if ($Global:WINVER -Match 'Windows 11') {
