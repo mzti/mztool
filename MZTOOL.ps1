@@ -1396,12 +1396,12 @@ ________________________________________________________
 |                                                      |
 |                        MZTOOL                        |
 | ________________________BETA________________________ | 
+|                                                      |
 |                                                      | 
 |               IMPLEMENTAÇÃO COMPLETA                 |
 |                                                      |
 | |1| IMPLEMENTAR                                      |
 | |2| MENU                                             |
-|                                                      |
 |                                                      |
 |                                                      |
 |                   MOZART INFORMÁTICA | DANIEL MOZART |
