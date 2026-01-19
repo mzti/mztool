@@ -1385,13 +1385,38 @@ ________________________________________________________
 
         #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
         1 {
+            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
+            
             #Verifica se há conexão com internet.
             INTERNET
-           
-            $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
-                       
+
             Clear-Host
             Write-Host '
+________________________________________________________
+|                                                      |
+|                        MZTOOL                        |
+| ________________________BETA________________________ | 
+|                                                      | 
+|               IMPLEMENTAÇÃO COMPLETA                 |
+|                                                      |
+| |1| IMPLEMENTAR                                      |
+| |2| MENU                                             |
+|                                                      |
+|                                                      |
+|                   MOZART INFORMÁTICA | DANIEL MOZART |
+|______________________________________________________|
+'
+            # Solicita ao usuário que insira o número correspondente à opção desejada.
+            $CHOICE = Read-Host "`nINSIRA O NÚMERO CORRESPONDENTE A OPÇÃO DESEJADA"
+            Switch ($CHOICE) { 
+
+                #OPÇÃO 1 - INSTALAR SOFTWARES E ATUALIZAÇÕES DO SISTEMA.
+                1 {                          
+
+                    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> INSTALL"
+                       
+                    Clear-Host
+                    Write-Host '
 _______________________________________________________
 |                                                     |
 |                       MZTOOL                        |
@@ -1407,31 +1432,31 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '
-            # Executa o conjunto de funções com os devidos parâmetros especificados.
-            $DEPLOYFUNCTION1 = @(
-                @{ Functions = 'PERFILTHEME' },
-                @{ Functions = 'ANYDESK' },
-                @{ Functions = 'WINGETMODULE'; Wait = $true },
-                @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' }
-            )       
+                    # Executa o conjunto de funções com os devidos parâmetros especificados.
+                    $DEPLOYFUNCTION1 = @(
+                        @{ Functions = 'PERFILTHEME' },
+                        @{ Functions = 'ANYDESK' },
+                        @{ Functions = 'WINGETMODULE'; Wait = $true },
+                        @{ Functions = 'WINUPDATEMODULE', 'REMOVEGHOSTDRIVERS', 'WINUPDATE' }
+                    )       
             
-            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION1 <#-HIDDENALL#> 
+                    DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION1 <#-HIDDENALL#> 
 
-            $DEPLOYFUNCTION2 = @(
-                @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
-                @{ Functions = 'MICROSOFT365'; Wait = $true }                
-            )
+                    $DEPLOYFUNCTION2 = @(
+                        @{ Functions = 'WINGETAPPS', 'WINGETUPGRADE' },
+                        @{ Functions = 'MICROSOFT365'; Wait = $true }                
+                    )
 
-            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION2 -WAITALL <#-HIDDENALL#> 
+                    DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION2 -WAITALL <#-HIDDENALL#> 
 
-            $DEPLOYFUNCTION3 = @(
-                @{ Functions = 'PINICONS', 'STARTSOFTWARES' }
-            )
+                    $DEPLOYFUNCTION3 = @(
+                        @{ Functions = 'PINICONS', 'STARTSOFTWARES' }
+                    )
 
-            DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION3 <#-HIDDENALL#>
+                    DEPLOYFUNCTION -DEPLOYFUNCTION $DEPLOYFUNCTION3 <#-HIDDENALL#>
 
-            Clear-Host
-            Write-Host '
+                    Clear-Host
+                    Write-Host '
 _______________________________________________________
 |                                                     |
 |                       MZTOOL                        |
@@ -1447,12 +1472,18 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '
-            Start-Sleep -Seconds 5
+                    Start-Sleep -Seconds 5
 
-            DISPLAYMENU
+                    DISPLAYMENU
             
+                }
+          
+                2 { 
+                    DISPLAYMENU 
+                }  
+            }  
         }
-
+        
         #OPÇÃO 2 - FERRAMENTAS.
         2 {
             function DISPLAYMENU1B {
@@ -2115,7 +2146,6 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/TERRAFORM/UPLOADFILE/terraform-outputs.json"
 
     $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_md5.value
-    #$MZTOOLZIPHASH1 = "2DD189FA98F7AF9D8C8210D706FF7C62"
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
 
