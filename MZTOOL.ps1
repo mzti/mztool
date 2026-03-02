@@ -2144,7 +2144,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/BETA/TERRAFORM/UPLOADFILE/terraform-outputs.json"
+    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/TERRAFORM/UPLOADFILE/terraform-outputs.json"
 
     $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_md5.value
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
