@@ -1,6 +1,6 @@
 #---FOLDERS---#
 /DATA
-
+/TERRAFORM
 #---TERRAFORM---#
 .terraform/
 **/.terraform/
