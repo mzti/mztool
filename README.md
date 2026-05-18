@@ -1,3 +1,10 @@
+MZTOOL - Automação de Provisionamento e Padronização para Windows
+
+Ferramenta de automação para Windows que instala softwares, aplica configurações de usuário e padroniza ambientes de forma totalmente automática.  
+Consome recursos da nuvem (GitHub, AWS), utiliza pacotes Microsoft via Winget e integra módulos do Windows Update para garantir ambientes consistentes, reprodutíveis e atualizados.
+
+Integra práticas DevOps com CI/CD usando Terraform, AWS CLI e JSONs versionados, executando sempre via RAW diretamente do GitHub em uma sessão PowerShell.
+
 ![image](https://github.com/user-attachments/assets/c00c49c6-f4a9-4b0e-9ce3-7f8327387e45)
 
 ## FUNCIONALIDADES
