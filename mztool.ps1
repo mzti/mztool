@@ -53,8 +53,8 @@ $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://mzti.github.io/mztool | iex"
-    'MZBETA'               = "irm https://mzti.github.io/mztool/dev | iex"     
+    'MZTOOL'               = "irm https://raw.githubusercontent.com/mzti/mztool/MZTOOL/MZTOOL.ps1 | iex"
+    'MZBETA'               = "irm https://raw.githubusercontent.com/mzti/mztool/dev/mztool.ps1 | iex"     
 }
 
 #$ErrorActionPreference = 'SilentlyContinue'
@@ -1137,7 +1137,7 @@ function MZTOOLMODULE {
         Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
     try { 
-        Invoke-RestMethod https://mzti.github.io/mztool/modulesdev | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
+        Invoke-RestMethod https://raw.githubusercontent.com/mzti/mztool/dev/modules/mztool.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
     }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
