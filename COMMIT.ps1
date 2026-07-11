@@ -1,3 +1,3 @@
 git add .
-git commit -m "UP"
+git commit -m "Updating files"
 git push
