@@ -53,7 +53,7 @@ $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"         
+    'MZTOOL'               = "irm https://raw.githubusercontent.com/mzti/mztool/main/mztool.ps1 | iex"         
 }
 
 #$ErrorActionPreference = 'SilentlyContinue'
@@ -1136,7 +1136,7 @@ function MZTOOLMODULE {
         Remove-Item -Path $Global:MZTOOLMODULEPATH -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     }
     try { 
-        Invoke-RestMethod https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/MODULES/MZTOOL.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
+        Invoke-RestMethod https://raw.githubusercontent.com/mzti/mztool/main/modules/mztool.psm1 | Out-File -FilePath $Global:MZTOOLMODULEPATH -Encoding UTF8 
     }
     catch {        
         # Grava o conteúdo no arquivo .psm1 (sobrescrevendo, se necessário)
@@ -2138,7 +2138,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/TERRAFORM/UPLOADFILE/terraform-outputs.json"
+    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/terraform/uploadfile/terraform-outputs.json"
 
     $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_md5.value
     #$MZTOOLZIPHASH1 = "2DD189FA98F7AF9D8C8210D706FF7C62"
