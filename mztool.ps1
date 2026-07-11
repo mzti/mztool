@@ -53,7 +53,7 @@ $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://raw.githubusercontent.com/mzti/mztool/MZTOOL/MZTOOL.ps1 | iex"
+    'MZTOOL'               = "irm https://raw.githubusercontent.com/mzti/mztool/main/mztool.ps1  | iex"
     'MZBETA'               = "irm https://raw.githubusercontent.com/mzti/mztool/dev/mztool.ps1 | iex"     
 }
 
@@ -2144,7 +2144,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/DanielMozartt/MZTOOL/refs/heads/MZTOOL/TERRAFORM/UPLOADFILE/terraform-outputs.json"
+    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/terraform/uploadfile/terraform-outputs.json"
 
     $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_md5.value
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
