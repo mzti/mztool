@@ -53,8 +53,8 @@ $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://bit.ly/MZT00L | iex"
-    'MZBETA'               = "irm https://bit.ly/MZBETA | iex"     
+    'MZTOOL'               = "irm https://raw.githubusercontent.com/DanielMozartt/MZTOOL/MZTOOL/MZTOOL.ps1 | iex"
+    'MZBETA'               = "irm https://raw.githubusercontent.com/DanielMozartt/MZTOOL/BETA/MZTOOL.ps1 | iex"     
 }
 
 #$ErrorActionPreference = 'SilentlyContinue'
