@@ -1,6 +1,10 @@
+##---FILES---#
+README.md
+
 #---FOLDERS---#
 /DATA
 /TERRAFORM
+
 #---TERRAFORM---#
 .terraform/
 **/.terraform/
