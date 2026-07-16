@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Instalação e personalização automatizada de softwares e o perfil de usuário no ambiente Windows.
 
@@ -2140,8 +2140,7 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/terraform/uploadfile/terraform-outputs.json"
 
-    $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_md5.value
-    #$MZTOOLZIPHASH1 = "2DD189FA98F7AF9D8C8210D706FF7C62"
+    $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_sha256.value
     $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
 
@@ -2161,7 +2160,7 @@ function DOWNLOADMZTOOL {
         
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
               
-        $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm MD5 -ErrorAction SilentlyContinue
+        $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm SHA256 -ErrorAction SilentlyContinue
        
         $TRYGETMZTOOLZIP++   
         
@@ -2662,7 +2661,7 @@ function OFFICE2007 {
 
         $OFFICE2007ZIP = "$env:TOOL\OFFICE\OFFICE2007.zip"
         $OFFICE2007FOLDER = "$env:TOOL\OFFICE\2007"
-        $OFFICE2007HASH = "43543423A3EF750BFCA1E1A35696741A"
+        $OFFICE2007HASH = "4B182D82DDC4B24691E71C756E817E053AD81FB3E5167230CD2DF8A883E6B63C"
 
         $DRIVEURLS = @($OFFICE2007AWS, $OFFICE2007GOOGLEDRIVE)
 
@@ -2686,7 +2685,7 @@ function OFFICE2007 {
             do {
                 DOWNLOAD -Urls $DRIVEURLS -Destination $OFFICE2007ZIP -BarWidth 30
 
-                $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm MD5
+                $NEWOFFICE2007HASH = Get-FileHash -Path $OFFICE2007ZIP -Algorithm SHA256
 
                 $TRYGETOFFICE2007ZIP++      
             
@@ -3276,4 +3275,4 @@ function AMDULPS {
     
 DISPLAYMENU 
 
-EXIT   
+EXIT
