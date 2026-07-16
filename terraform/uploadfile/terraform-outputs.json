@@ -1,7 +1,7 @@
 {
-  "mztool_zip_md5": {
+  "mztool_zip_sha256": {
     "sensitive": false,
     "type": "string",
-    "value": "c502bd3a8a16d16843c4fe33932ae86f"
+    "value": "c86b81b49aea0b6ad872b79151f376a50a08c443f00e88729d1f438922c04335"
   }
 }
