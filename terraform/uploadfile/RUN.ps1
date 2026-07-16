@@ -1,10 +1,10 @@
-Compress-Archive -Path ".\DATA\ZIP\*" -DestinationPath ".\DATA\MZTOOL.zip" -Force
+Compress-Archive -Path ".\data\zip" -DestinationPath ".\data\MZTOOL.zip" -Force
 
-terraform -chdir=TERRAFORM\UPLOADFILE init -upgrade
-terraform -chdir=TERRAFORM\UPLOADFILE apply -auto-approve
-terraform -chdir=TERRAFORM\UPLOADFILE output -json > TERRAFORM\UPLOADFILE\terraform-outputs.json
+terraform -chdir=terraform\uploadfile init -upgrade
+terraform -chdir=terraform\uploadfile apply -auto-approve
+terraform -chdir=terraform\uploadfile output -json > terraform\uploadfile\terraform-outputs.json
 
-$tfvarsPath = ".\TERRAFORM\UPLOADFILE\terraform.tfvars"
+$tfvarsPath = ".\terraform\uploadfile\terraform.tfvars"
 $lines = Get-Content $tfvarsPath
 $vars = @{}
 foreach ($line in $lines) {
@@ -21,4 +21,6 @@ aws cloudfront create-invalidation `
     --distribution-id $distributionId `
     --paths "/MZTOOL.zip"
 
-.\COMMIT.ps1
+git add .\terraform\uploadfile\terraform-outputs.json
+git commit -m "Update SHA256 hash for MZTOOL.zip after S3 upload"
+git push
