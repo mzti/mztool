@@ -19,7 +19,8 @@ $distributionId = $vars["cloudfront_distribution_id"]
 
 aws cloudfront create-invalidation `
     --distribution-id $distributionId `
-    --paths "/MZTOOL.zip"
+    --paths "/MZTOOL.zip" `
+    --no-cli-pager
 
 git add .\terraform\uploadfile\
 git commit -m "Update SHA256 hash for MZTOOL.zip after S3 upload"
