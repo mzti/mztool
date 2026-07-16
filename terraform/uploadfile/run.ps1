@@ -1,4 +1,4 @@
-Compress-Archive -Path ".\data\zip\" -DestinationPath ".\data\MZTOOL.zip" -Force
+Compress-Archive -Path ".\data\zip\*" -DestinationPath ".\data\MZTOOL.zip" -Force
 
 terraform -chdir=terraform\uploadfile init -upgrade
 terraform -chdir=terraform\uploadfile apply -auto-approve
@@ -21,6 +21,6 @@ aws cloudfront create-invalidation `
     --distribution-id $distributionId `
     --paths "/MZTOOL.zip"
 
-git add .\terraform\uploadfile\terraform-outputs.json
+git add .\terraform\uploadfile\
 git commit -m "Update SHA256 hash for MZTOOL.zip after S3 upload"
 git push
