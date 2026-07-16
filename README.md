@@ -40,16 +40,16 @@ Integra práticas DevOps com CI/CD usando Terraform, AWS CLI e JSONs versionados
 ### EM UM AMBIENTE WINDOWS
 ### COLE O CÓDIGO NA CAIXA EXECUTAR EM UMA SESSÃO POWERSHELL OU WINDOWS TERMINAL COM POWERSHELL.
 ```PowerShell
-irm https://bit.ly/MZT00L | iex
+irm https://bit.ly/mz-tool | iex
 ```
-![image](https://github.com/user-attachments/assets/866ad246-5419-45ba-9e62-993e9ea14ba4)
+<img width="469" height="177" alt="image" src="https://github.com/user-attachments/assets/c7dda7f3-f8ee-4ecb-ac62-4a521ba2817e" />
 
 ### OU, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO ABAIXO NA CAIXA EXECUTAR. 
 (Em novas atualizaçõeos do Windows Defender este método pode identificar um Falso Positivo.)
 ```PowerShell
-PowerShell irm https://bit.ly/MZT00L | iex
+PowerShell irm https://bit.ly/mz-tool | iex
 ```
-![image](https://github.com/user-attachments/assets/036e7a94-888c-40e4-aff4-4e5ef77917e5)
+<img width="407" height="208" alt="image" src="https://github.com/user-attachments/assets/a186d900-ec96-4c25-828b-55092e0d56fc" />
 
 
 ## DEMONSTRAÇÃO
@@ -73,4 +73,6 @@ Após a primeira execução da ferramenta, é instalada uma variável de ambient
 Windows 10 X64 & X86, Windows 11.
 *Versões anteriores ao Windows 10 não são compatíves.
 
-PowerShell 5.1.0 ou superior.
+PowerShell 5.
+
+Em desenvolvimento para Powershel 7.
