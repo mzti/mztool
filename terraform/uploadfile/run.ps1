@@ -1,4 +1,4 @@
-Compress-Archive -Path ".\data\zip" -DestinationPath ".\data\MZTOOL.zip" -Force
+Compress-Archive -Path ".\data\zip\" -DestinationPath ".\data\MZTOOL.zip" -Force
 
 terraform -chdir=terraform\uploadfile init -upgrade
 terraform -chdir=terraform\uploadfile apply -auto-approve
