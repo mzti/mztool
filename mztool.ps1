@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Instalação e personalização automatizada de softwares e o perfil de usuário no ambiente Windows.
 
