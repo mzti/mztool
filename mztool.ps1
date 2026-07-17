@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Instalação e personalização automatizada de softwares e o perfil de usuário no ambiente Windows.
 
@@ -3272,7 +3272,6 @@ function AMDULPS {
     Write-Host "ULPS desativado. Por favor, reinicie." -ForegroundColor Cyan
 }
 
-    
 DISPLAYMENU 
 
 EXIT
