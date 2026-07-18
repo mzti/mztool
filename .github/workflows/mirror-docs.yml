@@ -1,6 +1,7 @@
 name: Mirror docs to User Pages
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
