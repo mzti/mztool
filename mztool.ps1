@@ -31,10 +31,10 @@ HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, 
 4 - Implementação automatizada de diferentes versões do Pacote Office e Microsoft 365.
 
 .LINK
-    https://github.com/DanielMozartt/MZTOOL    
+    https://github.com/mzti/mztool    
 #>
 
-#MZTOOL - MOZART IT | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
+#MZTOOL - MOZART IT | MZTI | MZ.IT | MOZART INFORMÁTICA | DANIEL MOZART
 
 Clear-Host
 
