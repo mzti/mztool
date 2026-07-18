@@ -40,16 +40,16 @@ Integra práticas DevOps com CI/CD usando Terraform, AWS CLI e JSONs versionados
 ### EM UM AMBIENTE WINDOWS
 ### COLE O CÓDIGO NA CAIXA EXECUTAR EM UMA SESSÃO POWERSHELL OU WINDOWS TERMINAL COM POWERSHELL.
 ```PowerShell
-irm https://bit.ly/mz-tool | iex
+iex (irm https://mzti.github.io/mztool)
 ```
-<img width="469" height="177" alt="image" src="https://github.com/user-attachments/assets/c7dda7f3-f8ee-4ecb-ac62-4a521ba2817e" />
+<img width="536" height="172" alt="image" src="https://github.com/user-attachments/assets/777381c4-83e1-4c17-9754-a60c562ec005" />
 
 ### OU, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO ABAIXO NA CAIXA EXECUTAR. 
 (Em novas atualizaçõeos do Windows Defender este método pode identificar um Falso Positivo.)
 ```PowerShell
-PowerShell irm https://bit.ly/mz-tool | iex
+powershell iex (irm https://mzti.github.io/mztool)
 ```
-<img width="407" height="208" alt="image" src="https://github.com/user-attachments/assets/a186d900-ec96-4c25-828b-55092e0d56fc" />
+<img width="395" height="205" alt="image" src="https://github.com/user-attachments/assets/0d441003-48f9-4b6f-a037-fca077fc7f0b" />
 
 
 ## DEMONSTRAÇÃO
