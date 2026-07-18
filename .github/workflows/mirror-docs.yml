@@ -21,7 +21,7 @@ jobs:
 
       - name: Clone mzti.github.io
         run: |
-          git clone git push "https://x-access-token:${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git" target_repo
+          git clone "https://x-access-token:${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git" target_repo
 
       - name: Copy docs to target repo
         run: |
@@ -35,4 +35,4 @@ jobs:
           git config user.email "actions@github.com"
           git add .
           git commit -m "Auto-sync docs from mztool" || echo "No changes to commit"
-          git push git push "https://x-access-token:${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git"
+          git push "https://x-access-token:${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git"
