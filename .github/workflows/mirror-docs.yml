@@ -11,28 +11,31 @@ jobs:
   sync-docs:
     runs-on: ubuntu-latest
 
+    env:
+      PAGES_TOKEN: ${{ secrets.PAGES_TOKEN }}
+
     steps:
-      - name: Checkout mztool repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Debug token
         run: |
-         echo "Token length: ${#PAGES_TOKEN}"
+          echo "Token length: ${#PAGES_TOKEN}"
 
       - name: Clone mzti.github.io
         run: |
-          git clone "https://${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git" target_repo
+          git clone https://x-access-token:${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git target_repo
 
-      - name: Copy docs to target repo
+      - name: Copy docs
         run: |
           rm -rf target_repo/docs/*
           cp -r docs/* target_repo/docs/
 
-      - name: Commit and push changes
+      - name: Commit and push
         run: |
           cd target_repo
           git config user.name "mzti-bot"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Auto-sync docs from mztool" || echo "No changes to commit"
-          git push "https://${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git"
+          git commit -m "Auto-sync docs from mztool" || echo "No changes"
+
+          git push origin main
