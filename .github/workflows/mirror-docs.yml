@@ -13,6 +13,10 @@ jobs:
     steps:
       - name: Checkout mztool repo
         uses: actions/checkout@v4
+        
+      - name: Debug token
+        run: |
+         echo "Token length: ${#PAGES_TOKEN}"
 
       - name: Clone mzti.github.io
         run: |
