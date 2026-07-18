@@ -3,7 +3,7 @@ name: Mirror docs to User Pages
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   sync-docs:
