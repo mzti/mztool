@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - main
 
 jobs:
   sync-docs:
@@ -30,4 +31,3 @@ jobs:
           git add .
           git commit -m "Auto-sync docs from mztool" || echo "No changes to commit"
           git push https://$PAGES_TOKEN@github.com/mzti/mzti.github.io.git
-
