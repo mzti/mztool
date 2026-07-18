@@ -19,19 +19,17 @@ jobs:
 
       - name: Clone mzti.github.io
         run: |
-          git clone https://x-access-token:${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git target_repo
+         git clone https://x-access-token:${PAGES_TOKEN}@github.com/mzti/mzti.github.io.git target_repo
 
-      - name: Copy docs
+      - name: Copy mztool.ps1 to root of Pages
         run: |
-          rm -rf target_repo/docs/*
-          cp -r docs/* target_repo/docs/
+         cp mztool.ps1 target_repo/mztool.ps1
 
       - name: Commit and push
         run: |
-          cd target_repo
-          git config user.name "mzti-bot"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Auto-sync docs from mztool" || echo "No changes"
-
-          git push origin main
+         cd target_repo
+         git config user.name "mzti-bot"
+         git config user.email "actions@github.com"
+         git add .
+         git commit -m "Auto-sync docs from mztool" || echo "No changes"
+         git push origin main
