@@ -1,4 +1,11 @@
+# Gerar ZIP do arquivo MZTOOL.zip
 Compress-Archive -Path ".\data\zip\*" -DestinationPath ".\data\MZTOOL.zip" -Force
+
+# Gerar SHA256 local do arquivo MZTOOL.zip
+$hashMztool = (Get-FileHash -Path ".\data\MZTOOL.zip" -Algorithm SHA256).Hash
+
+# Salvar hash local do arquivo MZTOOL.zip no repositório
+Set-Content -Path ".\checksums\mztool.sha256" -Value $hashMztool
 
 terraform -chdir=terraform\uploadfile init -upgrade
 terraform -chdir=terraform\uploadfile apply -auto-approve
