@@ -2144,10 +2144,12 @@ function DOWNLOADMZTOOL {
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
 
-    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/terraform/uploadfile/terraform-outputs.json"
+    #$MZTOOLZIPJSONHASH = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/terraform/uploadfile/terraform-outputs.json"
+    $MZTOOLZIPCHECKSUMHASH = (Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/checksums/MZTOOL.sha256").Trim()
 
-    $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_sha256.value
-    $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
+    $MZTOOLZIPHASH1 = $MZTOOLZIPJSONHASH.mztool_zip_sha256.value
+    $MZTOOLZIPHASH2 = $MZTOOLZIPCHECKSUMHASH
+    #$MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
     $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
 
     $MZTOOLAWS = "$Global:CLOUDFRONT/MZTOOL.zip"      
