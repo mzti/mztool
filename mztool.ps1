@@ -2175,7 +2175,7 @@ function DOWNLOADMZTOOL {
             $DRIVEURLS = @($MZTOOLGOOGLEDRIVE)              
         }
  
-        #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
+        #Se o número de tentativas for maior ou igual a 5, volta ao menu principal.
         if ($TRYGETMZTOOLZIP -ge 5) {
     
             Write-Warning "FALHA NO CARREGAMENTO DO MZTOOL.ZIP. RETORNANDO AO MENU."
