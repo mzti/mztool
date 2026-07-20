@@ -2143,15 +2143,10 @@ function DOWNLOADMZTOOL {
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DOWNLOADMZTOOL"  
 
     $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
-
-    #$MZTOOLZIPJSONHASH = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/terraform/uploadfile/terraform-outputs.json"
-    $MZTOOLZIPCHECKSUMHASH = (Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/checksums/mztool.sha256").Trim()
-
-    $MZTOOLZIPHASH1 = $MZTOOLZIPJSONHASH.mztool_zip_sha256.value
-    $MZTOOLZIPHASH2 = $MZTOOLZIPCHECKSUMHASH
-    #$MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
-    $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
-
+   
+    $MZTOOLZIPSHA256 = (Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/checksums/mztool.sha256").Trim()
+    $MZTOOLZIPSHA512 = (Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/checksums/mztool.sha512").Trim()
+        
     $MZTOOLAWS = "$Global:CLOUDFRONT/MZTOOL.zip"      
     $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
@@ -2168,11 +2163,15 @@ function DOWNLOADMZTOOL {
         
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
               
-        $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm SHA256 -ErrorAction SilentlyContinue
-       
+        $LOCALMZTOOLZIPSHA256 = Get-FileHash -Path $MZTOOLZIP -Algorithm SHA256 -ErrorAction SilentlyContinue
+        $LOCALMZTOOLZIPSHA512 = Get-FileHash -Path $MZTOOLZIP -Algorithm SHA512 -ErrorAction SilentlyContinue
+        $MZTOOLZIPHASH = ($LOCALMZTOOLZIPSHA256 -eq $MZTOOLZIPSHA256) -and ($LOCALMZTOOLZIPSHA512 -eq $MZTOOLZIPSHA512)
+
         $TRYGETMZTOOLZIP++   
         
-        if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {                              
+        if (-not $MZTOOLZIPHASH -or $TRYGETMZTOOLZIP -ge 3) {                              
+            Write-Warning "FALHA NA VERIFICAÇÃO DO HASH DO MZTOOL.ZIP."
+            Start-Sleep -Seconds 3
             $DRIVEURLS = @($MZTOOLGOOGLEDRIVE)              
         }
  
@@ -2192,7 +2191,7 @@ function DOWNLOADMZTOOL {
     RESETCURSOR 
 
     $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
-        Write-Host "HASH OK $($_)" -NoNewline -ForegroundColor Green
+        Write-Host "HASH SHA256 OK" -NoNewline -ForegroundColor Green
     }     
 
     Start-Sleep -Seconds 3
