@@ -2163,8 +2163,8 @@ function DOWNLOADMZTOOL {
         
         DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
               
-        $LOCALMZTOOLZIPSHA256 = Get-FileHash -Path $MZTOOLZIP -Algorithm SHA256 -ErrorAction SilentlyContinue
-        $LOCALMZTOOLZIPSHA512 = Get-FileHash -Path $MZTOOLZIP -Algorithm SHA512 -ErrorAction SilentlyContinue
+        $LOCALMZTOOLZIPSHA256 = (Get-FileHash -Path $MZTOOLZIP -Algorithm SHA256 -ErrorAction SilentlyContinue).Hash
+        $LOCALMZTOOLZIPSHA512 = (Get-FileHash -Path $MZTOOLZIP -Algorithm SHA512 -ErrorAction SilentlyContinue).Hash
         $MZTOOLZIPHASH = ($LOCALMZTOOLZIPSHA256 -eq $MZTOOLZIPSHA256) -and ($LOCALMZTOOLZIPSHA512 -eq $MZTOOLZIPSHA512)
 
         $TRYGETMZTOOLZIP++   
