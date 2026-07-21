@@ -70,3 +70,10 @@ jobs:
             **SHA512 remoto:** ${{ steps.s3sha512.outputs.sha }}
 
             Verifique o processo de build e upload do MZTOOL.zip.
+            
+      - name: Notificar Slack
+        if: steps.comparar.outputs.igual == 'false'
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"⚠️ Divergência detectada no MZTOOL.zip\nSHA256 local: ${{ steps.localsha256.outputs.sha }}\nSHA256 remoto: ${{ steps.s3sha256.outputs.sha }}\nSHA512 local: ${{ steps.localsha512.outputs.sha }}\nSHA512 remoto: ${{ steps.s3sha512.outputs.sha }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
