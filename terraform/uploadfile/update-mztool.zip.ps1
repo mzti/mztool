@@ -1,9 +1,8 @@
-#Função Update-MztoolZip: gera o novo arquivo zip local a partir de sua pasta orinal com arquivos e coleta e armazena as Hashes SHA256 e SHA512 na pasta .\checksums do novo arquivo criado.
 $config = @{
     ZipPath = ".\data\MZTOOL.zip"
 }
 
-
+#Função Update-MztoolZip: gera o novo arquivo zip local a partir de sua pasta orinal com arquivos e coleta e armazena as Hashes SHA256 e SHA512 na pasta .\checksums do novo arquivo criado.
 function Update-MztoolZip {
 
     $path = $config.ZipPath
