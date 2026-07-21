@@ -3,8 +3,9 @@ README.md
 autenticate-mztool.ps1
 
 #---FOLDERS---#
-/DATA
-/TERRAFORM
+/data
+/terraform
+/authenticate
 
 #---TERRAFORM---#
 .terraform/
