@@ -1,0 +1,51 @@
+name: Verificar integridade do MZTOOL.zip no S3
+
+on:
+  push:
+    paths:
+      - "checksums/**"   # dispara somente quando os hashes mudam
+  workflow_dispatch:      # permite rodar manualmente
+
+jobs:
+  verificar-integridade:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar AWS CLI
+        run: |
+          pip install awscli
+          
+      - name: Baixar ZIP do S3
+        run: |
+          aws s3 cp s3://mztool/MZTOOL.zip MZTOOL.zip
+
+      - name: Gerar SHA256 do S3
+        id: s3hash
+        run: |
+          sha256sum MZTOOL.zip | awk '{print $1}' > s3_sha.txt
+          echo "sha=$(cat s3_sha.txt)" >> $GITHUB_OUTPUT
+
+      - name: Ler SHA256 local do repositório
+        id: localhash
+        run: |
+          cat checksums/mztool.sha256 > local_sha.txt
+          echo "sha=$(cat local_sha.txt)" >> $GITHUB_OUTPUT
+
+      - name: Comparar hashes
+        id: comparar
+        run: |
+          if [ "${{ steps.s3hash.outputs.sha }}" = "${{ steps.localhash.outputs.sha }}" ]; then
+            echo "igual=true" >> $GITHUB_OUTPUT
+          else
+            echo "igual=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Registrar divergência
+        if: steps.comparar.outputs.igual == 'false'
+        run: |
+          echo "ATENÇÃO: O arquivo no S3 está diferente do hash local!"
+          echo "Hash local: ${{ steps.localhash.outputs.sha }}"
+          echo "Hash S3:    ${{ steps.s3hash.outputs.sha }}"
