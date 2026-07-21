@@ -7,3 +7,13 @@ variable "mztool_zip" {
   type        = string
   description = "MZTOOL.ZIP"
 }
+
+variable "github_pat" {
+  type      = string
+  sensitive = true
+}
+
+variable "github_repo" {
+  type = string
+  # exemplo: "mzti/mztool"
+}
