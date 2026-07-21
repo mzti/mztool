@@ -4,7 +4,8 @@ on:
   push:
     paths:
       - "checksums/**"
-  workflow_dispatch:   # habilita botão manual
+      - ".github/workflows/mztool.zip-hash-check.yml*"
+  workflow_dispatch:  
 
 jobs:
   verificar-integridade:
