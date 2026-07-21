@@ -2191,7 +2191,7 @@ function DOWNLOADMZTOOL {
     RESETCURSOR 
 
     $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
-        Write-Host "HASH SHA256 OK" -NoNewline -ForegroundColor Green
+        Write-Host "HASH SHA256 & SHA512 OK" -NoNewline -ForegroundColor Green
     }     
 
     Start-Sleep -Seconds 3
