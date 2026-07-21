@@ -57,20 +57,14 @@ jobs:
 
       - name: Criar Issue de divergência
         if: steps.comparar.outputs.igual == 'false'
-        uses: peter-evans/create-issue@v5
-        with:
-          title: "⚠️ Divergência de integridade no MZTOOL.zip"
-          body: |
-            O arquivo no CloudFront/S3 não corresponde aos hashes locais.
+        run: |
+          gh issue create \
+            --title "⚠️ Divergência de integridade no MZTOOL.zip" \
+            --body "SHA256 local: ${{ steps.localsha256.outputs.sha }}
+                SHA256 remoto: ${{ steps.s3sha256.outputs.sha }}
+                SHA512 local: ${{ steps.localsha512.outputs.sha }}
+                SHA512 remoto: ${{ steps.s3sha512.outputs.sha }}"
 
-            **SHA256 local:** ${{ steps.localsha256.outputs.sha }}
-            **SHA256 remoto:** ${{ steps.s3sha256.outputs.sha }}
-
-            **SHA512 local:** ${{ steps.localsha512.outputs.sha }}
-            **SHA512 remoto:** ${{ steps.s3sha512.outputs.sha }}
-
-            Verifique o processo de build e upload do MZTOOL.zip.
-            
       - name: Notificar Slack
         if: steps.comparar.outputs.igual == 'false'
         run: |
