@@ -4,11 +4,14 @@ on:
   push:
     paths:
       - "checksums/**"
-  workflow_dispatch:
+  workflow_dispatch:   # habilita botão manual
 
 jobs:
   verificar-integridade:
     runs-on: ubuntu-latest
+
+    env:
+      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}
 
     steps:
       - name: Checkout
@@ -16,32 +19,54 @@ jobs:
 
       - name: Baixar ZIP via CloudFront
         run: |
-          curl -o MZTOOL.zip "${{ secrets.CLOUDFRONT_URL }}"/MZTOOL.zip
+          curl -o MZTOOL.zip "$MZTOOL_CLOUDFRONT"
 
-      - name: Gerar SHA256 do ZIP baixado
-        id: s3hash
+      - name: Gerar SHA256 remoto
+        id: s3sha256
         run: |
-          sha256sum MZTOOL.zip | awk '{print $1}' > s3_sha.txt
-          echo "sha=$(cat s3_sha.txt)" >> $GITHUB_OUTPUT
+          sha256sum MZTOOL.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha256.txt
+          echo "sha=$(cat s3_sha256.txt)" >> $GITHUB_OUTPUT
+
+      - name: Gerar SHA512 remoto
+        id: s3sha512
+        run: |
+          sha512sum MZTOOL.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha512.txt
+          echo "sha=$(cat s3_sha512.txt)" >> $GITHUB_OUTPUT
 
       - name: Ler SHA256 local
-        id: localhash
+        id: localsha256
         run: |
-          cat checksums/mztool.sha256 > local_sha.txt
-          echo "sha=$(cat local_sha.txt)" >> $GITHUB_OUTPUT
+          cat checksums/mztool.sha256 | tr '[:upper:]' '[:lower:]' > local_sha256.txt
+          echo "sha=$(cat local_sha256.txt)" >> $GITHUB_OUTPUT
+
+      - name: Ler SHA512 local
+        id: localsha512
+        run: |
+          cat checksums/mztool.sha512 | tr '[:upper:]' '[:lower:]' > local_sha512.txt
+          echo "sha=$(cat local_sha512.txt)" >> $GITHUB_OUTPUT
 
       - name: Comparar hashes
         id: comparar
         run: |
-          if [ "${{ steps.s3hash.outputs.sha }}" = "${{ steps.localhash.outputs.sha }}" ]; then
+          if [ "${{ steps.s3sha256.outputs.sha }}" = "${{ steps.localsha256.outputs.sha }}" ] && \
+             [ "${{ steps.s3sha512.outputs.sha }}" = "${{ steps.localsha512.outputs.sha }}" ]; then
             echo "igual=true" >> $GITHUB_OUTPUT
           else
             echo "igual=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Registrar divergência
+      - name: Criar Issue de divergência
         if: steps.comparar.outputs.igual == 'false'
-        run: |
-          echo "ATENÇÃO: O arquivo no CloudFront/S3 está diferente do hash local!"
-          echo "Hash local: ${{ steps.localhash.outputs.sha }}"
-          echo "Hash remoto: ${{ steps.s3hash.outputs.sha }}"
+        uses: peter-evans/create-issue@v5
+        with:
+          title: "⚠️ Divergência de integridade no MZTOOL.zip"
+          body: |
+            O arquivo no CloudFront/S3 não corresponde aos hashes locais.
+
+            **SHA256 local:** ${{ steps.localsha256.outputs.sha }}
+            **SHA256 remoto:** ${{ steps.s3sha256.outputs.sha }}
+
+            **SHA512 local:** ${{ steps.localsha512.outputs.sha }}
+            **SHA512 remoto:** ${{ steps.s3sha512.outputs.sha }}
+
+            Verifique o processo de build e upload do MZTOOL.zip.
