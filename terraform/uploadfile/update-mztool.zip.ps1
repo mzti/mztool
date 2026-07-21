@@ -53,26 +53,28 @@ function Update-Terraform {
      
         # Coleta a hash SHA256 do arquivo MZTOOL.zip e insere no arquivo terraform-outputs.json para consulta futura.
         terraform -chdir=terraform\uploadfile output -json > terraform\uploadfile\terraform-outputs.json
-        $tfvarsPath = ".\terraform\uploadfile\terraform.tfvars"
-        $lines = Get-Content $tfvarsPath
-        $vars = @{}
-
-        foreach ($line in $lines) {
-    
-            if ($line -match '^\s*(\w+)\s*=\s*"?(.*?)"?\s*$') {
-                $key = $matches[1]
-                $value = $matches[2]
-                $vars[$key] = $value
-    
-            }
-
-        }
 
     }
+
 }
+
 
 #Função Update-Cloudfront: Executa o cloudfront invalidation via AWS CLI para manter o arquivo MZTOOL.ZIP atualizado no cloudfront.
 function Update-Cloudfront {
+
+    $tfvarsPath = ".\terraform\uploadfile\terraform.tfvars"
+    $lines = Get-Content $tfvarsPath
+    $vars = @{}
+
+    foreach ($line in $lines) {
+    
+        if ($line -match '^\s*(\w+)\s*=\s*"?(.*?)"?\s*$') {
+            $key = $matches[1]
+            $value = $matches[2]
+            $vars[$key] = $value
+    
+        }
+    }
 
     $distributionId = $vars["cloudfront_distribution_id"]
 
