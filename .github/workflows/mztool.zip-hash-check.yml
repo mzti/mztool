@@ -27,7 +27,7 @@ jobs:
       - name: Ler SHA256 local
         id: localhash
         run: |
-          cat checksums/mztool.sha256.txt > local_sha.txt
+          cat checksums/mztool.sha256 > local_sha.txt
           echo "sha=$(cat local_sha.txt)" >> $GITHUB_OUTPUT
 
       - name: Comparar hashes
