@@ -1,37 +1,33 @@
-name: Verificar integridade do MZTOOL.zip no S3
+name: Verificar integridade do MZTOOL.zip
 
 on:
   push:
     paths:
-      - "checksums/**"   # dispara somente quando os hashes mudam
-  workflow_dispatch:      # permite rodar manualmente
+      - "checksums/**"
+  workflow_dispatch:
 
 jobs:
   verificar-integridade:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do repositório
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Instalar AWS CLI
+      - name: Baixar ZIP via CloudFront
         run: |
-          pip install awscli
-          
-      - name: Baixar ZIP do S3
-        run: |
-          aws s3 cp s3://mztool/MZTOOL.zip MZTOOL.zip
+          curl -o MZTOOL.zip "${{ secrets.CLOUDFRONT_URL }}"/MZTOOL.zip
 
-      - name: Gerar SHA256 do S3
+      - name: Gerar SHA256 do ZIP baixado
         id: s3hash
         run: |
           sha256sum MZTOOL.zip | awk '{print $1}' > s3_sha.txt
           echo "sha=$(cat s3_sha.txt)" >> $GITHUB_OUTPUT
 
-      - name: Ler SHA256 local do repositório
+      - name: Ler SHA256 local
         id: localhash
         run: |
-          cat checksums/mztool.sha256 > local_sha.txt
+          cat checksums/mztool.sha256.txt > local_sha.txt
           echo "sha=$(cat local_sha.txt)" >> $GITHUB_OUTPUT
 
       - name: Comparar hashes
@@ -46,6 +42,6 @@ jobs:
       - name: Registrar divergência
         if: steps.comparar.outputs.igual == 'false'
         run: |
-          echo "ATENÇÃO: O arquivo no S3 está diferente do hash local!"
+          echo "ATENÇÃO: O arquivo no CloudFront/S3 está diferente do hash local!"
           echo "Hash local: ${{ steps.localhash.outputs.sha }}"
-          echo "Hash S3:    ${{ steps.s3hash.outputs.sha }}"
+          echo "Hash remoto: ${{ steps.s3hash.outputs.sha }}"
