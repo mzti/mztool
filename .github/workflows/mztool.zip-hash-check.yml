@@ -1,0 +1,64 @@
+name: Verificar integridade do MZTOOL.zip
+
+on:
+  push:
+    paths:
+      - "checksums/**"
+      - ".github/workflows/mztool.zip-hash-check.yml*"
+  workflow_dispatch:  
+
+jobs:
+  verificar-integridade:
+    runs-on: ubuntu-latest
+
+    env:
+      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Baixar ZIP via CloudFront
+        run: |
+          curl -o MZTOOL.zip "$MZTOOL_CLOUDFRONT"
+
+      - name: Gerar SHA256 remoto
+        id: s3sha256
+        run: |
+          sha256sum MZTOOL.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha256.txt
+          echo "sha=$(cat s3_sha256.txt)" >> $GITHUB_OUTPUT
+
+      - name: Gerar SHA512 remoto
+        id: s3sha512
+        run: |
+          sha512sum MZTOOL.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha512.txt
+          echo "sha=$(cat s3_sha512.txt)" >> $GITHUB_OUTPUT
+
+      - name: Ler SHA256 local
+        id: localsha256
+        run: |
+          cat checksums/mztool.sha256 | tr '[:upper:]' '[:lower:]' > local_sha256.txt
+          echo "sha=$(cat local_sha256.txt)" >> $GITHUB_OUTPUT
+
+      - name: Ler SHA512 local
+        id: localsha512
+        run: |
+          cat checksums/mztool.sha512 | tr '[:upper:]' '[:lower:]' > local_sha512.txt
+          echo "sha=$(cat local_sha512.txt)" >> $GITHUB_OUTPUT
+
+      - name: Comparar hashes
+        id: comparar
+        run: |
+          if [ "${{ steps.s3sha256.outputs.sha }}" = "${{ steps.localsha256.outputs.sha }}" ] && \
+             [ "${{ steps.s3sha512.outputs.sha }}" = "${{ steps.localsha512.outputs.sha }}" ]; then
+            echo "igual=true" >> $GITHUB_OUTPUT
+          else
+            echo "igual=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notificar Slack
+        if: steps.comparar.outputs.igual == 'false'
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"⚠️ Divergência detectada no MZTOOL.zip\nSHA256 local: ${{ steps.localsha256.outputs.sha }}\nSHA256 remoto: ${{ steps.s3sha256.outputs.sha }}\nSHA512 local: ${{ steps.localsha512.outputs.sha }}\nSHA512 remoto: ${{ steps.s3sha512.outputs.sha }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
