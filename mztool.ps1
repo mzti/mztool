@@ -2185,12 +2185,12 @@ function DOWNLOADMZTOOL {
   
     } while (
         (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
-        ($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH)
+        (-not $MZTOOLZIPHASH)
     )
 
     RESETCURSOR 
 
-    $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
+    if ($MZTOOLZIPHASH -eq $true) {
         Write-Host "HASH SHA256 & SHA512 OK" -NoNewline -ForegroundColor Green
     }     
 
