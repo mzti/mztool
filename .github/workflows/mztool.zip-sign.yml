@@ -15,6 +15,13 @@ jobs:
       DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
     steps:
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Baixar ZIP do S3
         run: |
           aws s3 cp s3://$S3_BUCKET/MZTOOL.zip MZTOOL.zip
@@ -38,13 +45,6 @@ jobs:
           sha256=$(sha256sum MZTOOL.zip | awk '{print $1}')
           sha512=$(sha512sum MZTOOL.zip | awk '{print $1}')
           echo "{\"sha256\":\"$sha256\",\"sha512\":\"$sha512\"}" > mztool.json
-
-      - name: Configurar credenciais AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Enviar arquivos para S3
         run: |
