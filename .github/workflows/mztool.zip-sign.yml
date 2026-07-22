@@ -3,18 +3,21 @@ name: Assinar MZTOOL.zip
 on:
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   sign:
     runs-on: ubuntu-latest
 
     env:
-      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}/MZTOOL.zip
       S3_BUCKET: ${{ secrets.MZTOOL_BUCKET }}
+      DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
     steps:
-      - name: Baixar ZIP do CloudFront
+      - name: Baixar ZIP do S3
         run: |
-          curl -o MZTOOL.zip "$MZTOOL_CLOUDFRONT"
+          aws s3 cp s3://$S3_BUCKET/MZTOOL.zip MZTOOL.zip
 
       - name: Gerar chave privada (se não existir)
         run: |
@@ -39,15 +42,18 @@ jobs:
       - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Enviar arquivos para S3
         run: |
           aws s3 cp MZTOOL.zip.sig s3://$S3_BUCKET/
           aws s3 cp public.pem s3://$S3_BUCKET/
           aws s3 cp mztool.json s3://$S3_BUCKET/
-    
 
-      
+      - name: Invalidar CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $DISTRIBUTION_ID \
+            --paths "/MZTOOL.zip" "/MZTOOL.zip.sig" "/public.pem" "/mztool.json"
