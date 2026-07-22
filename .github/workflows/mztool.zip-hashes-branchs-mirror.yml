@@ -17,15 +17,21 @@ jobs:
         with:
           ref: dev
 
+      - name: Salvar checksums da dev
+        run: |
+          mkdir dev_checksums
+          cp -r checksums/* dev_checksums/
+
       - name: Fetch main
         run: git fetch origin main
 
       - name: Checkout main
         run: git checkout main
 
-      - name: Copiar pasta checksums inteira
+      - name: Copiar checksums da dev para main
         run: |
-          cp -r checksums/ checksums/
+          mkdir -p checksums
+          cp -r dev_checksums/* checksums/
 
       - name: Commit e push
         run: |
