@@ -20,7 +20,7 @@ jobs:
 
       - name: Baixar ZIP via CloudFront
         run: |
-          curl -o MZTOOL.zip "$MZTOOL_CLOUDFRONT"
+          curl --fail -L -o MZTOOL.zip "$MZTOOL_CLOUDFRONT"
 
       - name: Gerar SHA256 remoto
         id: s3sha256
