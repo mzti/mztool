@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}/MZTOOL.ZIP
+      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}/MZTOOL.zip
 
     steps:
       - name: Checkout
