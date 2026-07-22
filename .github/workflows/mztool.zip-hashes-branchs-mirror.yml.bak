@@ -1,0 +1,43 @@
+name: Mirror checksums from dev to main
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - "checksums/**"
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Salvar checksums da dev
+        run: |
+          mkdir dev_checksums
+          cp -r checksums/* dev_checksums/
+
+      - name: Fetch main
+        run: git fetch origin main
+
+      - name: Checkout main
+        run: git checkout main
+
+      - name: Copiar checksums da dev para main
+        run: |
+          mkdir -p checksums
+          cp -r dev_checksums/* checksums/
+
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add checksums
+          git commit -m "Mirror checksums from dev"
+          git push origin main
