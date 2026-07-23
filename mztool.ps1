@@ -2137,16 +2137,16 @@ _______________________________________________________
 
 function DOWNLOADMZTOOL {
      
-    # Download do arquivo MZTOOL.zip
+    # Download do arquivo mztool.zip
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DOWNLOADMZTOOL"  
 
-    $MZTOOLZIP = "$Env:TOOL\MZTOOL.zip"
+    $MZTOOLZIP = "$Env:TOOL\mztool.zip"
    
     $MZTOOLZIPSHA256 = (Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/checksums/mztool.sha256").Trim()
     $MZTOOLZIPSHA512 = (Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/checksums/mztool.sha512").Trim()
         
-    $MZTOOLAWS = "$Global:CLOUDFRONT/MZTOOL.zip"      
+    $MZTOOLAWS = "$Global:CLOUDFRONT/mztool.zip"      
     $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
     
     TOOLDIR
@@ -2169,7 +2169,7 @@ function DOWNLOADMZTOOL {
         $TRYGETMZTOOLZIP++   
         
         if (-not $MZTOOLZIPHASH -or $TRYGETMZTOOLZIP -ge 3) {                              
-            Write-Warning "FALHA NA VERIFICAÇÃO DO HASH DO MZTOOL.ZIP."
+            Write-Warning "FALHA NA VERIFICAÇÃO DO HASH DO mztool.zip."
             Start-Sleep -Seconds 3
             $DRIVEURLS = @($MZTOOLGOOGLEDRIVE)              
         }
@@ -2177,7 +2177,7 @@ function DOWNLOADMZTOOL {
         #Se o número de tentativas for maior ou igual a 5, volta ao menu principal.
         if ($TRYGETMZTOOLZIP -ge 5) {
     
-            Write-Warning "FALHA NO CARREGAMENTO DO MZTOOL.ZIP. RETORNANDO AO MENU."
+            Write-Warning "FALHA NO CARREGAMENTO DO mztool.zip. RETORNANDO AO MENU."
             Start-Sleep -Seconds 3
             DISPLAYMENU
         }
@@ -2197,13 +2197,13 @@ function DOWNLOADMZTOOL {
 
     RESETCURSOR   
 
-    #Verifica se o arquivo MZTOOL.zip existe antes de extrair.
+    #Verifica se o arquivo mztool.zip existe antes de extrair.
     if (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue ) {        
   
-        #Extrai o arquivo MZTOOL.zip para a pasta $Env:TOOL.
+        #Extrai o arquivo mztool.zip para a pasta $Env:TOOL.
         EXPAND -Path $MZTOOLZIP -DestinationPath $env:TOOL -Force -Quiet
                       
-        #Deleta o arquivo MZTOOL.zip.
+        #Deleta o arquivo mztool.zip.
         Remove-Item $MZTOOLZIP
 
     }   
@@ -2698,7 +2698,7 @@ function OFFICE2007 {
                 #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
                 if ($TRYGETOFFICE2007ZIP -ge 5) {
         
-                    Write-Warning "FALHA NO CARREGAMENTO DO MZTOOL.ZIP. RETORNANDO AO MENU."
+                    Write-Warning "FALHA NO CARREGAMENTO DO mztool.zip. RETORNANDO AO MENU."
                     Start-Sleep -Seconds 3
                     DISPLAYMENU
                

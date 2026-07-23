@@ -1,4 +1,4 @@
-name: Assinar MZTOOL.zip
+name: Assinar mztool.zip
 
 on:
   workflow_dispatch:
@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}/MZTOOL.zip
+      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}/mztool.zip
       S3_BUCKET: ${{ secrets.MZTOOL_BUCKET }}
 
     steps:
       - name: Baixar ZIP do CloudFront
         run: |
-          curl -o MZTOOL.zip "$MZTOOL_CLOUDFRONT"
+          curl -o mztool.zip "$MZTOOL_CLOUDFRONT"
 
       - name: Gerar chave privada (se não existir)
         run: |
@@ -28,12 +28,12 @@ jobs:
 
       - name: Assinar ZIP
         run: |
-          openssl dgst -sha256 -sign private.pem -out MZTOOL.zip.sig MZTOOL.zip
+          openssl dgst -sha256 -sign private.pem -out mztool.zip.sig mztool.zip
 
       - name: Gerar hashes e JSON
         run: |
-          sha256=$(sha256sum MZTOOL.zip | awk '{print $1}')
-          sha512=$(sha512sum MZTOOL.zip | awk '{print $1}')
+          sha256=$(sha256sum mztool.zip | awk '{print $1}')
+          sha512=$(sha512sum mztool.zip | awk '{print $1}')
           echo "{\"sha256\":\"$sha256\",\"sha512\":\"$sha512\"}" > mztool.json
 
       - name: Configurar credenciais AWS
@@ -45,7 +45,7 @@ jobs:
 
       - name: Enviar arquivos para S3
         run: |
-          aws s3 cp MZTOOL.zip.sig s3://$S3_BUCKET/
+          aws s3 cp mztool.zip.sig s3://$S3_BUCKET/
           aws s3 cp public.pem s3://$S3_BUCKET/
           aws s3 cp mztool.json s3://$S3_BUCKET/
     

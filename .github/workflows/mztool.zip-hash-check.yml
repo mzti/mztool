@@ -1,4 +1,4 @@
-name: Verificar integridade do MZTOOL.zip
+name: Verificar integridade do mztool.zip
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}/MZTOOL.zip
+      MZTOOL_CLOUDFRONT: ${{ secrets.CLOUDFRONT_URL }}/mztool.zip
 
     steps:
       - name: Checkout
@@ -20,18 +20,18 @@ jobs:
 
       - name: Baixar ZIP via CloudFront
         run: |
-          curl --fail -L -o MZTOOL.zip "$MZTOOL_CLOUDFRONT"
+          curl --fail -L -o mztool.zip "$MZTOOL_CLOUDFRONT"
 
       - name: Gerar SHA256 remoto
         id: s3sha256
         run: |
-          sha256sum MZTOOL.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha256.txt
+          sha256sum mztool.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha256.txt
           echo "sha=$(cat s3_sha256.txt)" >> $GITHUB_OUTPUT
 
       - name: Gerar SHA512 remoto
         id: s3sha512
         run: |
-          sha512sum MZTOOL.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha512.txt
+          sha512sum mztool.zip | awk '{print $1}' | tr '[:upper:]' '[:lower:]' > s3_sha512.txt
           echo "sha=$(cat s3_sha512.txt)" >> $GITHUB_OUTPUT
 
       - name: Ler SHA256 local
@@ -60,5 +60,5 @@ jobs:
         if: steps.comparar.outputs.igual == 'false'
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"⚠️ Divergência detectada no MZTOOL.zip\nSHA256 local: ${{ steps.localsha256.outputs.sha }}\nSHA256 remoto: ${{ steps.s3sha256.outputs.sha }}\nSHA512 local: ${{ steps.localsha512.outputs.sha }}\nSHA512 remoto: ${{ steps.s3sha512.outputs.sha }}\"}" \
+          --data "{\"text\":\"⚠️ Divergência detectada no mztool.zip\nSHA256 local: ${{ steps.localsha256.outputs.sha }}\nSHA256 remoto: ${{ steps.s3sha256.outputs.sha }}\nSHA512 local: ${{ steps.localsha512.outputs.sha }}\nSHA512 remoto: ${{ steps.s3sha512.outputs.sha }}\"}" \
           ${{ secrets.SLACK_WEBHOOK_URL }}

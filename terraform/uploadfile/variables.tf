@@ -5,7 +5,7 @@ variable "cloudfront_distribution_id" {
 
 variable "mztool_zip" {
   type        = string
-  description = "MZTOOL.ZIP"
+  description = "mztool.zip"
 }
 
 variable "github_pat" {
