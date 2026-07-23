@@ -1,1 +1,7 @@
-{}
+{
+  "mztool_zip_sha256": {
+    "sensitive": false,
+    "type": "string",
+    "value": "1467a1eb62f9aa3f51e7a81c9f7a8bf1a9b01ba089c1c4b12b2886ccc464bceb"
+  }
+}
