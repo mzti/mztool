@@ -35,8 +35,7 @@ jobs:
         CF_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
         CF_R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_R2_ACCOUNT_ID }}
       run: |
-        wrangler r2 object put "$CF_R2_BUCKET/mztool.zip" \
-          --file=./mztool.zip \
-          --access-key-id="$CF_R2_ACCESS_KEY_ID" \
-          --secret-access-key="$CF_R2_SECRET_ACCESS_KEY" \
-          --account-id="$CF_R2_ACCOUNT_ID"
+         wrangler r2 object put "$CF_R2_BUCKET/mztool.zip" \
+           --file=./mztool.zip \
+           --remote
+
