@@ -1,4 +1,4 @@
-name: Assinar MZTOOL.zip
+name: Assinar mztool.zip
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
 
       - name: Baixar ZIP do S3
         run: |
-          aws s3 cp s3://$S3_BUCKET/MZTOOL.zip MZTOOL.zip
+          aws s3 cp s3://$S3_BUCKET/mztool.zip mztool.zip
 
       - name: Gerar chave privada (se não existir)
         run: |
@@ -38,17 +38,17 @@ jobs:
 
       - name: Assinar ZIP
         run: |
-          openssl dgst -sha256 -sign private.pem -out MZTOOL.zip.sig MZTOOL.zip
+          openssl dgst -sha256 -sign private.pem -out mztool.zip.sig mztool.zip
 
       - name: Gerar hashes e JSON
         run: |
-          sha256=$(sha256sum MZTOOL.zip | awk '{print $1}')
-          sha512=$(sha512sum MZTOOL.zip | awk '{print $1}')
+          sha256=$(sha256sum mztool.zip| awk '{print $1}')
+          sha512=$(sha512sum mztool.zip | awk '{print $1}')
           echo "{\"sha256\":\"$sha256\",\"sha512\":\"$sha512\"}" > mztool.json
 
       - name: Enviar arquivos para S3
         run: |
-          aws s3 cp MZTOOL.zip.sig s3://$S3_BUCKET/
+          aws s3 cp mztool.zip.sig s3://$S3_BUCKET/
           aws s3 cp public.pem s3://$S3_BUCKET/
           aws s3 cp mztool.json s3://$S3_BUCKET/
 
@@ -56,4 +56,4 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id $DISTRIBUTION_ID \
-            --paths "/MZTOOL.zip" "/MZTOOL.zip.sig" "/public.pem" "/mztool.json"
+            --paths "/mztool.zip" "/mztool.zip.sig" "/public.pem" "/mztool.json"
