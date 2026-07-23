@@ -1,0 +1,11 @@
+name: MZTool Dispatch Test
+
+on:
+  repository_dispatch:
+    types: [mztool-updated]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Workflow disparou via repository_dispatch!"

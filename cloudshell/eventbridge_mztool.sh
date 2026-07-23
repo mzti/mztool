@@ -16,10 +16,22 @@ API_DEST_NAME="MztoolGithubActionsAPI"
 RULE_NAME="mztool-githubactions"
 
 echo "====================================="
+echo "CRIANDO/ATIVANDO CLOUDTRAIL"
+echo "====================================="
+
+aws cloudtrail create-trail \
+  --name mztool-trail \
+  --s3-bucket-name "$BUCKET_NAME" \
+  --is-multi-region-trail 2>/dev/null || true
+
+aws cloudtrail start-logging --name mztool-trail
+
+echo "CloudTrail ativo."
+
+echo "====================================="
 echo "BUSCANDO OU CRIANDO CONNECTION"
 echo "====================================="
 
-# Tenta buscar a Connection existente
 CONNECTION_ARN=$(aws events list-connections \
   --query "Connections[?Name=='$CONNECTION_NAME'].ConnectionArn" \
   --output text)
@@ -58,17 +70,20 @@ else
 fi
 
 echo "====================================="
-echo "CRIANDO RULE (SE NECESSÁRIO)"
+echo "CRIANDO RULE VIA CLOUDTRAIL"
 echo "====================================="
 
 aws events put-rule \
   --name "$RULE_NAME" \
   --event-pattern "{
     \"source\": [\"aws.s3\"],
-    \"detail-type\": [\"Object Created\"],
+    \"detail-type\": [\"AWS API Call via CloudTrail\"],
     \"detail\": {
-      \"bucket\": { \"name\": [\"$BUCKET_NAME\"] },
-      \"object\": { \"key\": [\"$ZIP_NAME\"] }
+      \"eventName\": [\"PutObject\"],
+      \"requestParameters\": {
+        \"bucketName\": [\"$BUCKET_NAME\"],
+        \"key\": [\"$ZIP_NAME\"]
+      }
     }
   }" \
   --region "$REGION"
@@ -94,7 +109,6 @@ aws iam create-role \
     ]
   }"
 
-# Policy inline que funciona em qualquer região
 aws iam put-role-policy \
   --role-name "$ROLE_NAME" \
   --policy-name "InvokeApiDestinationPolicy" \
@@ -136,5 +150,5 @@ aws events put-targets \
 
 echo "====================================="
 echo "CONFIGURAÇÃO COMPLETA!"
-echo "EventBridge → GitHub Actions funcionando."
+echo "EventBridge (CloudTrail) → GitHub Actions funcionando."
 echo "====================================="
