@@ -10,7 +10,7 @@ $Global:WINGETVER = "v1.10.390"
 $Global:GETWINGETVER = { Winget --version 2>&1 }
 $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
 $Global:CLOUDFRONT = "https://d15d16xpb69uci.cloudfront.net"
-
+$Global:CLOUDFLARE = "https://mztool.mzti.workers.dev"
 #endregion
 
 #region Definições Globais
@@ -415,15 +415,26 @@ function CLOUDSTATUS {
         [STRING]$URL,
         [STRING]$CLOUD
     )
-  
-    Write-Host "               "$($CLOUD)"  " -NoNewline; $(if (TESTLINK -Url $URL) {
-            Write-Host "ONLINE" -ForegroundColor Green
-        }    
-        else {
-            Write-Host "OFFLINE" -ForegroundColor Red
-        })
 
-}     
+    $ONLINE = TESTLINK -Url $URL
+
+    # Exibe na tela 
+    Write-Host "               $CLOUD  " -NoNewline
+    if ($ONLINE) {
+        Write-Host "ONLINE" -ForegroundColor Green
+    }
+    else {
+        Write-Host "OFFLINE" -ForegroundColor Red
+    }
+
+    # RETORNA um objeto
+    return [PSCustomObject]@{
+        CLOUD  = $CLOUD
+        STATUS = if ($ONLINE) { "ONLINE" } else { "OFFLINE" }
+        URL    = $URL
+    }
+}
+  
 
 function DOWNLOADPROGRESS {
     param(
