@@ -184,58 +184,6 @@ function NEWPWSH {
     
 }
 
-<#
-function NEWPWSH {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$Functions,
-        [switch]$Wait,
-        [switch]$ReturnProcess,
-        [switch]$Hidden
-    )    
-      
-    $baseDefinition = (Get-Command -Type Function GETMZTOOLMODULE).Definition
-    $funcDefinitions = foreach ($fn in $Functions) {
-        (Get-Command -Type Function $fn).Definition
-    } -join "`n"
-    
-    $combinedDefinitions = $baseDefinition + "`n" + $funcDefinitions
-  
-    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($combinedDefinitions))
-      
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = "powershell.exe"   
-    $psi.Arguments = "-EncodedCommand `"$encodedCommand`""
-    $psi.UseShellExecute = $false  
-    $psi.RedirectStandardOutput = $true
-    
-    if ($Hidden) {
-        $psi.WindowStyle = 'Hidden'
-        $psi.CreateNoWindow = $true
-    }
-
-    else {
-        $psi.CreateNoWindow = $false
-    }
-
-    $process = [System.Diagnostics.Process]::Start($psi)
-    if ($Wait -and $ReturnProcess) {
-        $process.WaitForExit()
-        $output = $process.StandardOutput.ReadToEnd()
-        return $output
-    } 
-    elseif ($Wait) {
-        $process.WaitForExit()
-    }
-    elseif ($ReturnProcess) {
-        $output = $process.StandardOutput.ReadToEnd()
-        return $output
-    }   
-    else {}
-}
-#>
-
 # Função para exibir a barra de progresso in-place em uma linha fixa.           
 function DEPLOYFUNCTIONPROGRESS {
     param(
@@ -268,60 +216,6 @@ function DEPLOYFUNCTIONPROGRESS {
     Write-Host $progressText -NoNewline
 }
 
-<#
-function DEPLOYFUNCTION {
-    param(
-        [hashtable[]]$DEPLOYFUNCTION,
-        [int]$BarWidth = 30,
-        [int]$LinePosition = 17,
-        [switch]$HIDDENALL,
-        [switch]$WAITALL
-    )
-    
-    $total = $DEPLOYFUNCTION.Count
-    $completed = 0
-
-    # Exibe a barra inicial (0% concluído)
-    DEPLOYFUNCTIONPROGRESS -PercentComplete 0 -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-    $NEWPWSHHASH = @() 
-    foreach ($group in $DEPLOYFUNCTION) {       
-        
-        # Se para este grupo foi especificado Wait, adiciona o parâmetro Wait com valor $true
-        # Inicializa os valores padrão para os switches
-        $Wait = $false
-        if ($group.ContainsKey("Wait") -and $group.Wait) {
-            $Wait = $true
-        }
-
-        # Aqui, $HIDDENALL é um parâmetro (SwitchParameter) da função DEPLOYFUNCTION.
-        # Se ele estiver presente, vamos garantir que na passagem para NEWPWSH
-        # seja utilizado o valor $true.
-        $Hidden = $false
-        if ($HIDDENALL) {
-            $Hidden = $true
-        }
-
-        # Monta a tabela de parâmetros para passar à função NEWPWSH
-        $arguments = @{
-            Functions = $group.Functions
-            Wait      = $Wait
-            Hidden    = $Hidden
-        }
-        $NEWPWSHHASH = $NEWPWSHHASH + @arguments 
-        # Chama a função passando os parâmetros via splatting
-   NEWPWSH @arguments
-      
-        $completed++
-        $percent = [math]::Round(($completed * 100) / $total)
-        DEPLOYFUNCTIONPROGRESS -PercentComplete $percent -BarWidth $BarWidth -Message "IMPLEMENTANDO" -LinePosition $LinePosition
-        
-        # Aguarda 3 segundos antes de iniciar o próximo grupo
-        Start-Sleep -Seconds 3   
-    }
-    # Ao término, pula para a linha seguinte para que o prompt não fique sobre a barra
-    Write-Host ""
-}   
-#>
 function DEPLOYFUNCTION {
     param(
         [hashtable[]] $DEPLOYFUNCTION,
@@ -389,8 +283,6 @@ function DEPLOYFUNCTION {
     Write-Host ''
 }
 
-
-
 function TESTLINK {
     param(
         [Parameter(Mandatory = $true)]
@@ -434,7 +326,6 @@ function CLOUDSTATUS {
         URL    = $URL
     }
 }
-  
 
 function DOWNLOADPROGRESS {
     param(
