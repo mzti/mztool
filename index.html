@@ -1,1 +1,10 @@
+param (
+    $switch = $dev
+)
+
+if ($dev){
+    Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/mzti/mztool/dev/mztool.ps1)
+}
+else{
 Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/mzti/mztool/main/mztool.ps1)
+}
