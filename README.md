@@ -5,7 +5,7 @@ Consome recursos da nuvem (GitHub, AWS), utiliza pacotes Microsoft via Winget e 
 
 Integra práticas DevOps com CI/CD usando Terraform, AWS CLI e JSONs versionados, executando sempre via RAW diretamente do GitHub em uma sessão PowerShell.
 
-![image](https://github.com/user-attachments/assets/c00c49c6-f4a9-4b0e-9ce3-7f8327387e45)
+<img width="599" height="369" alt="image" src="https://github.com/user-attachments/assets/f903edf3-f530-43e1-bb51-8287e27c22b4" />
 
 ## FUNCIONALIDADES
 
@@ -21,11 +21,12 @@ Integra práticas DevOps com CI/CD usando Terraform, AWS CLI e JSONs versionados
 
 ![image](https://github.com/user-attachments/assets/f8fd0c6a-13ae-4216-8119-5958d63c12b1)
 
-- 2 - Download, extração e execução automatizada em nuvem AWS (CloudFront) de softwares standalone para monitoramento e diagnóstico de hardwares. 
+- 2 - Download, extração e execução automatizada em nuvem com fallback AWS (CloudFront) e Cloudflare de softwares standalone para monitoramento e diagnóstico de hardwares. 
       
       HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, GPUZ.
+  
+<img width="599" height="369" alt="image" src="https://github.com/user-attachments/assets/b0dfde15-3d53-41ff-865f-c56ec693c711" />
 
- ![image](https://github.com/user-attachments/assets/07a41ae4-6b9b-40c1-a76d-c82c6558bac2)
   
 - 3 - Atualização automatizada de softwares e drivers através do Winget e Módulo Windows Update.
 
