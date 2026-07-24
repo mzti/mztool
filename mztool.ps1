@@ -2136,27 +2136,11 @@ function DOWNLOADMZTOOL {
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DOWNLOADMZTOOL"  
 
-<<<<<<< HEAD
-    $MZTOOLZIP = "$Env:TOOL\mztool.zip"
-
-    $MZTOOLZIPJSON = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mzti/mztool/main/terraform/uploadfile/terraform-outputs.json"
-
-    $MZTOOLZIPHASH1 = $MZTOOLZIPJSON.mztool_zip_sha256.value
-    $MZTOOLZIPHASH2 = "15795A668435FA4A6F81A6E9BFB4DEEB"
-    $MZTOOLZIPHASH = @("$MZTOOLZIPHASH1", "$MZTOOLZIPHASH2")
-
-    $MZTOOLAWS = "$Global:CLOUDFRONT/mztool.zip"      
-    $MZTOOLGOOGLEDRIVE = 'https://drive.usercontent.google.com/download?id=19eiKJbx55RgkV_KczFrkL7uMkxjVrMo9&confirm=yy'
-    
-    TOOLDIR
-    
-=======
     $MZIP = "mztool.zip"
     $MZTOOLZIP = "$Env:TOOL\$MZIP"            
     $MZTOOLAWS = "$Global:CLOUDFRONT/$MZIP"      
     $MZTOOLCLOUDFLARE = "$Global:CLOUDFLARE/$MZIP"
      
->>>>>>> 4a9dafb (Testing download with fallback of mztool.zip with multicloud aws + cloudflare)
     # Exibe o status dos links das Nuvens. 
     $AWSSTATUS = CLOUDSTATUS -URL $MZTOOLAWS -CLOUD AWS
     $CLOUDFLARESTATUS = CLOUDSTATUS -URL $MZTOOLCLOUDFLARE -CLOUD CLOUDFLARE
@@ -2171,22 +2155,6 @@ function DOWNLOADMZTOOL {
         $MZTOOLURL = $null
     }
 
-<<<<<<< HEAD
-    do {
-        
-        DOWNLOAD -Urls $DRIVEURLS -Destination $MZTOOLZIP -BarWidth 30
-              
-        $NEWMZTOOLZIPHASH = Get-FileHash -Path $MZTOOLZIP -Algorithm SHA256 -ErrorAction SilentlyContinue
-       
-        $TRYGETMZTOOLZIP++   
-        
-        if (($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH) -or ($TRYGETMZTOOLZIP -ge 3)) {                              
-            $DRIVEURLS = @($MZTOOLGOOGLEDRIVE)              
-        }
- 
-        #Se o número de tentativas for maior ou igual a 5, encerra o MZTOOL.
-        if ($TRYGETMZTOOLZIP -ge 5) {
-=======
     if ($MZTOOLURL) {
 
         do {
@@ -2211,36 +2179,22 @@ function DOWNLOADMZTOOL {
  
             #Se o número de tentativas for maior ou igual a 5, volta ao menu principal.
             if ($TRYGETMZTOOLZIP -ge 5) {
->>>>>>> 4a9dafb (Testing download with fallback of mztool.zip with multicloud aws + cloudflare)
     
                 Write-Warning "FALHA NO CARREGAMENTO. RETORNANDO AO MENU."
                 Start-Sleep -Seconds 3
                 DISPLAYMENU
             }
   
-<<<<<<< HEAD
-    } while (
-        (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
-        ($NEWMZTOOLZIPHASH.Hash -notin $MZTOOLZIPHASH)
-    )
-=======
         } while (
             (-not (Test-Path -Path $MZTOOLZIP -ErrorAction SilentlyContinue)) -or 
             (-not $MZTOOLZIPHASH)
         )
->>>>>>> 4a9dafb (Testing download with fallback of mztool.zip with multicloud aws + cloudflare)
 
         RESETCURSOR 
 
-<<<<<<< HEAD
-    $MZTOOLZIPHASH | Where-Object { $_ -eq $NEWMZTOOLZIPHASH.Hash } | ForEach-Object {
-        Write-Host "HASH OK $($_)" -NoNewline -ForegroundColor Green
-    }     
-=======
         if ($MZTOOLZIPHASH -eq $true) {
             Write-Host "HASH SHA256 & SHA512 OK" -NoNewline -ForegroundColor Green
         }     
->>>>>>> 4a9dafb (Testing download with fallback of mztool.zip with multicloud aws + cloudflare)
 
         Start-Sleep -Seconds 3
 
