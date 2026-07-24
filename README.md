@@ -45,7 +45,6 @@ iex (irm https://mzti.github.io/mztool)
 <img width="536" height="172" alt="image" src="https://github.com/user-attachments/assets/777381c4-83e1-4c17-9754-a60c562ec005" />
 
 ### OU, APERTE A COMBINAÇÃO DE TECLAS "WINDOWS + R" E COLE O CÓDIGO ABAIXO NA CAIXA EXECUTAR. 
-(Em novas atualizaçõeos do Windows Defender este método pode identificar um Falso Positivo.)
 ```PowerShell
 powershell iex (irm https://mzti.github.io/mztool)
 ```
