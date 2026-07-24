@@ -1,10 +1,9 @@
-param (
-    $switch = $dev
-)
+# MZTOOL Loader
+# https://mzti.github.io/mztool
+#
+# Usage:
+#   iex (irm https://mzti.github.io/mztool)
+#   irm https://mzti.github.io/mztool | iex
+#   Invoke-Expression (Invoke-RestMethod https://mzti.github.io/mztool)
 
-if ($dev){
-    Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/mzti/mztool/dev/mztool.ps1)
-}
-else{
 Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/mzti/mztool/main/mztool.ps1)
-}
