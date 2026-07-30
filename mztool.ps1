@@ -1691,8 +1691,6 @@ _______________________________________________________
                             NEWPWSH -Functions 'WINUPDATEMODULE' -ReturnProcess #-Hidden
                         ) | Where-Object { $_.Id -gt 0 } | ForEach-Object { Wait-Process -Id $_.Id -ErrorAction SilentlyContinue }         
                       
-                        CLEANTEMP
-
                         DISPLAYMENU3
             
                     }
@@ -1805,6 +1803,8 @@ _______________________________________________________
                         DISPLAYMENUM365STATUS -M365STATUS $M365STATUS                           
                                      
                         CLEANTEMP
+
+                        CLEANMZTOOLPATH
              
                         DISPLAYMENU 
                     }
@@ -1832,7 +1832,9 @@ _______________________________________________________
 '    
                         OFFICE2007
 
-                        CLEANTEMP                   
+                        CLEANTEMP 
+                        
+                        CLEANMZTOOLPATH
 
                         DISPLAYMENU
                     }
@@ -2121,7 +2123,7 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '
-    CLEANTEMP
+    CLEANMZTOOLPATH
     CLEANMODULEPROFILE
     EXIT 
 

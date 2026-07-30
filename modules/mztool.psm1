@@ -865,6 +865,10 @@ function CLEANTEMP {
 
     # Remove miniaturas.
     REMOVEFILE -Path "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db" -Description "miniaturas"
+    
+}
+
+function CLEANMZTOOLPATH {
 
     if (Test-Path -Path $env:TOOL -ErrorAction SilentlyContinue) {
 
@@ -875,6 +879,7 @@ function CLEANTEMP {
 
         REMOVEFILE -Path $Global:MZTOOLAPPDATA -Description "pasta MZTOOL (APPDATA)."
     }  
+    
 }
 
 function CLEANMODULEPROFILE {
