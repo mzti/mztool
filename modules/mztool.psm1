@@ -67,7 +67,8 @@ public static class ConsoleEventHandler {
         Write-Host "Evento de controle recebido: $CtrlType"
         if ($CtrlType -eq 2) {
             
-            NEWPWSH -Functions EXITMZTOOL
+            #NEWPWSH -Functions EXITMZTOOL
+            EXITMZTOOL
         }
         # Retorne $true para indicar que o evento foi tratado (impede, se possível, o fechamento imediato)
         return $true
