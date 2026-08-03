@@ -1797,12 +1797,13 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '    
+                        MICROSOFT365
                         
-                        $M365STATUS = MICROSOFT365 | Select-Object -Last 1                       
+                        #$M365STATUS = MICROSOFT365 | Select-Object -Last 1                       
                      
-                        DISPLAYMENUM365STATUS -M365STATUS $M365STATUS                           
+                        #DISPLAYMENUM365STATUS -M365STATUS $M365STATUS                           
                                      
-                        CLEANTEMP
+                        #CLEANTEMP
 
                         CLEANMZTOOLPATH
              
