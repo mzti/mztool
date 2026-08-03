@@ -1797,7 +1797,7 @@ _______________________________________________________
 |                  MOZART INFORMÁTICA | DANIEL MOZART |
 |_____________________________________________________|
 '    
-                        MICROSOFT365
+                        MICROSOFT365B
                         
                         #$M365STATUS = MICROSOFT365 | Select-Object -Last 1                       
                      
@@ -2660,6 +2660,100 @@ function MICROSOFT365 {
     return $M365STATUS
     
 }   
+function MICROSOFT365B {
+
+    $Host.UI.RawUI.WindowTitle = "MZTOOL > MICROSOFT365B"
+
+    # Caminho padrão do Word para detectar instalação
+    $WordPath = "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE"
+
+    # Verifica se já está instalado
+    if (Test-Path $WordPath) {
+        return 3   # Já instalado
+    }
+
+    # Cria XML temporário
+    $XMLPath = "$env:TEMP\MICROSOFT365.xml"
+
+    $XMLContent = @'
+<Configuration ID="b498f2f1-0144-4998-8873-909801e7e0b3">
+  <Add OfficeClientEdition="64" Channel="Current" MigrateArch="TRUE">
+    <Product ID="O365BusinessEEANoTeamsRetail">
+      <Language ID="pt-br" />
+      <ExcludeApp ID="Access" />
+      <ExcludeApp ID="Groove" />
+      <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="OneDrive" />
+      <ExcludeApp ID="OneNote" />
+      <ExcludeApp ID="Publisher" />
+    </Product>
+  </Add>
+  <Property Name="SharedComputerLicensing" Value="0" />
+  <Property Name="FORCEAPPSHUTDOWN" Value="TRUE" />
+  <Property Name="DeviceBasedLicensing" Value="0" />
+  <Property Name="SCLCacheOverride" Value="0" />
+  <Updates Enabled="TRUE" />
+  <RemoveMSI />
+</Configuration>
+'@
+
+    Set-Content -Path $XMLPath -Value $XMLContent -Encoding UTF8
+
+    # Verifica Winget corretamente (sem depender de processo)
+    $WingetOK = winget --version 2>$null
+
+    # Se Winget estiver disponível, tenta instalar por ele
+    if ($WingetOK) {
+
+        try {
+            winget install --id Microsoft.Office `
+                --override "/configure $XMLPath" `
+                --accept-source-agreements `
+                --accept-package-agreements `
+                --silent
+
+            Start-Sleep -Seconds 5
+
+            if (Test-Path $WordPath) {
+                return 1   # Instalado com sucesso via Winget
+            }
+        }
+        catch {
+            # Winget falhou → cai no fallback
+        }
+    }
+
+    # Fallback alternativo (instalador direto da Microsoft)
+    $URLs = @(
+        "https://officecdn.microsoft.com/pr/wsus/setup.exe",
+        "https://go.microsoft.com/fwlink/?linkid=2264705&clcid=0x409&culture=pt-br&country=br"
+        "$Global:CLOUDFRONT/MICROSOFT365.exe"      
+    )
+
+    $ExePath = "$env:TEMP\MICROSOFT365.exe"
+
+    foreach ($url in $URLs) {
+        try {
+            Invoke-WebRequest -Uri $url -OutFile $ExePath -UseBasicParsing -ErrorAction Stop
+            break
+        }
+        catch {
+            # tenta próximo link
+        }
+    }
+
+    if (Test-Path $ExePath) {
+        Start-Process -FilePath $ExePath -ArgumentList "/configure $XMLPath" -Wait
+    }
+
+    # Verifica instalação final
+    if (Test-Path $WordPath) {
+        return 1   # Instalado com sucesso via fallback
+    }
+    else {
+        return 2   # Falhou
+    }
+}
 
 function OFFICE2007 {
 
@@ -3294,8 +3388,8 @@ EXIT
 # SIG # Begin signature block
 # MIIFoQYJKoZIhvcNAQcCoIIFkjCCBY4CAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCAB0rqL79BD/q0z
-# XFHFJYenpLz0s3/2p6f7GlgkiWuYAKCCAxIwggMOMIIB9qADAgECAhAu1Cpzk/6k
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCCzMciSPavLHmxr
+# TWObET1wLZl2cAp98+tI0K9vz5eiVaCCAxIwggMOMIIB9qADAgECAhAu1Cpzk/6k
 # r0H8oUP/ZkaeMA0GCSqGSIb3DQEBCwUAMB8xHTAbBgNVBAMMFE1aVEkgLSBEQU5J
 # RUwgTU9aQVJUMB4XDTI2MDcxNjEzNTA1M1oXDTI3MDcxNjE0MTA1M1owHzEdMBsG
 # A1UEAwwUTVpUSSAtIERBTklFTCBNT1pBUlQwggEiMA0GCSqGSIb3DQEBAQUAA4IB
@@ -3315,12 +3409,12 @@ EXIT
 # MIIB4QIBATAzMB8xHTAbBgNVBAMMFE1aVEkgLSBEQU5JRUwgTU9aQVJUAhAu1Cpz
 # k/6kr0H8oUP/ZkaeMA0GCWCGSAFlAwQCAQUAoIGEMBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEICvvN/zkrmWZFNnOgFHV
-# LBYHDPgU4mgW4s9SqU/TyFBpMA0GCSqGSIb3DQEBAQUABIIBAKJqRyjg5OOfi9Pg
-# PzcXW+veSWlauJFo+kXWacol+dwiuKnscIxV6KVZwuKwmbBN3WGls5QLANTxffZR
-# CgcwAhLR7vpt4iC0DwFmPaxV5ylqgnHI+qRApeFyS9cSPdWr4477eW8RZlvpy+zv
-# GOcv3kQxd9aiWjrogCnb7m0hnffhxsYtN1JbaxwLt0H6Qw5llEjNsNJRy2EOOkSA
-# +cWA4H6AJVfhbgf5Ypk4ZzRCfaZ7XCbg1EIvF4cPe5wIUCv1DPcaFsuXMFtOno7+
-# hgbgiQdj3eSH8+TSN97+qrTV7R7yjhbhyz6pkFQCTC/EoNroFtQV0vBiheaCQ+0D
-# hWLF9iI=
+# CzEOMAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIOpeFqGpbYmsFY5+N1D7
+# +YoHJFyXZrx1sEaPVcsveq09MA0GCSqGSIb3DQEBAQUABIIBAMSQozRh15AJV8zW
+# e0F/nUb2K3yYM3WwTwRwdxIUJkPDjkdG9k/OPCWIxnlynlxGXN+SXJIblOTdC1FB
+# 2KD5ZSjoBcSQvJeHCEjaBZZugV/tgMtFc5zaqYivuKAUiKFwLLo1x+k2EGkdw055
+# DQ3IgybhRU07qtaLxmjE2DsycQn1neIzbOAuvUBpdO92/gisz3VQ0CdI3nn1Nv9N
+# od+Y8j+CZ3vukYlncpMxeeFnZc/yk0dFVhtmneREuY5Un3/AJun9EVs59pm3ljUT
+# ehDWedx7Wm0J5t43w5CULaQym/h/Cjnx2/ITiTLvkRhXYkINiZETjSOgeGQFwbl3
+# MGVObg0=
 # SIG # End signature block
