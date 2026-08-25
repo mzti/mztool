@@ -52,7 +52,7 @@ $Global:ENVIROMENTVARS = @{
     'TOOL'                 = "C:\MZTOOL"
     'Global:DESKTOP'       = "C:\Users\Public\DESKTOP"
     'Global:PROFILELOADED' = "`$True"         
-    'MZTOOL'               = "irm https://raw.githubusercontent.com/mzti/mztool/main/mztool.ps1  | iex"
+    'MZTOOL'               = "irm https://raw.githubusercontent.com/mzti/mztool/main/mztool.ps1 | iex"
     'MZBETA'               = "irm https://raw.githubusercontent.com/mzti/mztool/dev/mztool.ps1 | iex"     
 }
 
