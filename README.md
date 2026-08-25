@@ -21,15 +21,14 @@ Executado diretamente do GitHub em uma sessão PowerShell, o MZTOOL assegura que
       Atualizações (PSWindowsUpdate): Remoção de drivers de dispositivo não utilizados pelo sistema atualmente (Dispositivos Ocultos) e Implementação e Atualização de novos e atuais Drivers de Dispositivo e Atualizações do Windows Update.
       
       Personalização do Perfil de Usuário (Regedit, XML, Appx): Tema, Ícones da Área de Trabalho e Barra de Tarefas, Remoção de Widgets, Remoção de Bloatwares, Remoção do Microsoft Copilot, Remoção de Ícones Visão de Tarefas e Notícias, Remoção de notificações da Central de Ações, Define o Google Chrome como navegador padrão e o Acrobat Reader como leitor de PDF padrão.
-
-<img width="600" height="367" alt="image" src="https://github.com/user-attachments/assets/4cfb6ae4-3de5-4ea4-b1d4-80f06c535bd9" />
+  
+![image](https://github.com/user-attachments/assets/f8fd0c6a-13ae-4216-8119-5958d63c12b1)
 
 - 2 - Download, extração e execução automatizada em nuvem com fallback AWS (CloudFront) e Cloudflare de softwares standalone para monitoramento e diagnóstico de hardwares. 
       
       HDSentinel, AIDA64, CPUZ, BlueScreenView, Core Temp, Crystal Disk Info, HWInfo, GPUZ.
   
-<img width="599" height="369" alt="image" src="https://github.com/user-attachments/assets/b0dfde15-3d53-41ff-865f-c56ec693c711" />
-
+<img width="600" height="367" alt="image" src="https://github.com/user-attachments/assets/4cfb6ae4-3de5-4ea4-b1d4-80f06c535bd9" />
   
 - 3 - Atualização automatizada de softwares e drivers através do Winget e Módulo Windows Update.
 
