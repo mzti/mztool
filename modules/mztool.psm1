@@ -9,8 +9,8 @@ $Global:WINVER = (Get-CimInstance Win32_OperatingSystem).Caption, (Get-CimInstan
 $Global:WINGETVER = "v1.10.390"
 $Global:GETWINGETVER = { Winget --version 2>&1 }
 $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
-#$Global:CLOUDFRONT = "https://d15d16xpb69uci.cloudfront.net"
-#$Global:CLOUDFLARE = "https://mztool.mzti.workers.dev"
+$Global:CLOUDFRONT = "https://d15d16xpb69uci.cloudfront.net"
+$Global:CLOUDFLARE = "https://mztool.mzti.workers.dev"
 $Global:AZUREBLOB = "https://mzti.blob.core.windows.net/mztool"
 #endregion
 
