@@ -2141,18 +2141,37 @@ function DOWNLOADMZTOOL {
     $MZIP = "mztool.zip"
     $MZTOOLZIP = "$Env:TOOL\$MZIP"            
     $MZTOOLAWS = "$Global:CLOUDFRONT/$MZIP"      
+<<<<<<< HEAD
     $MZTOOLCLOUDFLARE = "$Global:CLOUDFLARE/$MZIP"
      
     # Exibe o status dos links das Nuvens. 
     $AWSSTATUS = CLOUDSTATUS -URL $MZTOOLAWS -CLOUD AWS
     $CLOUDFLARESTATUS = CLOUDSTATUS -URL $MZTOOLCLOUDFLARE -CLOUD CLOUDFLARE
+=======
+    $MZTOOLAZURE = "$Global:AZUREBLOB/$MZIP"
+    $MZTOOLCLOUDFLARE = "$Global:CLOUDFLARE/$MZIP"
+
+    # Exibe o status dos links das Nuvens. 
+    $AWSSTATUS = CLOUDSTATUS -URL $MZTOOLAWS -CLOUD AWS
+    $AZURESTATUS = CLOUDSTATUS -URL $MZTOOLAZURE -CLOUD AZURE
+    $CLOUDFLARESTATUS = CLOUDSTATUS -URL $MZTOOLCLOUDFLARE -CLOUD CLOUDFLARE
+   
+>>>>>>> 65d5e46 (Testing Azure multicloud option for mztool.zip)
   
     if ($AWSSTATUS.STATUS -eq "ONLINE") {
         $MZTOOLURL = $MZTOOLAWS
     }
+<<<<<<< HEAD
     elseif ($CLOUDFLARESTATUS.STATUS -eq "ONLINE") {
         $MZTOOLURL = $MZTOOLCLOUDFLARE
+=======
+    elseif ($AZURESTATUS.STATUS -eq "ONLINE") {
+        $MZTOOLURL = $MZTOOLAZURE
+>>>>>>> 65d5e46 (Testing Azure multicloud option for mztool.zip)
     }
+    elseif ($CLOUDFLARESTATUS.STATUS -eq "ONLINE") {
+        $MZTOOLURL = $MZTOOLCLOUDFLARE
+    }  
     else {
         $MZTOOLURL = $null
     }

@@ -10,6 +10,7 @@ $Global:WINGETVER = "v1.10.390"
 $Global:GETWINGETVER = { Winget --version 2>&1 }
 $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
 $Global:CLOUDFRONT = "https://d15d16xpb69uci.cloudfront.net"
+$Global:AZUREBLOB = "https://mzti.blob.core.windows.net/mztool"
 $Global:CLOUDFLARE = "https://mztool.mzti.workers.dev"
 #endregion
 
@@ -950,48 +951,48 @@ function PSGETMANANGEMENT {
     
     if (-not (Get-Module -ListAvailable PowerShellGet, PackageManagement)) {
    
-    $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PSGETMANANGEMENT" 
+        $Host.UI.RawUI.WindowTitle = "$Global:TITLE> PSGETMANANGEMENT" 
 
-    # Força TLS 1.2 para conexões seguras
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        # Força TLS 1.2 para conexões seguras
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-    # Versões desejadas
-    $psGetVersion = "2.2.5"
-    $pkgMgmtVersion = "1.4.8.1"
+        # Versões desejadas
+        $psGetVersion = "2.2.5"
+        $pkgMgmtVersion = "1.4.8.1"
 
-    # URLs dos pacotes na PowerShell Gallery
-    $psGetUrl = "https://www.powershellgallery.com/api/v2/package/PowerShellGet/$psGetVersion"
-    $pkgMgmtUrl = "https://www.powershellgallery.com/api/v2/package/PackageManagement/$pkgMgmtVersion"
+        # URLs dos pacotes na PowerShell Gallery
+        $psGetUrl = "https://www.powershellgallery.com/api/v2/package/PowerShellGet/$psGetVersion"
+        $pkgMgmtUrl = "https://www.powershellgallery.com/api/v2/package/PackageManagement/$pkgMgmtVersion"
 
-    # Pasta de destino (para todos os usuários)
-    $destRoot = "C:\Program Files\WindowsPowerShell\Modules"
+        # Pasta de destino (para todos os usuários)
+        $destRoot = "C:\Program Files\WindowsPowerShell\Modules"
 
-    # Função para baixar e instalar módulo
-    function Install-PSModuleFromNuPkg($name, $url, $version) {
-        $tempFile = "$env:TEMP\$name.$version.zip"
-        $destPath = Join-Path $destRoot $name
+        # Função para baixar e instalar módulo
+        function Install-PSModuleFromNuPkg($name, $url, $version) {
+            $tempFile = "$env:TEMP\$name.$version.zip"
+            $destPath = Join-Path $destRoot $name
 
-        Write-Host "Baixando $name $version..."
-        Invoke-WebRequest -Uri $url -OutFile $tempFile -UseBasicParsing
+            Write-Host "Baixando $name $version..."
+            Invoke-WebRequest -Uri $url -OutFile $tempFile -UseBasicParsing
 
-        Write-Host "Extraindo para $destPath..."
-        if (-not (Test-Path $destPath)) {
-            New-Item -ItemType Directory -Path $destPath -Force | Out-Null
+            Write-Host "Extraindo para $destPath..."
+            if (-not (Test-Path $destPath)) {
+                New-Item -ItemType Directory -Path $destPath -Force | Out-Null
+            }
+            Expand-Archive -Path $tempFile -DestinationPath $destPath -Force
+
+            Remove-Item $tempFile -Force
+            Write-Host "$name $version instalado em $destPath"
         }
-        Expand-Archive -Path $tempFile -DestinationPath $destPath -Force
 
-        Remove-Item $tempFile -Force
-        Write-Host "$name $version instalado em $destPath"
+        # Instala os dois módulos
+        Install-PSModuleFromNuPkg -name "PowerShellGet" -url $psGetUrl -version $psGetVersion
+        Install-PSModuleFromNuPkg -name "PackageManagement" -url $pkgMgmtUrl -version $pkgMgmtVersion
+
+        # Importa os módulos para testar
+        Import-Module PowerShellGet -Force
+        Import-Module PackageManagement -Force
     }
-
-    # Instala os dois módulos
-    Install-PSModuleFromNuPkg -name "PowerShellGet" -url $psGetUrl -version $psGetVersion
-    Install-PSModuleFromNuPkg -name "PackageManagement" -url $pkgMgmtUrl -version $pkgMgmtVersion
-
-    # Importa os módulos para testar
-    Import-Module PowerShellGet -Force
-    Import-Module PackageManagement -Force
- }
 
 }
 
