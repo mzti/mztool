@@ -2147,7 +2147,7 @@ function DOWNLOADMZTOOL {
     $MZTOOLZIP = "$Env:TOOL\$MZIP"            
     $MZTOOLAWS = "$Global:CLOUDFRONT/$MZIP"      
     $MZTOOLCLOUDFLARE = "$Global:CLOUDFLARE/$MZIP"
-    $MZTOOLAZURE = "$Global:AZURE/$MZIP"
+    $MZTOOLAZURE = "$Global:AZUREBLOB/$MZIP"
 
     # Exibe o status dos links das Nuvens. 
     $AWSSTATUS = CLOUDSTATUS -URL $MZTOOLAWS -CLOUD AWS
