@@ -11,6 +11,7 @@ $Global:GETWINGETVER = { Winget --version 2>&1 }
 $Global:MZTOOLAPPDATA = if ($MZTOOLAPPDATA) { $MZTOOLAPPDATA } else { "$env:APPDATA\MZTOOL" }
 $Global:CLOUDFRONT = "https://d15d16xpb69uci.cloudfront.net"
 $Global:CLOUDFLARE = "https://mztool.mzti.workers.dev"
+$Global:AZURE = "https://mzti.blob.core.windows.net/mztool"
 #endregion
 
 #region Definições Globais
