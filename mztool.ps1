@@ -1918,7 +1918,6 @@ _______________________________________________________
         #Testa a função DRIVERBOOSTER.
         db {
 
-            DOWNLOADMZTOOL
             NEWPWSH -Functions 'DRIVERBOOSTER'
             DISPLAYMENU
 
@@ -2777,56 +2776,69 @@ function DRIVERBOOSTER {
     #Extrai e inicializa o software Driver Booster.   
 
     $Host.UI.RawUI.WindowTitle = "$Global:TITLE> DRIVER_BOOSTER"
+       
+    $TOOLPATH = "$Env:TOOL\TOOL"
+    $DRIVERBOOSTERPATH = "$TOOLPATH\DRIVER_BOOSTER"    
+    $DRIVERBOOSTERZIP = "driver_booster.zip"
+    $DRIVERBOOSTERAWS = "$Global:CLOUDFRONT/$DRIVERBOOSTERZIP"    
+    $DRIVERBOOSTERFILE = "$TOOLPATH\$DRIVERBOOSTERZIP"            
+    $DRIVERBOOSTEREXE = "$DRIVERBOOSTERPATH\DriverBoosterPortable.exe"
 
-    $TOOLFOLDER = "$Env:TOOL\TOOL"
-
-    $DRIVERBOOSTERPATH = "$TOOLFOLDER\DRIVER_BOOSTER"
-        
-    Expand-Archive -LiteralPath "$TOOLFOLDER\DRIVER_BOOSTER.zip" -DestinationPath "$DRIVERBOOSTERPATH"
-
-    Start-Process "$DRIVERBOOSTERPATH\DriverBoosterPortable.exe" -Wait        
+    $AWSSTATUS = CLOUDSTATUS -URL $DRIVERBOOSTERAWS -CLOUD AWS
     
-    #Finaliza os serviços do software Driver Booster e deleta a pasta temporária do mesmo.
-    function STOPDRIVERBOOSTER {
+    if ($AWSSTATUS) {
 
-        Start-Sleep -Seconds 2
+        TOOLDIR
+
+        DOWNLOAD -Urls $DRIVERBOOSTERAWS -Destination $DRIVERBOOSTERFILE -BarWidth 30
+        
+        Expand-Archive -LiteralPath "$DRIVERBOOSTERFILE" -DestinationPath "$DRIVERBOOSTERPATH"
+
+        Start-Process "$DRIVERBOOSTEREXE" -Wait        
+    
+        #Finaliza os serviços do software Driver Booster e deleta a pasta temporária do mesmo.
+        function STOPDRIVERBOOSTER {
+
+            Start-Sleep -Seconds 2
             
-        if (Get-Process -Name 'DriverBooster'-ErrorAction SilentlyContinue ) {
-                
-            Stop-Process -Name 'DriverBooster' -Force
-
-            if (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
-                
-                Stop-Process -Name 'ScanWinUpd' -Force
-            }
-                
-            Start-Sleep -Seconds 5
-
-            Remove-Item -Path "$DRIVERBOOSTERPATH" -Recurse -Force -ErrorAction SilentlyContinue
-        }
-
-        elseif (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
-                
-            Stop-Process -Name 'ScanWinUpd' -Force
-
             if (Get-Process -Name 'DriverBooster'-ErrorAction SilentlyContinue ) {
                 
                 Stop-Process -Name 'DriverBooster' -Force
+
+                if (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
+                
+                    Stop-Process -Name 'ScanWinUpd' -Force
+                }
+                
+                Start-Sleep -Seconds 5
+
+                Remove-Item -Path "$DRIVERBOOSTERPATH" -Recurse -Force -ErrorAction SilentlyContinue
             }
-                
-            Start-Sleep -Seconds 5
 
-            Remove-Item -Path "$DRIVERBOOSTERPATH" -Recurse -Force -ErrorAction SilentlyContinue
-        }
-
-        else {
+            elseif (Get-Process -Name 'ScanWinUpd'-ErrorAction SilentlyContinue) {
                 
-            #Script continua.
-        }
+                Stop-Process -Name 'ScanWinUpd' -Force
+
+                if (Get-Process -Name 'DriverBooster'-ErrorAction SilentlyContinue ) {
+                
+                    Stop-Process -Name 'DriverBooster' -Force
+                }
+                
+                Start-Sleep -Seconds 5
+
+                Remove-Item -Path "$DRIVERBOOSTERPATH" -Recurse -Force -ErrorAction SilentlyContinue
+            }
+
+            else {
+                
+                #Script continua.
+            }
     
-    }
+        }
 
-    STOPDRIVERBOOSTER
+        STOPDRIVERBOOSTER
+
+    }
     
 }
 
