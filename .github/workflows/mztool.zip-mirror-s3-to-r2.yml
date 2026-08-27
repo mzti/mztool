@@ -1,4 +1,4 @@
-name: Mirror S3 to R2
+name: Mirror S3 to BLOB and R2
 
 on:
   repository_dispatch:
@@ -22,6 +22,23 @@ jobs:
       run: |
         aws s3 cp s3://mztool/mztool.zip mztool.zip \
           --region "$AWS_REGION"
+
+    - name: Login no Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+    - name: Upload do mztool.zip para o Azure Blob
+      run: |
+        az storage blob upload \
+          --account-name mztistorage \
+          --container-name mztool \
+          --name mztool.zip \
+          --file mztool.zip \
+          --auth-mode login
 
     - name: Install Wrangler
       run: |
