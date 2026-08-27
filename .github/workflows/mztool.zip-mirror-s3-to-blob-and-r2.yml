@@ -31,7 +31,7 @@ jobs:
     - name: Upload do mztool.zip para o Azure Blob
       run: |
         az storage blob upload \
-          --account-name mztistorage \
+          --account-name mzti \
           --container-name mztool \
           --name mztool.zip \
           --file mztool.zip \
