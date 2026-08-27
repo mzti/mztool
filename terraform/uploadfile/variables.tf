@@ -14,6 +14,5 @@ variable "github_pat" {
 }
 
 variable "github_repo" {
-  type = string
-  # exemplo: "mzti/mztool"
+  type = string 
 }
