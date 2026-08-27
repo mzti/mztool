@@ -35,9 +35,9 @@ jobs:
           --container-name mztool \
           --name mztool.zip \
           --file mztool.zip \
-          --auth-mode login
+          --auth-mode login \
           --overwrite
-          
+
     - name: Install Wrangler
       run: |
         npm install -g wrangler
