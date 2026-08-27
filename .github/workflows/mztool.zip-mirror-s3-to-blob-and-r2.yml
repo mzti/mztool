@@ -1,0 +1,58 @@
+name: Mirror S3 to BLOB and R2
+
+on:
+  repository_dispatch:
+    types: [mztool-updated]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
+
+    - name: Download mztool.zip from S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        aws s3 cp s3://mztool/mztool.zip mztool.zip \
+          --region "$AWS_REGION"
+
+    - name: Login no Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+    - name: Upload do mztool.zip para o Azure Blob
+      run: |
+        az storage blob upload \
+          --account-name mztistorage \
+          --container-name mztool \
+          --name mztool.zip \
+          --file mztool.zip \
+          --auth-mode login
+
+    - name: Install Wrangler
+      run: |
+        npm install -g wrangler
+
+    - name: Upload to Cloudflare R2
+      env:
+        CF_R2_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
+        CF_R2_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
+        CF_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
+        CF_R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_R2_ACCOUNT_ID }}
+      run: |
+        wrangler r2 object put "$CF_R2_BUCKET/mztool.zip" \
+          --file=./mztool.zip \
+          --access-key-id="$CF_R2_ACCESS_KEY_ID" \
+          --secret-access-key="$CF_R2_SECRET_ACCESS_KEY" \
+          --account-id="$CF_R2_ACCOUNT_ID"
