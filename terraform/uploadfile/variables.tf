@@ -14,5 +14,5 @@ variable "github_pat" {
 }
 
 variable "github_repo" {
-  type = string 
+  type = string
 }
