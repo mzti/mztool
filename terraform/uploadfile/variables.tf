@@ -1,18 +1,41 @@
 variable "cloudfront_distribution_id" {
   type        = string
+  sensitive   = true
   description = "ID da distribuição CloudFront"
 }
 
-variable "mztool_zip" {
+variable "file_zip" {
   type        = string
-  description = "mztool.zip"
+  sensitive   = true
+  description = "Diretório do arquivo zip do projeto."
 }
 
 variable "github_pat" {
-  type      = string
-  sensitive = true
+  type        = string
+  sensitive   = true
+  description = "Token do projeto."
 }
 
 variable "github_repo" {
-  type = string
+  type        = string
+  sensitive   = true
+  description = "Repositório github do projeto."
+}
+
+variable "bucket" {
+  type        = string
+  sensitive   = true
+  description = "Bucket do projeto."
+}
+
+variable "file" {
+  type        = string
+  sensitive   = true
+  description = "Nome do arquivo do projeto."
+}
+
+variable "region" {
+  type        = string
+  sensitive   = true
+  description = "Região utilizada no projeto."
 }

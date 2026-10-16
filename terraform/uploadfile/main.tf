@@ -1,18 +1,18 @@
-resource "aws_s3_object" "mztool_zip" {
-  bucket = "mztool"
-  key    = "mztool.zip"
-  source = var.mztool_zip
-  etag   = filesha256("${var.mztool_zip}")
+provider "aws" {
+  region = var.region
 }
 
-output "mztool_zip_sha256" {
-  value = filesha256("${var.mztool_zip}")
+resource "aws_s3_object" "file" {
+  bucket = var.bucket
+  key    = var.file
+  source = var.file_zip
 }
 
-resource "null_resource" "trigger_mztool_sign_workflow" {
+
+resource "null_resource" "trigger_file_sign_workflow" {
   # depende do upload do ZIP
   depends_on = [
-    aws_s3_object.mztool_zip
+    aws_s3_object.file
   ]
 
   provisioner "local-exec" {
@@ -23,10 +23,10 @@ resource "null_resource" "trigger_mztool_sign_workflow" {
 }
 
 resource "null_resource" "invalidate_cloudfront" {
-  depends_on = [aws_s3_object.mztool_zip]
+  depends_on = [aws_s3_object.file]
 
   provisioner "local-exec" {
-    command = "aws cloudfront create-invalidation --distribution-id ${var.cloudfront_distribution_id} --paths /mztool.zip"
+    command = "aws cloudfront create-invalidation --distribution-id ${var.cloudfront_distribution_id} --paths /${var.file}"
   }
 
 }
