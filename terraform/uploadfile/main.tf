@@ -6,6 +6,7 @@ resource "aws_s3_object" "file" {
   bucket = var.bucket
   key    = var.file
   source = var.file_zip
+   source_hash = filemd5("${var.file_zip}")
 }
 
 
