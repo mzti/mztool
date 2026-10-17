@@ -1,4 +1,4 @@
-name: Verificar integridade do mztool.zip
+name: Verificar integridade do mztool.zip e notificar o Slack.
 
 on:
   push:
@@ -60,8 +60,14 @@ jobs:
           fi
 
       - name: Notificar Slack
-        if: steps.comparar.outputs.igual == 'false'
         run: |
+          if steps.comparar.outputs.igual == 'false'
           curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"⚠️ Divergência detectada no mztool.zip\nSHA256 local: ${{ steps.localsha256.outputs.sha }}\nSHA256 remoto: ${{ steps.s3sha256.outputs.sha }}\nSHA512 local: ${{ steps.localsha512.outputs.sha }}\nSHA512 remoto: ${{ steps.s3sha512.outputs.sha }}\"}" \
+          --data '{\"text": " ⚠️ *Divergência detectada no mztool.zip*\n```\nSHA256 local:  \({{ steps.localsha256.outputs.sha }}\nSHA256 remoto:\){{ steps.s3sha256.outputs.sha }}\n\nSHA512 local:  \({{ steps.localsha512.outputs.sha }}\nSHA512 remoto:\){{ steps.s3sha512.outputs.sha }}\n```"
+          }' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
+          else         
+           curl -X POST -H 'Content-type: application/json' \
+           --data '{\"text": "✅ *Nenhuma divergência detectada no mztool.zip*\n```\nSHA256 local:  \({{ steps.localsha256.outputs.sha }}\nSHA256 remoto:\){{ steps.s3sha256.outputs.sha }}\n\nSHA512 local:  \({{ steps.localsha512.outputs.sha }}\nSHA512 remoto:\){{ steps.s3sha512.outputs.sha }}\n```"
+           }' \
+           ${{ secrets.SLACK_WEBHOOK_URL }}
