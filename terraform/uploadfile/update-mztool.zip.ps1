@@ -1,4 +1,16 @@
-# Hashtable para armazenar as variáveis do tfvars
+#Define a codificação de texto para UTF8 para garantir a tradução correta de carácteres de texto especiais.
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+#Define a política de execução de scripts da sessão atual em bypass para o usuário atual.
+if ((Get-ExecutionPolicy -List -ErrorAction SilentlyContinue).Scope -in @('Process', 'CurrentUser') -notin "Bypass") {
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+} 
+
+#Direciona para o diretório raiz do projeto.
+$dir = git rev-parse --show-toplevel
+Set-Location "$dir"
+   
+#Hashtable para armazenar as variáveis do tfvars.
 $tfvarsPath = ".\terraform\uploadfile\terraform.tfvars"
 $lines = Get-Content $tfvarsPath
 $vars = @{}
@@ -11,8 +23,7 @@ foreach ($line in $lines) {
     }
 }
 
-
-# Agora monta o objeto final de configuração
+# Monta o objeto final de configuração com as variáveis abstraídas de tfvars.
 $config = @{
     ZipPath                  = ".\data\mztool.zip"
   
@@ -23,7 +34,6 @@ $config = @{
     GithubRepo               = $vars["github_repo"]
   
 }
-
 
 #Função Update-MztoolZip: gera o novo arquivo zip local a partir de sua pasta orinal com arquivos e coleta e armazena as Hashes SHA256 e SHA512 na pasta .\checksums do novo arquivo criado.
 function Update-MztoolZip {
@@ -169,7 +179,7 @@ Update-Terraform
 Update-MultiCloudWorkflow
 
 #Executa a função Update-Cloudfront.
-Update-Cloudfront
+#Update-Cloudfront
 
 #Executa a função Update-Github.
 Update-Github

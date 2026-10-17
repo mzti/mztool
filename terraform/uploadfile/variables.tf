@@ -1,3 +1,8 @@
+variable "tag" {
+  type        = string
+  sensitive   = true
+  description = "Tag do projeto e nome do bucket."
+}
 variable "cloudfront_distribution_id" {
   type        = string
   sensitive   = true
