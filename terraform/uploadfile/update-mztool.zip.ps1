@@ -172,11 +172,11 @@ Update-MztoolZip
 #Executa a função Update-Terraform.
 Update-Terraform
 
-#Executa a função Update-MultiCloudWorkflow.
-Update-MultiCloudWorkflow
-
 #Executa a função Update-Cloudfront.
 #Update-Cloudfront
+
+#Executa a função Update-MultiCloudWorkflow.
+Update-MultiCloudWorkflow
 
 #Executa a função Update-Github.
 Update-Github
