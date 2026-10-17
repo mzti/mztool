@@ -82,15 +82,12 @@ function Update-Terraform {
        
         # Envia o arquivo mztool.zip para o bucket no S3 via Terraform.
         terraform -chdir=terraform\uploadfile init -upgrade
-        terraform -chdir=terraform\uploadfile apply -auto-approve
-     
-        # Coleta a hash SHA256 do arquivo mztool.zip e insere no arquivo terraform-outputs.json para consulta futura.
-        terraform -chdir=terraform\uploadfile output -json > terraform\uploadfile\terraform-outputs.json
-
+        terraform -chdir=terraform\uploadfile apply -auto-approve        
     }
 
 }
 
+#Função Update-MultiCloudWorkflow: Dispara o evento mztool-updated para disparar o workflow de espelhamento do arquivo mztool.zip entre nuvens. 
 function Update-MultiCloudWorkflow {
     curl.exe -i -X POST `
         -H "Accept: application/vnd.github+json" `
