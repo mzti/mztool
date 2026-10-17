@@ -14,6 +14,9 @@ resource "aws_s3_bucket" "bucket" {
   force_destroy = true
   #Forçar a região.
   provider = aws
+  tags = {
+    Name = "${var.tag}"
+  }
 
 }
 
@@ -23,33 +26,34 @@ resource "aws_s3_bucket" "bucket_tfstate" {
   bucket = var.tfstate_backup
   #Permissão para limpar os arquivos dentro do bucket e deletar o bucket.
   force_destroy = true
+  tags = {
+    Name = "${var.tag}"
+  }
 
 }
 
-# Cria o Origin Access Control que será utilizado pelo CloudFront para acessar o S3.
+#Cria o Origin Access Control que será utilizado pelo CloudFront para acessar o S3.
 resource "aws_cloudfront_origin_access_control" "oac" {
-  name                              = "oac-${var.tag}" # Dá um nome usando a sua tag
+  name                              = "oac-${var.tag}"
   description                       = "Chave de acesso seguro para o S3"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
-}
 
+}
+#Cria o Cloudfront dedicado ao projeto e aplica as configuração de acesso ao S3 via Origin Access Control.
 resource "aws_cloudfront_distribution" "cloudfront" {
   aliases             = []
   anycast_ip_list_id  = null
-  comment             = null
+  comment             = "Cloudfront para fornecer artefatos do projeto MZTOOL."
   default_root_object = null
   enabled             = true
-  http_version        = "http2"
+  http_version        = "http2and3"
   is_ipv6_enabled     = true
   price_class         = "PriceClass_All"
   retain_on_delete    = false
   staging             = false
   tags = {
-    Name = "${var.tag}"
-  }
-  tags_all = {
     Name = "${var.tag}"
   }
   wait_for_deployment = true
